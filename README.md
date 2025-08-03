@@ -33,7 +33,7 @@ HODLTracker solves this by combining wallet analysis, FIFO simulation, and tax-o
 | Layer       | Stack                                 |
 | ----------- | ------------------------------------- |
 | Frontend    | Vite + Vue 3 + TypeScript + Tailwind  |
-| Wallet      | Wagmi + Viem + WalletConnect          |
+| Wallet      | Reown AppKit + Wagmi + Viem           |
 | API         | Covalent / Alchemy / Etherscan        |
 | FIFO Engine | Local JS logic (Node.js / TypeScript) |
 | Backend     | Supabase or Firebase (optional)       |
@@ -62,9 +62,9 @@ npm run dev
 
 ## 🔧 Configuration
 
-### WalletConnect Setup
+### Reown AppKit Setup
 
-1. Get a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
+1. Get a project ID from [Reown Dashboard](https://dashboard.reown.com)
 2. Update the project ID in your `.env` file
 3. The app will automatically configure wallet connections
 
@@ -73,7 +73,7 @@ npm run dev
 Create a `.env` file with:
 
 ```env
-# WalletConnect
+# Reown AppKit
 VITE_REOWN_PROJECT_ID=your_project_id_here
 
 # API Keys (optional for development)
@@ -133,13 +133,13 @@ src/
 
 ## 🔄 Recent Updates
 
-### v1.2.0 (Latest)
+### v1.3.0 (Latest)
 
+- ✅ Migrated to Reown AppKit for enhanced wallet functionality
 - ✅ Updated to latest dependency versions
-- ✅ Migrated to @wagmi/vue for Vue 3 integration
-- ✅ Added @tanstack/vue-query for data fetching
-- ✅ Simplified wallet connection setup
-- ✅ Improved TypeScript support
+- ✅ Improved wallet connection with 600+ wallet support
+- ✅ Added smart account and embedded wallet support
+- ✅ Enhanced TypeScript support
 
 ### v1.1.0
 
@@ -175,11 +175,12 @@ src/
 
 HODLTracker now uses the latest Web3 technologies:
 
-- **🔗 Wallet Connections**: MetaMask, WalletConnect, and more via Wagmi
+- **🔗 Wallet Connections**: 600+ wallets via Reown AppKit
 - **📊 Data Management**: TanStack Query for efficient data fetching
 - **🎨 Modern UI**: Latest Tailwind CSS with improved styling
 - **🔧 Type Safety**: Enhanced TypeScript support
 - **⚡ Performance**: Latest Vite build system
+- **🧠 Smart Accounts**: Embedded wallet and smart account support
 
 ---
 
