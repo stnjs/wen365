@@ -1,28 +1,29 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-50: 213 100% 96%;
+  --color-primary-100: 214 95% 93%;
+  --color-primary-200: 213 97% 87%;
+  --color-primary-300: 212 96% 78%;
+  --color-primary-400: 213 94% 68%;
+  --color-primary-500: 217 91% 60%;
+  --color-primary-600: 221 83% 53%;
+  --color-primary-700: 224 76% 48%;
+  --color-primary-800: 226 71% 40%;
+  --color-primary-900: 224 64% 33%;
+
+  --color-crypto-green: 142 100% 50%;
+  --color-crypto-red: 0 100% 60%;
+  --color-crypto-yellow: 45 100% 60%;
+  --color-crypto-purple: 270 100% 60%;
+
+  --font-family-sans: "Inter", system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", monospace;
+}
+
 @layer base {
-  :root {
-    /* Primary Colors */
-    --primary-50: 213 100% 96%;
-    --primary-100: 214 95% 93%;
-    --primary-200: 213 97% 87%;
-    --primary-300: 212 96% 78%;
-    --primary-400: 213 94% 68%;
-    --primary-500: 217 91% 60%;
-    --primary-600: 221 83% 53%;
-    --primary-700: 224 76% 48%;
-    --primary-800: 226 71% 40%;
-    --primary-900: 224 64% 33%;
-
-    /* Crypto Colors */
-    --crypto-green: 142 100% 50%;
-    --crypto-red: 0 100% 60%;
-    --crypto-yellow: 45 100% 60%;
-    --crypto-purple: 270 100% 60%;
-  }
-
   html {
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: var(--font-family-sans);
   }
 
   body {

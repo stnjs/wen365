@@ -17,7 +17,7 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 
 // Create wagmi config
 // 1. Get projectId from https://dashboard.reown.com
-const projectId = "YOUR_PROJECT_ID";
+const projectId = "d83d9895fdd368edad57303bce75c013";
 
 // 2. Create a metadata object
 const metadata = {
