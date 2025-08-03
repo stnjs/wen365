@@ -5,7 +5,9 @@ import App from "./App.vue";
 import "./style.css";
 
 // Reown AppKit setup
-import { appKit } from "./config/reown";
+import { appKitVue } from "./config/reown";
+
+const appKit = appKitVue;
 
 const app = createApp(App);
 

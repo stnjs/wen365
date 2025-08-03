@@ -1,7 +1,13 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { useAppKit } from "@reown/appkit/vue";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import {
+  useAppKitState,
+  useAppKitAccount,
+  useWalletInfo,
+  useAppKit,
+  useDisconnect,
+  useAppKitBalance,
+} from "@reown/appkit/vue";
 import type { WalletInfo } from "@/types";
 
 export const useWalletStore = defineStore("wallet", () => {
@@ -9,46 +15,26 @@ export const useWalletStore = defineStore("wallet", () => {
   const { open } = useAppKit();
 
   // Wagmi hooks for wallet state
-  const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, isPending } = useConnect();
+  const accountInfo = useAppKitAccount();
+  const walletInfo = useWalletInfo();
+  const state = useAppKitState();
   const { disconnect } = useDisconnect();
 
+  const isConnecting = computed(
+    () => accountInfo.value.status === "connecting"
+  );
+  const isConnected = computed(() => accountInfo.value.status === "connected");
+  const address = computed(() => accountInfo.value.address);
+  const chainId = computed(() => state.selectedNetworkId);
   // Local state
   const connectionError = ref<string | null>(null);
 
-  // Computed
-  const walletInfo = computed<WalletInfo | null>(() => {
-    if (!isConnected || !address) return null;
-
-    return {
-      address: address,
-      chainId: chainId || 1,
-      isConnected: isConnected,
-      balance: "0.0", // Will be updated when we add balance fetching
-    };
-  });
-
-  const isConnecting = computed(() => isPending);
-
   // Actions
   const connectWallet = async () => {
-    try {
-      connectionError.value = null;
-      await open();
-    } catch (error) {
-      connectionError.value =
-        error instanceof Error ? error.message : "Failed to connect wallet";
-      throw error;
-    }
+    await open();
   };
-
-  const disconnectWallet = () => {
-    disconnect();
-    connectionError.value = null;
-  };
-
-  const updateWalletInfo = (info: Partial<WalletInfo>) => {
-    console.log("Wallet info updated:", info);
+  const disconnectWallet = async () => {
+    await disconnect();
   };
 
   return {
@@ -65,6 +51,5 @@ export const useWalletStore = defineStore("wallet", () => {
     // Actions
     connectWallet,
     disconnectWallet,
-    updateWalletInfo,
   };
 });
