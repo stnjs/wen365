@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="min-h-screen bg-gray-50">
-    <router-view />
+    <RouterView />
   </div>
 </template>
 
@@ -10,6 +10,6 @@
 
 <style scoped>
 #app {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
 }
-</style> 
+</style>
