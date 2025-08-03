@@ -32,8 +32,8 @@ HODLTracker solves this by combining wallet analysis, FIFO simulation, and tax-o
 
 | Layer       | Stack                                 |
 | ----------- | ------------------------------------- |
-| Frontend    | Next.js or Vite + Vue + Tailwind      |
-| Wallet      | Wagmi + viem (React) / web3modal-vue  |
+| Frontend    | Vite + Vue + Tailwind                 |
+| Wallet      | Wagmi + viem / web3modal-vue          |
 | API         | Covalent / Alchemy / Etherscan        |
 | FIFO Engine | Local JS logic (Node.js / TypeScript) |
 | Backend     | Supabase or Firebase (optional)       |
