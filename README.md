@@ -33,7 +33,7 @@ HODLTracker solves this by combining wallet analysis, FIFO simulation, and tax-o
 | Layer       | Stack                                 |
 | ----------- | ------------------------------------- |
 | Frontend    | Vite + Vue 3 + TypeScript + Tailwind  |
-| Wallet      | Reown AppKit + Viem                   |
+| Wallet      | Wagmi + Viem + WalletConnect          |
 | API         | Covalent / Alchemy / Etherscan        |
 | FIFO Engine | Local JS logic (Node.js / TypeScript) |
 | Backend     | Supabase or Firebase (optional)       |
@@ -54,7 +54,7 @@ npm install
 
 # Set up environment variables
 cp env.example .env
-# Edit .env with your API keys and Reown project ID
+# Edit .env with your API keys and WalletConnect project ID
 
 # Start development server
 npm run dev
@@ -62,18 +62,18 @@ npm run dev
 
 ## 🔧 Configuration
 
-### Reown AppKit Setup
+### WalletConnect Setup
 
-1. Get a project ID from [Reown Cloud](https://cloud.reown.com) (formerly WalletConnect Cloud)
-2. Update `src/config/reown.ts` with your project ID
-3. Update the metadata URL to match your domain
+1. Get a project ID from [WalletConnect Cloud](https://cloud.walletconnect.com)
+2. Update the project ID in your `.env` file
+3. The app will automatically configure wallet connections
 
 ### Environment Variables
 
 Create a `.env` file with:
 
 ```env
-# Reown AppKit
+# WalletConnect
 VITE_REOWN_PROJECT_ID=your_project_id_here
 
 # API Keys (optional for development)
@@ -110,8 +110,6 @@ npm run lint
 ```
 src/
 ├── components/          # Reusable Vue components
-├── config/             # Configuration files
-│   └── reown.ts        # Reown AppKit configuration
 ├── stores/             # Pinia state management
 │   ├── wallet.ts       # Wallet connection state
 │   ├── portfolio.ts    # Portfolio & FIFO calculations
@@ -135,7 +133,15 @@ src/
 
 ## 🔄 Recent Updates
 
-### v1.1.0 (Latest)
+### v1.2.0 (Latest)
+
+- ✅ Updated to latest dependency versions
+- ✅ Migrated to @wagmi/vue for Vue 3 integration
+- ✅ Added @tanstack/vue-query for data fetching
+- ✅ Simplified wallet connection setup
+- ✅ Improved TypeScript support
+
+### v1.1.0
 
 - ✅ Migrated from deprecated Web3Modal to Reown AppKit
 - ✅ Added support for email and social login
@@ -154,27 +160,26 @@ src/
 
 ### Key Dependency Updates
 
-- **Reown AppKit**: Added v1.0.0 (replaces Web3Modal)
-- **Vue**: 3.4.0 → 3.4.21
-- **Vite**: 5.0.0 → 5.1.4
-- **TypeScript**: 5.2.0 → 5.3.3
-- **Tailwind CSS**: 3.3.0 → 3.4.1
+- **Vue**: 3.4.21 → 3.5.18
+- **Vite**: 5.1.4 → 7.0.6
+- **TypeScript**: 5.3.3 → 5.9.2
+- **Tailwind CSS**: 3.4.1 → 4.1.11
+- **Wagmi**: 2.5.7 (latest)
+- **@wagmi/vue**: 0.1.25 (new)
+- **@tanstack/vue-query**: 5.83.1 (new)
 - **All other dependencies**: Updated to latest stable versions
 
 ---
 
-## 🆕 Reown AppKit Features
+## 🆕 Current Features
 
-HODLTracker now leverages [Reown AppKit](https://docs.reown.com/appkit/overview) for enhanced functionality:
+HODLTracker now uses the latest Web3 technologies:
 
-- **🔐 Email & Social Login**: Users can connect using email or social accounts
-- **💳 On-Ramp**: Purchase crypto with fiat directly in the app
-- **🔄 Swaps**: In-app token swapping with one line of code
-- **🧠 Smart Accounts**: Enhanced security with multi-signature and automated workflows
-- **📱 Multi-Chain**: Support for EVM and non-EVM chains
-- **🔔 Notifications**: Web3-native notifications to wallets and in-app
-- **🎨 Customizable UI**: Light/dark modes and custom branding
-- **📊 Transaction History**: Built-in transaction tracking
+- **🔗 Wallet Connections**: MetaMask, WalletConnect, and more via Wagmi
+- **📊 Data Management**: TanStack Query for efficient data fetching
+- **🎨 Modern UI**: Latest Tailwind CSS with improved styling
+- **🔧 Type Safety**: Enhanced TypeScript support
+- **⚡ Performance**: Latest Vite build system
 
 ---
 
