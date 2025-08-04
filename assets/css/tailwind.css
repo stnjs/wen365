@@ -1,6 +1,8 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
+:root {
   --color-primary-50: 213 100% 96%;
   --color-primary-100: 214 95% 93%;
   --color-primary-200: 213 97% 87%;

@@ -1,40 +1,57 @@
 // Pinia is auto-imported by Nuxt
 import { ref, computed } from "vue";
-import {
-  useAppKitState,
-  useAppKitAccount,
-  useWalletInfo,
-  useAppKit,
-  useDisconnect,
-  useAppKitBalance,
-} from "@reown/appkit/vue";
 import type { WalletInfo } from "~/types";
 
 export const useWalletStore = defineStore("wallet", () => {
-  // Reown AppKit modal
-  const { open } = useAppKit();
+  // Only use Reown AppKit on client-side
+  let open: (() => Promise<void>) | undefined;
+  let accountInfo: any;
+  let walletInfo: any;
+  let state: any;
+  let disconnect: (() => Promise<void>) | undefined;
 
-  // Wagmi hooks for wallet state
-  const accountInfo = useAppKitAccount();
-  const walletInfo = useWalletInfo();
-  const state = useAppKitState();
-  const { disconnect } = useDisconnect();
+  if (process.client) {
+    const {
+      useAppKitState,
+      useAppKitAccount,
+      useWalletInfo,
+      useAppKit,
+      useDisconnect,
+    } = require("@reown/appkit/vue");
+
+    // Reown AppKit modal
+    const appKit = useAppKit();
+    open = appKit?.open;
+
+    // Wagmi hooks for wallet state
+    accountInfo = useAppKitAccount();
+    walletInfo = useWalletInfo();
+    state = useAppKitState();
+    const disconnectHook = useDisconnect();
+    disconnect = disconnectHook?.disconnect;
+  }
 
   const isConnecting = computed(
-    () => accountInfo.value.status === "connecting"
+    () => accountInfo?.value?.status === "connecting"
   );
-  const isConnected = computed(() => accountInfo.value.status === "connected");
-  const address = computed(() => accountInfo.value.address);
-  const chainId = computed(() => state.selectedNetworkId);
+  const isConnected = computed(
+    () => accountInfo?.value?.status === "connected"
+  );
+  const address = computed(() => accountInfo?.value?.address);
+  const chainId = computed(() => state?.selectedNetworkId);
   // Local state
   const connectionError = ref<string | null>(null);
 
   // Actions
   const connectWallet = async () => {
-    await open();
+    if (open) {
+      await open();
+    }
   };
   const disconnectWallet = async () => {
-    await disconnect();
+    if (disconnect) {
+      await disconnect();
+    }
   };
 
   return {
