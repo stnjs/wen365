@@ -46,6 +46,23 @@
             >
               Settings
             </NuxtLink>
+
+            <!-- Wallet Connection Status -->
+            <div v-if="isConnected" class="flex items-center space-x-2">
+              <span class="text-sm text-gray-600">{{ shortAddress }}</span>
+              <button @click="disconnectWallet" class="btn-secondary text-sm">
+                Disconnect
+              </button>
+            </div>
+            <button
+              v-else
+              @click="connectWallet"
+              :disabled="isConnecting"
+              class="btn-primary text-sm"
+            >
+              <span v-if="isConnecting">Connecting...</span>
+              <span v-else>Connect Wallet</span>
+            </button>
           </div>
         </div>
       </div>
@@ -71,5 +88,29 @@
 </template>
 
 <script setup lang="ts">
-// Default layout component
+import { computed } from "vue";
+import { useWalletStore } from "~/stores/wallet";
+
+const walletStore = useWalletStore();
+
+const isConnected = computed(() => walletStore.isConnected);
+const isConnecting = computed(() => walletStore.isConnecting);
+const address = computed(() => walletStore.address);
+
+const shortAddress = computed(() => {
+  if (!address.value) return "";
+  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
+});
+
+const connectWallet = async () => {
+  try {
+    await walletStore.connectWallet();
+  } catch (error) {
+    console.error("Failed to connect wallet:", error);
+  }
+};
+
+const disconnectWallet = () => {
+  walletStore.disconnectWallet();
+};
 </script>
