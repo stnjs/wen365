@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // CSS and styling
-  css: ["~/assets/css/main.css"],
+  css: ["~/assets/css/tailwind.css"],
 
   // PostCSS configuration - not needed for Tailwind CSS v4
   // Tailwind CSS v4 handles PostCSS internally
@@ -28,7 +28,7 @@ export default defineNuxtConfig({
 
   // Tailwind CSS configuration
   tailwindcss: {
-    cssPath: "~/assets/css/main.css",
+    cssPath: "~/assets/css/tailwind.css",
     configPath: "tailwind.config.ts",
     exposeConfig: false,
     viewer: true,
