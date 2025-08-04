@@ -7,8 +7,9 @@ import {
 } from "@reown/appkit/networks";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 
-// Get projectId from environment variable
-const projectId = import.meta.env.VITE_REOWN_PROJECT_ID;
+// Get projectId from Nuxt runtime config
+const config = useRuntimeConfig();
+const projectId = config.public.reownProjectId;
 
 if (!projectId) {
   throw new Error(

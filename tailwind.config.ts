@@ -1,6 +1,14 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
+
 export default {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: [
+    "./components/**/*.{js,vue,ts}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./app.vue",
+    "./error.vue",
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -14,4 +22,4 @@ export default {
     },
   },
   plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
-};
+} satisfies Config;

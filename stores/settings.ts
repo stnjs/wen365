@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { TaxSettings, NotificationSettings } from "@/types";
+import type { TaxSettings, NotificationSettings } from "~/types";
 
 export const useSettingsStore = defineStore("settings", () => {
   // State

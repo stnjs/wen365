@@ -261,8 +261,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useWalletStore } from "@/stores/wallet";
-import { useSettingsStore } from "@/stores/settings";
+import { useWalletStore } from "~/stores/wallet";
+import { useSettingsStore } from "~/stores/settings";
 
 const walletStore = useWalletStore();
 const settingsStore = useSettingsStore();

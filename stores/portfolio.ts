@@ -5,7 +5,7 @@ import type {
   PortfolioAsset,
   FIFOHolding,
   Transaction,
-} from "@/types";
+} from "~/types";
 
 export const usePortfolioStore = defineStore("portfolio", () => {
   // State
