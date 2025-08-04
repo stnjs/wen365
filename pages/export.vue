@@ -220,16 +220,16 @@
             </div>
             <div v-else class="space-y-2">
               <div
-                v-for="export in exportHistory.slice(0, 3)"
-                :key="export.id"
+                v-for="exportItem in exportHistory.slice(0, 3)"
+                :key="exportItem.id"
                 class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
               >
                 <div>
                   <div class="font-medium text-gray-900">
-                    {{ export.filename }}
+                    {{ exportItem.filename }}
                   </div>
                   <div class="text-sm text-gray-500">
-                    {{ formatDate(export.timestamp) }}
+                    {{ formatDate(exportItem.timestamp) }}
                   </div>
                 </div>
                 <button class="text-primary-600 hover:text-primary-900 text-sm">

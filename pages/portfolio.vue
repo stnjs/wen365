@@ -231,7 +231,7 @@ const filteredAssets = computed(() => {
   if (!searchTerm.value) return assets.value;
 
   return assets.value.filter(
-    asset =>
+    (asset: any) =>
       asset.token.symbol
         .toLowerCase()
         .includes(searchTerm.value.toLowerCase()) ||
