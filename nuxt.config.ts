@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  // Compatibility date for Nitro
+  compatibilityDate: "2025-08-04",
+
   // Enable TypeScript
   typescript: {
     strict: true,
@@ -12,20 +15,15 @@ export default defineNuxtConfig({
   // CSS and styling
   css: ["~/assets/css/main.css"],
 
-  // PostCSS configuration
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
-  },
+  // PostCSS configuration - not needed for Tailwind CSS v4
+  // Tailwind CSS v4 handles PostCSS internally
 
   // Modules
   modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", "@vueuse/nuxt"],
 
   // Pinia configuration
   pinia: {
-    autoImports: ["defineStore", "acceptHMRUpdate"],
+    // Auto-imports are handled by Nuxt automatically
   },
 
   // Tailwind CSS configuration
@@ -33,7 +31,6 @@ export default defineNuxtConfig({
     cssPath: "~/assets/css/main.css",
     configPath: "tailwind.config.ts",
     exposeConfig: false,
-    injectPosition: 0,
     viewer: true,
   },
 

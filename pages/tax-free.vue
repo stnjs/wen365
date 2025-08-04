@@ -299,7 +299,7 @@ const shortAddress = computed(() => {
 
 const becomingTaxFreeSoon = computed(() => {
   const thirtyDaysFromNow = Date.now() + 30 * 24 * 60 * 60 * 1000;
-  return taxableAssets.value.filter(asset => {
+  return taxableAssets.value.filter((asset: any) => {
     const taxFreeDate =
       asset.taxFreeDate ||
       asset.acquisitionDate + taxFreePeriodDays.value * 24 * 60 * 60 * 1000;

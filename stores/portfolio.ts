@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+// Pinia is auto-imported by Nuxt
 import { ref, computed } from "vue";
 import type {
   Portfolio,
@@ -100,7 +100,7 @@ export const usePortfolioStore = defineStore("portfolio", () => {
         if (!acc[tx.tokenAddress]) {
           acc[tx.tokenAddress] = [];
         }
-        acc[tx.tokenAddress].push(tx);
+        acc[tx.tokenAddress]!.push(tx);
         return acc;
       },
       {} as Record<string, Transaction[]>
@@ -114,7 +114,7 @@ export const usePortfolioStore = defineStore("portfolio", () => {
       // TODO: Implement actual FIFO logic
       // For now, create a simple holding
       if (sortedTxs.length > 0) {
-        const firstTx = sortedTxs[0];
+        const firstTx = sortedTxs[0]!;
         const totalQuantity = sortedTxs.reduce((sum, tx) => {
           if (tx.type === "receive") {
             return sum + parseFloat(tx.value);
