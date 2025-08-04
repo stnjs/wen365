@@ -1,44 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center space-x-8">
-            <h1 class="text-2xl font-bold text-gradient">🧾 HODLTracker</h1>
-            <nav class="hidden md:flex space-x-6">
-              <router-link
-                to="/dashboard"
-                class="text-gray-600 hover:text-primary-600"
-                >Dashboard</router-link
-              >
-              <router-link
-                to="/portfolio"
-                class="text-gray-600 hover:text-primary-600"
-                >Portfolio</router-link
-              >
-              <router-link
-                to="/tax-free"
-                class="text-gray-600 hover:text-primary-600"
-                >Tax-Free</router-link
-              >
-              <router-link
-                to="/export"
-                class="text-gray-600 hover:text-primary-600"
-                >Export</router-link
-              >
-            </nav>
-          </div>
-          <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-600">{{ shortAddress }}</span>
-            <button @click="disconnectWallet" class="btn-secondary text-sm">
-              Disconnect
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex justify-between items-center mb-8">
