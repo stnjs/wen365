@@ -1,35 +1,5 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-    <!-- Navigation -->
-    <nav
-      class="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50"
-    >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-gradient">🧾 HODLTracker</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <button
-              v-if="!isConnected"
-              @click="connectWallet"
-              :disabled="isConnecting"
-              class="btn-primary"
-            >
-              <span v-if="isConnecting">Connecting...</span>
-              <span v-else>Connect Wallet</span>
-            </button>
-            <div v-else class="flex items-center space-x-2">
-              <span class="text-sm text-gray-600">{{ shortAddress }}</span>
-              <button @click="disconnectWallet" class="btn-secondary text-sm">
-                Disconnect
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
-
     <!-- Hero Section -->
     <section class="py-20 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto text-center">
@@ -53,13 +23,13 @@
             <span v-if="isConnecting">Connecting...</span>
             <span v-else>🚀 Get Started</span>
           </button>
-          <router-link
+          <NuxtLink
             v-else
             to="/dashboard"
             class="btn-primary text-lg px-8 py-4"
           >
             📊 View Dashboard
-          </router-link>
+          </NuxtLink>
           <a href="#features" class="btn-secondary text-lg px-8 py-4">
             📖 Learn More
           </a>
@@ -169,13 +139,13 @@
           <span v-if="isConnecting">Connecting...</span>
           <span v-else>Connect Wallet Now</span>
         </button>
-        <router-link
+        <NuxtLink
           v-else
           to="/dashboard"
           class="bg-white text-primary-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors inline-block"
         >
           Go to Dashboard
-        </router-link>
+        </NuxtLink>
       </div>
     </section>
   </div>
@@ -183,18 +153,12 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useWalletStore } from "@/stores/wallet";
+import { useWalletStore } from "~/stores/wallet";
 
 const walletStore = useWalletStore();
 
 const isConnected = computed(() => walletStore.isConnected);
 const isConnecting = computed(() => walletStore.isConnecting);
-const address = computed(() => walletStore.address);
-
-const shortAddress = computed(() => {
-  if (!address.value) return "";
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
-});
 
 const connectWallet = async () => {
   try {
@@ -202,9 +166,5 @@ const connectWallet = async () => {
   } catch (error) {
     console.error("Failed to connect wallet:", error);
   }
-};
-
-const disconnectWallet = () => {
-  walletStore.disconnectWallet();
 };
 </script>

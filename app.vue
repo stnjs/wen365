@@ -1,14 +1,16 @@
 <template>
-  <div id="app" class="min-h-screen bg-gray-50">
-    <RouterView />
+  <div id="app">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 
 <script setup lang="ts">
-// Main app component
+// Main app component for Nuxt
 </script>
 
-<style scoped>
+<style>
 #app {
   font-family: "Inter", system-ui, sans-serif;
 }

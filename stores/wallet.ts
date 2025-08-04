@@ -8,7 +8,7 @@ import {
   useDisconnect,
   useAppKitBalance,
 } from "@reown/appkit/vue";
-import type { WalletInfo } from "@/types";
+import type { WalletInfo } from "~/types";
 
 export const useWalletStore = defineStore("wallet", () => {
   // Reown AppKit modal
