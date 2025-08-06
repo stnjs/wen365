@@ -93,10 +93,16 @@ export default defineNuxtConfig({
     preset: "node-server",
   },
 
-    // Vite configuration (for client-side)
+  // Vite configuration (for client-side)
   vite: {
     define: {
       "process.env": {},
+    },
+    optimizeDeps: {
+      exclude: ["@wagmi/vue", "wagmi", "viem"],
+    },
+    ssr: {
+      noExternal: ["@wagmi/vue", "wagmi", "viem"],
     },
   },
 });
