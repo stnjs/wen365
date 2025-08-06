@@ -37,7 +37,7 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available on server-side)
-    reownProjectId: process.env.VITE_REOWN_PROJECT_ID,
+    wagmiProjectId: process.env.VITE_REOWN_PROJECT_ID,
     covalentApiKey: process.env.VITE_COVALENT_API_KEY,
     alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
     etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
@@ -46,7 +46,7 @@ export default defineNuxtConfig({
 
     // Public keys (exposed to client-side)
     public: {
-      reownProjectId: process.env.VITE_REOWN_PROJECT_ID,
+      wagmiProjectId: process.env.VITE_REOWN_PROJECT_ID,
     },
   },
 
@@ -85,7 +85,7 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["@reown/appkit", "@reown/appkit-adapter-wagmi"],
+    transpile: ["@wagmi/vue", "wagmi", "viem"],
   },
 
   // Nitro server configuration
@@ -93,7 +93,7 @@ export default defineNuxtConfig({
     preset: "node-server",
   },
 
-  // Vite configuration (for client-side)
+    // Vite configuration (for client-side)
   vite: {
     define: {
       "process.env": {},
