@@ -103,6 +103,7 @@ const shortAddress = computed(() => {
 });
 
 const connectWallet = async () => {
+  console.log("connectWallet");
   try {
     await walletStore.connectWallet();
   } catch (error) {
@@ -113,4 +114,8 @@ const connectWallet = async () => {
 const disconnectWallet = () => {
   walletStore.disconnectWallet();
 };
+
+onMounted(() => {
+  console.log("onMounted");
+});
 </script>
