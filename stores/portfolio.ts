@@ -47,19 +47,10 @@ export const usePortfolioStore = defineStore("portfolio", () => {
       isLoading.value = true;
       error.value = null;
 
-      // TODO: Implement API call to fetch portfolio data
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Mock data
-      portfolio.value = {
-        totalValue: 125000,
-        totalValueChange24h: 2500,
-        totalValueChangePercent24h: 2.04,
-        assets: [],
-        taxFreeAssets: [],
-        taxableAssets: [],
-      };
+      // Use $fetch for SPA mode
+      const data = await $fetch<Portfolio>("/api/portfolio");
+      console.log("portfolio", data);
+      portfolio.value = data;
     } catch (err) {
       error.value =
         err instanceof Error ? err.message : "Failed to fetch portfolio";
@@ -74,12 +65,9 @@ export const usePortfolioStore = defineStore("portfolio", () => {
       isLoading.value = true;
       error.value = null;
 
-      // TODO: Implement API call to fetch transactions
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock data
-      transactions.value = [];
+      // Use $fetch for SPA mode
+      const data = await $fetch<Transaction[]>("/api/transactions");
+      transactions.value = data || [];
     } catch (err) {
       error.value =
         err instanceof Error ? err.message : "Failed to fetch transactions";

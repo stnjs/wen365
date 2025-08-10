@@ -28,22 +28,22 @@ export const useSettingsStore = defineStore("settings", () => {
   const notifications = computed(() => settings.value.notifications);
 
   // Actions
-  const updateSettings = (newSettings: Partial<TaxSettings>) => {
+  const updateSettings = async (newSettings: Partial<TaxSettings>) => {
     settings.value = { ...settings.value, ...newSettings };
-    saveSettings();
+    await saveSettings();
   };
 
-  const updateNotificationSettings = (
+  const updateNotificationSettings = async (
     notificationSettings: Partial<NotificationSettings>
   ) => {
     settings.value.notifications = {
       ...settings.value.notifications,
       ...notificationSettings,
     };
-    saveSettings();
+    await saveSettings();
   };
 
-  const setCountry = (country: string) => {
+  const setCountry = async (country: string) => {
     settings.value.country = country;
 
     // Set default tax-free period based on country
@@ -61,12 +61,12 @@ export const useSettingsStore = defineStore("settings", () => {
         settings.value.taxFreePeriodDays = 365;
     }
 
-    saveSettings();
+    await saveSettings();
   };
 
-  const setTaxFreePeriod = (days: number) => {
+  const setTaxFreePeriod = async (days: number) => {
     settings.value.taxFreePeriodDays = days;
-    saveSettings();
+    await saveSettings();
   };
 
   const loadSettings = async () => {
@@ -74,10 +74,11 @@ export const useSettingsStore = defineStore("settings", () => {
       isLoading.value = true;
       error.value = null;
 
-      // TODO: Load settings from localStorage or API
-      const savedSettings = localStorage.getItem("hodltracker-settings");
-      if (savedSettings) {
-        settings.value = { ...settings.value, ...JSON.parse(savedSettings) };
+      // Use $fetch for SPA mode
+      const data = await $fetch<TaxSettings>("/api/settings");
+
+      if (data) {
+        settings.value = { ...settings.value, ...data };
       }
     } catch (err) {
       error.value =
@@ -87,13 +88,13 @@ export const useSettingsStore = defineStore("settings", () => {
     }
   };
 
-  const saveSettings = () => {
+  const saveSettings = async () => {
     try {
-      // TODO: Save settings to localStorage or API
-      localStorage.setItem(
-        "hodltracker-settings",
-        JSON.stringify(settings.value)
-      );
+      // Use $fetch for SPA mode
+      await $fetch("/api/settings", {
+        method: "POST",
+        body: settings.value,
+      });
     } catch (err) {
       error.value =
         err instanceof Error ? err.message : "Failed to save settings";
