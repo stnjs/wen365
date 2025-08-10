@@ -185,11 +185,6 @@ const taxFreeValue = computed(() => portfolioStore.taxFreeValue);
 const taxableValue = computed(() => portfolioStore.taxableValue);
 const assets = computed(() => portfolioStore.assets);
 
-const shortAddress = computed(() => {
-  if (!address.value) return "";
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
-});
-
 const filteredAssets = computed(() => {
   if (!searchTerm.value) return assets.value;
 
@@ -219,17 +214,10 @@ const formatBalance = (balance: string, decimals: number) => {
 
 const refreshPortfolio = async () => {
   if (address.value) {
-    await portfolioStore.refreshPortfolio(address.value);
+    await portfolioStore.fetchPortfolio(address.value);
+    console.log(portfolioStore.portfolio);
   }
 };
 
-const openAccountModal = () => {
-  walletStore.openAccountModal();
-};
-
-onMounted(async () => {
-  if (address.value) {
-    await refreshPortfolio();
-  }
-});
+onMounted(async () => {});
 </script>
