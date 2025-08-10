@@ -89,28 +89,4 @@ import { useWalletStore } from "~/stores/wallet";
 const walletStore = useWalletStore();
 
 const isConnected = computed(() => walletStore.isConnected);
-const isConnecting = computed(() => walletStore.isConnecting);
-const address = computed(() => walletStore.address);
-
-const shortAddress = computed(() => {
-  if (!address.value) return "";
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
-});
-
-const connectWallet = async () => {
-  console.log("connectWallet");
-  try {
-    await walletStore.connectWallet();
-  } catch (error) {
-    console.error("Failed to connect wallet:", error);
-  }
-};
-
-const openAccountModal = () => {
-  walletStore.openAccountModal();
-};
-
-onMounted(() => {
-  console.log("onMounted");
-});
 </script>
