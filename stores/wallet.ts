@@ -1,16 +1,26 @@
 // Pinia is auto-imported by Nuxt
 import { ref, computed, watch } from "vue";
-import { useAppKit } from "@reown/appkit/vue";
+import {
+  useAppKit,
+  useAppKitAccount,
+  useAppKitNetwork,
+} from "@reown/appkit/vue";
 
 export const useWalletStore = defineStore("wallet", () => {
   console.log("Wallet store is being initialized");
 
   // State
-  const isConnecting = ref(false);
-  const isConnected = ref(false);
-  const address = ref<string | null>(null);
-  const chainId = ref<number | null>(null);
   const connectionError = ref<string | null>(null);
+
+  const accountData = useAppKitAccount();
+  const networkData = useAppKitNetwork();
+
+  const isConnected = computed(() => accountData.value?.isConnected);
+  const address = computed(() => accountData.value?.address);
+  const chainId = computed(() => networkData.value?.chainId);
+  const isConnecting = computed(
+    () => accountData.value?.status === "connecting"
+  );
 
   const { open } = useAppKit();
 
@@ -19,7 +29,6 @@ export const useWalletStore = defineStore("wallet", () => {
     try {
       connectionError.value = null;
       console.log("Connecting wallet...");
-      isConnecting.value = true;
 
       // Open the connect modal
       open({ view: "Connect" });
@@ -27,8 +36,6 @@ export const useWalletStore = defineStore("wallet", () => {
       console.error("Wallet connection error:", error);
       connectionError.value =
         error instanceof Error ? error.message : "Connection failed";
-    } finally {
-      isConnecting.value = false;
     }
   };
 

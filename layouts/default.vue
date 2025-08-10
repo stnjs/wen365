@@ -57,13 +57,8 @@
           </NuxtLink>
 
           <!-- Wallet Connection Status -->
-          <div v-if="isConnected" class="flex items-center space-x-2">
-            <span class="text-sm text-gray-600">{{ shortAddress }}</span>
-            <button @click="openAccountModal" class="btn-secondary text-sm">
-              Disconnect
-            </button>
-          </div>
-          <appkit-connect-button />
+          <appkit-account-button v-if="isConnected" balance="hide" />
+          <appkit-connect-button v-else />
         </div>
       </div>
     </nav>
