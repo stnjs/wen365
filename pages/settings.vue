@@ -264,8 +264,8 @@ const resetSettings = () => {
   }
 };
 
-const disconnectWallet = () => {
-  walletStore.disconnectWallet();
+const openAccountModal = () => {
+  walletStore.openAccountModal();
 };
 
 onMounted(async () => {

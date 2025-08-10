@@ -12,14 +12,19 @@ export default defineNuxtConfig({
   // Development tools
   devtools: { enabled: true },
 
+  // SSR disabled for client-side only app
+  ssr: false,
+
   // CSS and styling
   css: ["~/assets/css/tailwind.css"],
 
-  // PostCSS configuration - not needed for Tailwind CSS v4
-  // Tailwind CSS v4 handles PostCSS internally
-
   // Modules
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", "@vueuse/nuxt"],
+  modules: [
+    "@nuxt/devtools",
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "@wagmi/vue/nuxt",
+  ],
 
   // Pinia configuration
   pinia: {
@@ -37,7 +42,7 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available on server-side)
-    wagmiProjectId: process.env.VITE_REOWN_PROJECT_ID,
+    reownProjectId: process.env.NUXT_PROJECT_ID,
     covalentApiKey: process.env.VITE_COVALENT_API_KEY,
     alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
     etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
@@ -46,7 +51,7 @@ export default defineNuxtConfig({
 
     // Public keys (exposed to client-side)
     public: {
-      wagmiProjectId: process.env.VITE_REOWN_PROJECT_ID,
+      projectId: process.env.NUXT_PROJECT_ID,
     },
   },
 
@@ -85,7 +90,7 @@ export default defineNuxtConfig({
 
   // Build configuration
   build: {
-    transpile: ["@wagmi/vue", "wagmi", "viem"],
+    // Simplified build config
   },
 
   // Nitro server configuration
@@ -97,12 +102,6 @@ export default defineNuxtConfig({
   vite: {
     define: {
       "process.env": {},
-    },
-    optimizeDeps: {
-      exclude: ["@wagmi/vue", "wagmi", "viem"],
-    },
-    ssr: {
-      noExternal: ["@wagmi/vue", "wagmi", "viem"],
     },
   },
 });
