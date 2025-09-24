@@ -10,7 +10,17 @@
 
 <script setup lang="ts">
 import { createAppKit } from "@reown/appkit/vue";
-import { wagmiAdapter, networks, projectId } from "./config/appkit";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { mainnet, arbitrum, base, sepolia } from "wagmi/chains";
+const config = useRuntimeConfig();
+const projectId = config.public.reownProjectId;
+
+const networks = [mainnet, arbitrum, base, sepolia];
+
+const wagmiAdapter = new WagmiAdapter({
+  networks,
+  projectId,
+});
 
 createAppKit({
   adapters: [wagmiAdapter],
