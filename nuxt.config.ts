@@ -19,24 +19,11 @@ export default defineNuxtConfig({
   css: ["~/assets/css/tailwind.css"],
 
   // Modules
-  modules: [
-    "@nuxt/devtools",
-    "@pinia/nuxt",
-    "@nuxtjs/tailwindcss",
-    "@wagmi/vue/nuxt",
-  ],
+  modules: ["@nuxt/devtools", "@pinia/nuxt", "@wagmi/vue/nuxt", "@nuxt/ui"],
 
   // Pinia configuration
   pinia: {
     // Auto-imports are handled by Nuxt automatically
-  },
-
-  // Tailwind CSS configuration
-  tailwindcss: {
-    cssPath: "~/assets/css/tailwind.css",
-    configPath: "tailwind.config.ts",
-    exposeConfig: false,
-    viewer: true,
   },
 
   // Runtime config for environment variables
