@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+  <div class="min-h-screen bg-linear-to-br from-gray-50 to-blue-50">
     <!-- Hero Section -->
     <section class="py-20 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto text-center">
@@ -120,7 +120,7 @@
 
     <!-- CTA Section -->
     <section
-      class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-600 to-purple-600"
+      class="py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-r from-primary-600 to-purple-600"
     >
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-4xl font-bold text-white mb-6">

@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   ssr: false,
 
   // CSS and styling
-  css: ["~/assets/css/tailwind.css"],
+  css: ["~/assets/css/main.css"],
 
   // Modules
   modules: ["@nuxt/devtools", "@pinia/nuxt", "@wagmi/vue/nuxt", "@nuxt/ui"],
