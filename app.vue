@@ -11,11 +11,22 @@
 <script setup lang="ts">
 import { createAppKit } from "@reown/appkit/vue";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { mainnet, arbitrum, base, sepolia } from "wagmi/chains";
+import {
+  arbitrum,
+  mainnet,
+  polygon,
+  base,
+  type AppKitNetwork,
+} from "@reown/appkit/networks";
 const config = useRuntimeConfig();
 const projectId = config.public.reownProjectId;
 
-const networks = [mainnet, arbitrum, base, sepolia];
+const networks: [AppKitNetwork, ...AppKitNetwork[]] = [
+  mainnet,
+  polygon,
+  base,
+  arbitrum,
+];
 
 const wagmiAdapter = new WagmiAdapter({
   networks,
@@ -24,13 +35,13 @@ const wagmiAdapter = new WagmiAdapter({
 
 createAppKit({
   adapters: [wagmiAdapter],
-  networks: networks as any,
+  networks,
   projectId,
   metadata: {
     name: "HODL Tracker",
     description: "Crypto Tax Tracking with FIFO Logic",
-    url: "https://reown.com/appkit",
-    icons: ["https://avatars.githubusercontent.com/u/179229932?s=200&v=4"],
+    url: "http://localhost:3030",
+    icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },
 });
 </script>
