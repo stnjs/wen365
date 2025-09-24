@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   // Modules
-  modules: ["@nuxt/devtools", "@pinia/nuxt", "@wagmi/vue/nuxt", "@nuxt/ui"],
+  modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui"],
 
   // Pinia configuration
   pinia: {
