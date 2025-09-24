@@ -43,6 +43,7 @@ createAppKit({
     url: "http://localhost:3030",
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },
+  themeMode: "light",
 });
 </script>
 

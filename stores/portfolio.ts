@@ -60,6 +60,25 @@ export const usePortfolioStore = defineStore("portfolio", () => {
     }
   };
 
+  const fetchPortfolio2 = async () => {
+    try {
+      isLoading.value = true;
+      error.value = null;
+
+      // Use $fetch for SPA mode
+      const data = await $fetch<Portfolio>(
+        "/api/portfolio/0x867c61e6f2004f45FabfC9Ca0A31720ED29038bF"
+      );
+      console.log("portfolio", data);
+    } catch (err) {
+      error.value =
+        err instanceof Error ? err.message : "Failed to fetch portfolio";
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   const fetchTransactions = async (address: string) => {
     try {
       isLoading.value = true;
@@ -156,6 +175,7 @@ export const usePortfolioStore = defineStore("portfolio", () => {
 
     // Actions
     fetchPortfolio,
+    fetchPortfolio2,
     fetchTransactions,
     calculateFIFOHoldings,
     refreshPortfolio,

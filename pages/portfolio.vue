@@ -213,9 +213,10 @@ const formatBalance = (balance: string, decimals: number) => {
 };
 
 const refreshPortfolio = async () => {
-  if (address.value) {
-    await portfolioStore.fetchPortfolio(address.value);
-  }
+  // if (address.value) {
+  //   await portfolioStore.fetchPortfolio(address.value);
+  // }
+  await portfolioStore.fetchPortfolio2();
 };
 
 onMounted(async () => {});
