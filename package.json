@@ -37,8 +37,6 @@
     "@nuxt/devtools": "latest",
     "@pinia/nuxt": "^0.11.2",
     "@rushstack/eslint-patch": "^1.12.0",
-    "@tailwindcss/forms": "^0.5.7",
-    "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
@@ -49,7 +47,7 @@
     "eslint-plugin-vue": "^10.4.0",
     "nuxt": "^4.1.2",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.13",
     "typescript": "~5.8.3",
     "vue-tsc": "3.0.5"
   },
