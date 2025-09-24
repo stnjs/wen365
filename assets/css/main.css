@@ -2,22 +2,25 @@
 @import "@nuxt/ui";
 
 @theme {
-  --color-primary-50: 213 100% 96%;
-  --color-primary-100: 214 95% 93%;
-  --color-primary-200: 213 97% 87%;
-  --color-primary-300: 212 96% 78%;
-  --color-primary-400: 213 94% 68%;
-  --color-primary-500: 217 91% 60%;
-  --color-primary-600: 221 83% 53%;
-  --color-primary-700: 224 76% 48%;
-  --color-primary-800: 226 71% 40%;
-  --color-primary-900: 224 64% 33%;
+  /* Primary (blue-ish) in OKLCH */
+  --color-primary-50: oklch(0.97 0.02 257);
+  --color-primary-100: oklch(0.94 0.03 257);
+  --color-primary-200: oklch(0.88 0.06 257);
+  --color-primary-300: oklch(0.8 0.1 257);
+  --color-primary-400: oklch(0.72 0.15 257);
+  --color-primary-500: oklch(0.64 0.2 257);
+  --color-primary-600: oklch(0.57 0.19 257);
+  --color-primary-700: oklch(0.5 0.17 257);
+  --color-primary-800: oklch(0.43 0.14 257);
+  --color-primary-900: oklch(0.36 0.11 257);
 
-  --color-crypto-green: 142 100% 50%;
-  --color-crypto-red: 0 100% 60%;
-  --color-crypto-yellow: 45 100% 60%;
-  --color-crypto-purple: 270 100% 60%;
+  /* Crypto greens (mint) in OKLCH */
+  --color-crypto-green: oklch(0.82 0.14 150);
+  --color-crypto-red: oklch(0.64 0.24 25);
+  --color-crypto-yellow: oklch(0.9 0.1 95);
+  --color-crypto-purple: oklch(0.62 0.18 305);
 
+  /* Fonts */
   --font-family-sans: "Inter", system-ui, sans-serif;
   --font-family-mono: "JetBrains Mono", monospace;
 }
@@ -32,34 +35,22 @@
   }
 }
 
-@layer components {
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-  }
-
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
-  }
-
-  .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
-  }
-
-  .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
-  }
+@utility btn-primary {
+  @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
 }
 
-@layer utilities {
-  .text-gradient {
-    @apply bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent;
-  }
+@utility btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+}
 
-  .crypto-green {
-    color: hsl(var(--color-crypto-green));
-  }
+@utility card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+}
 
-  .crypto-red {
-    color: hsl(var(--color-crypto-red));
-  }
+@utility input-field {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+}
+
+@utility text-gradient {
+  @apply bg-linear-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent;
 }

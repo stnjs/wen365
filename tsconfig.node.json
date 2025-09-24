@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["nuxt.config.ts", "tailwind.config.ts", ".nuxt/nuxt.d.ts"]
+  "include": ["nuxt.config.ts", ".nuxt/nuxt.d.ts"]
 }

@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <UApp>
-      <NuxtLayout>
+    <NuxtLayout>
+      <UApp>
         <NuxtPage />
-      </NuxtLayout>
-    </UApp>
+      </UApp>
+    </NuxtLayout>
   </div>
 </template>
 
