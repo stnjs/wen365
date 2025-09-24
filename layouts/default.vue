@@ -57,8 +57,7 @@
           </NuxtLink>
 
           <!-- Wallet Connection Status -->
-          <appkit-account-button v-if="isConnected" balance="hide" />
-          <appkit-connect-button v-else />
+          <appkit-button />
         </div>
       </div>
     </nav>
@@ -89,4 +88,6 @@ import { useWalletStore } from "~/stores/wallet";
 const walletStore = useWalletStore();
 
 const isConnected = computed(() => walletStore.isConnected);
+
+console.log(isConnected);
 </script>

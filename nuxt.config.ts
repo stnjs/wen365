@@ -30,7 +30,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private keys (only available on server-side)
     reownProjectId: process.env.REOWN_PROJECT_ID,
-    /*     covalentApiKey: process.env.VITE_COVALENT_API_KEY,
+    alchemyApiKey: process.env.ALCHEMY_API_KEY,
+
+    /*
     alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
     etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
     sendgridApiKey: process.env.VITE_SENDGRID_API_KEY,

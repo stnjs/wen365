@@ -1,6 +1,8 @@
 export default defineEventHandler(async event => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
+  const config = useRuntimeConfig(event);
+  const alchemyApiKey = config.alchemyApiKey;
 
   // Mock portfolio data
   const portfolio = {
