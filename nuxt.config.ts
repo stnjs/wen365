@@ -29,16 +29,16 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available on server-side)
-    reownProjectId: process.env.NUXT_PROJECT_ID,
-    covalentApiKey: process.env.VITE_COVALENT_API_KEY,
+    reownProjectId: process.env.REOWN_PROJECT_ID,
+    /*     covalentApiKey: process.env.VITE_COVALENT_API_KEY,
     alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
     etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
     sendgridApiKey: process.env.VITE_SENDGRID_API_KEY,
-    telegramBotToken: process.env.VITE_TELEGRAM_BOT_TOKEN,
+    telegramBotToken: process.env.VITE_TELEGRAM_BOT_TOKEN, */
 
     // Public keys (exposed to client-side)
     public: {
-      projectId: process.env.NUXT_PROJECT_ID,
+      reownProjectId: process.env.REOWN_PROJECT_ID,
     },
   },
 
