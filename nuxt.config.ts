@@ -1,3 +1,9 @@
+import { fileURLToPath } from "url";
+import { resolve, dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // Compatibility date for Nitro
@@ -20,11 +26,6 @@ export default defineNuxtConfig({
 
   // Modules
   modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui"],
-
-  // Pinia configuration
-  pinia: {
-    // Auto-imports are handled by Nuxt automatically
-  },
 
   // Runtime config for environment variables
   runtimeConfig: {
@@ -77,9 +78,8 @@ export default defineNuxtConfig({
     },
   },
 
-  // Build configuration
-  build: {
-    // Simplified build config
+  alias: {
+    "@server": resolve(__dirname, "server"),
   },
 
   // Nitro server configuration
