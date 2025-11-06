@@ -211,7 +211,6 @@
 import { computed, onMounted, ref } from "vue";
 import { useWalletStore } from "~/stores/wallet";
 import { usePortfolioStore } from "~/stores/portfolio";
-import type { ExportOptions } from "~/types";
 
 const walletStore = useWalletStore();
 const portfolioStore = usePortfolioStore();

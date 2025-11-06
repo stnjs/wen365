@@ -1,11 +1,5 @@
 // Pinia is auto-imported by Nuxt
 import { ref, computed } from "vue";
-import type {
-  Portfolio,
-  PortfolioAsset,
-  FIFOHolding,
-  Transaction,
-} from "~/types";
 
 export const usePortfolioStore = defineStore("portfolio", () => {
   // State

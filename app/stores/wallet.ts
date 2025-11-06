@@ -1,5 +1,4 @@
-// Pinia is auto-imported by Nuxt
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import {
   useAppKit,
   useAppKitAccount,

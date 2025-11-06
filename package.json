@@ -19,7 +19,7 @@
     "reinstall": "pnpm clean && pnpm install"
   },
   "dependencies": {
-    "@nuxt/ui": "4.0.0",
+    "@nuxt/ui": "4.1.0",
     "@reown/appkit": "^1.7.18",
     "@reown/appkit-adapter-wagmi": "^1.7.18",
     "@tanstack/vue-query": "^5.83.1",
