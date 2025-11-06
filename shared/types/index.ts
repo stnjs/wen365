@@ -150,8 +150,3 @@ export interface ChartDataset {
   borderColor?: string | string[];
   borderWidth?: number;
 }
-export interface PortfolioResponse {
-  totalValue: number;
-  totalValueChange24h: number;
-  totalValueChangePercent24h: number;
-}
