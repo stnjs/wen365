@@ -1,19 +1,5 @@
-import type {
-  AlchemyToken,
-  AlchemyTokensByAddressResponse,
-} from "@server/types";
-import { calculateTokenValue } from "@server/utils/blockchainUtils";
-/**
- * Calculates the total USD value of all tokens in the portfolio
- * @param assets - Array of Alchemy token objects
- * @returns The total USD value of all tokens
- */
-const calculateTotalValue = (assets: AlchemyToken[]): number => {
-  return assets.reduce((acc, asset) => {
-    const tokenValue = calculateTokenValue(asset);
-    return acc + tokenValue;
-  }, 0);
-};
+import type { AlchemyTokensByAddressResponse } from "@server/types";
+import { calculatePortfolioTotalValue } from "@server/utils/blockchainUtils";
 
 const getAlchemyTokensByAddress = async (
   walletAddress: string
@@ -105,7 +91,9 @@ export default defineEventHandler(async (event): Promise<PortfolioResponse> => {
   try {
     const alchemyTokensByAddress =
       await getAlchemyTokensByAddress(walletAddress);
-    const totalValue = calculateTotalValue(alchemyTokensByAddress.data.tokens);
+    const totalValue = calculatePortfolioTotalValue(
+      alchemyTokensByAddress.data.tokens
+    );
     return {
       totalValue: totalValue,
       totalValueChange24h: 0,

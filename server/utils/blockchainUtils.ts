@@ -6,7 +6,7 @@ import { formatUnits } from "viem";
  * @param token - The Alchemy token object with balance, decimals, and price info
  * @returns The USD value of the token balance
  */
-export const calculateTokenValue = (token: AlchemyToken): number => {
+export const calculateTokenUsdValue = (token: AlchemyToken): number => {
   try {
     // Get the token balance as hex string
     const balanceHex = token.tokenBalance;
@@ -36,4 +36,18 @@ export const calculateTokenValue = (token: AlchemyToken): number => {
     );
     return 0;
   }
+};
+
+/**
+ * Calculates the total USD value of all tokens in the portfolio
+ * @param assets - Array of Alchemy token objects
+ * @returns The total USD value of all tokens
+ */
+export const calculatePortfolioTotalValue = (
+  assets: AlchemyToken[]
+): number => {
+  return assets.reduce((acc, asset) => {
+    const tokenValue = calculateTokenUsdValue(asset);
+    return acc + tokenValue;
+  }, 0);
 };

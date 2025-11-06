@@ -181,9 +181,6 @@ const searchTerm = ref("");
 const address = computed(() => walletStore.address);
 const isLoading = computed(() => portfolioStore.isLoading);
 const totalValue = computed(() => portfolioStore.totalValue);
-const taxFreeValue = computed(() => portfolioStore.taxFreeValue);
-const taxableValue = computed(() => portfolioStore.taxableValue);
-const assets = computed(() => portfolioStore.assets);
 
 const filteredAssets = computed(() => {
   if (!searchTerm.value) return assets.value;
