@@ -241,7 +241,6 @@ import { computed, onMounted } from "vue";
 import { useWalletStore } from "~/stores/wallet";
 import { usePortfolioStore } from "~/stores/portfolio";
 import { useSettingsStore } from "~/stores/settings";
-import type { FIFOHolding } from "~/types";
 
 const walletStore = useWalletStore();
 const portfolioStore = usePortfolioStore();

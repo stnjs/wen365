@@ -1,6 +1,5 @@
 // Pinia is auto-imported by Nuxt
 import { ref, computed } from "vue";
-import type { TaxSettings, NotificationSettings } from "~/types";
 
 export const useSettingsStore = defineStore("settings", () => {
   // State
