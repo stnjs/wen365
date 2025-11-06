@@ -1,12 +1,23 @@
-export default defineEventHandler(async event => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const config = useRuntimeConfig(event);
-  const alchemyApiKey = config.alchemyApiKey;
+import type {
+  AlchemyToken,
+  AlchemyTokensByAddressResponse,
+} from "@server/types";
+import { calculateTokenValue } from "@server/utils/blockchainUtils";
+/**
+ * Calculates the total USD value of all tokens in the portfolio
+ * @param assets - Array of Alchemy token objects
+ * @returns The total USD value of all tokens
+ */
+const calculateTotalValue = (assets: AlchemyToken[]): number => {
+  return assets.reduce((acc, asset) => {
+    const tokenValue = calculateTokenValue(asset);
+    return acc + tokenValue;
+  }, 0);
+};
 
-  const walletAddress = getRouterParam(event, "walletAddress");
-  if (!walletAddress) return;
-
+const getAlchemyTokensByAddress = async (
+  walletAddress: string
+): Promise<AlchemyTokensByAddressResponse> => {
   const responseBody = {
     addresses: [
       {
@@ -15,17 +26,97 @@ export default defineEventHandler(async event => {
       },
     ],
   };
+
+  // const response = await $fetch(
+  //   `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`,
+  //   {
+  //     method: "POST",
+  //     body: responseBody,
+  //   }
+  // );
+  const mockResponse: AlchemyTokensByAddressResponse = {
+    data: {
+      tokens: [
+        {
+          address: "0x867c61e6f2004f45fabfc9ca0a31720ed29038bf",
+          network: "eth-mainnet",
+          tokenAddress: null,
+          tokenBalance:
+            "0x0000000000000000000000000000000000000000000000000025194869f764f4",
+          tokenMetadata: {
+            symbol: null,
+            decimals: null,
+            name: null,
+            logo: null,
+          },
+          tokenPrices: [
+            {
+              currency: "usd",
+              value: "3401.580304953",
+              lastUpdatedAt: "2025-11-06T10:43:23Z",
+            },
+          ],
+        },
+        {
+          address: "0x867c61e6f2004f45fabfc9ca0a31720ed29038bf",
+          network: "eth-mainnet",
+          tokenAddress: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          tokenBalance:
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+          tokenMetadata: {
+            decimals: 18,
+            logo: "https://static.alchemyapi.io/images/assets/2396.png",
+            name: "WETH",
+            symbol: "WETH",
+          },
+          tokenPrices: [
+            {
+              currency: "usd",
+              value: "3401.255935411",
+              lastUpdatedAt: "2025-11-06T10:43:04Z",
+            },
+          ],
+        },
+      ],
+      pageKey: null,
+    },
+  };
+  const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(
+    () => {
+      return mockResponse;
+    }
+  );
+  console.log(response);
+  return response as AlchemyTokensByAddressResponse;
+};
+
+export default defineEventHandler(async (event): Promise<PortfolioResponse> => {
+  // Simulate API delay
+  const config = useRuntimeConfig(event);
+  const alchemyApiKey = config.alchemyApiKey;
+  const walletAddress = getRouterParam(event, "walletAddress");
+  if (!walletAddress) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Wallet address is required",
+    });
+  }
+
   try {
-    const response = await $fetch(
-      `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`,
-      {
-        method: "POST",
-        body: responseBody,
-      }
-    );
-    return response;
-  } catch (error) {
-    console.log(error);
+    const alchemyTokensByAddress =
+      await getAlchemyTokensByAddress(walletAddress);
+    const totalValue = calculateTotalValue(alchemyTokensByAddress.data.tokens);
+    return {
+      totalValue: totalValue,
+      totalValueChange24h: 0,
+      totalValueChangePercent24h: 0,
+    };
+  } catch (error: any) {
+    console.error("Alchemy API error:", error);
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage: error.message || "Failed to fetch portfolio data",
+    });
   }
 
   // Mock portfolio data
