@@ -24,6 +24,9 @@ export default defineNuxtConfig({
   // CSS and styling
   css: ["~/assets/css/main.css"],
 
+  // Plugins
+  plugins: ["~/plugins/01.vue-query"],
+
   // Modules
   modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui"],
 
