@@ -154,15 +154,16 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useWalletStore } from "~/stores/wallet";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
+const accountData = useAppKitAccount();
+const { open } = useAppKit();
 
-const walletStore = useWalletStore();
-
-const isConnected = computed(() => walletStore.isConnected);
-const isConnecting = computed(() => walletStore.isConnecting);
+const isConnected = computed(() => accountData.value?.isConnected);
+const isConnecting = computed(() => accountData.value?.status === "connecting");
 
 const connectWallet = async () => {
   try {
-    await walletStore.connectWallet();
+    open({ view: "Connect" });
   } catch (error) {
     console.error("Failed to connect wallet:", error);
   }
