@@ -17,7 +17,7 @@
           Something went wrong
         </h2>
         <p class="text-gray-600 mb-4">{{ error }}</p>
-        <button @click="refreshPortfolio" class="btn-primary">Try Again</button>
+        <button @click="refetchPortfolio" class="btn-primary">Try Again</button>
       </div>
 
       <!-- Dashboard Content -->
@@ -180,55 +180,55 @@ import { computed, onMounted } from "vue";
 import { useWalletStore } from "~/stores/wallet";
 import { usePortfolioStore } from "~/stores/portfolio";
 
-const walletStore = useWalletStore();
-const portfolioStore = usePortfolioStore();
+// const walletStore = useWalletStore();
+// const portfolioStore = usePortfolioStore();
 
-const isConnected = computed(() => walletStore.isConnected);
-const address = computed(() => walletStore.address);
-const isLoading = computed(() => portfolioStore.isLoading);
-const error = computed(() => portfolioStore.error);
+// const isConnected = computed(() => walletStore.isConnected);
+// const address = computed(() => walletStore.address);
+// const isLoading = computed(() => portfolioStore.isLoading);
+// const error = computed(() => portfolioStore.error);
 
-const totalValue = computed(() => portfolioStore.totalValue);
-const totalValueChange24h = computed(() => portfolioStore.totalValueChange24h);
-const totalValueChangePercent24h = computed(
-  () => portfolioStore.totalValueChangePercent24h
-);
-const taxFreeValue = computed(() => portfolioStore.taxFreeValue);
-const taxableValue = computed(() => portfolioStore.taxableValue);
-const taxFreeAssets = computed(() => portfolioStore.taxFreeAssets);
-const taxableAssets = computed(() => portfolioStore.taxableAssets);
-const assets = computed(() => portfolioStore.assets);
-const transactions = computed(() => portfolioStore.transactions);
+// const totalValue = computed(() => portfolioStore.totalValue);
+// const totalValueChange24h = computed(() => portfolioStore.totalValueChange24h);
+// const totalValueChangePercent24h = computed(
+//   () => portfolioStore.totalValueChangePercent24h
+// );
+// const taxFreeValue = computed(() => portfolioStore.taxFreeValue);
+// const taxableValue = computed(() => portfolioStore.taxableValue);
+// const taxFreeAssets = computed(() => portfolioStore.taxFreeAssets);
+// const taxableAssets = computed(() => portfolioStore.taxableAssets);
+// const assets = computed(() => portfolioStore.assets);
+// const transactions = computed(() => portfolioStore.transactions);
 
-const shortAddress = computed(() => {
-  if (!address.value) return "";
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
-});
+// const shortAddress = computed(() => {
+//   if (!address.value) return "";
+//   return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
+// });
 
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(num);
-};
+// const formatNumber = (num: number) => {
+//   return new Intl.NumberFormat("en-US", {
+//     minimumFractionDigits: 0,
+//     maximumFractionDigits: 2,
+//   }).format(num);
+// };
 
-const formatDate = (timestamp: number) => {
-  return new Date(timestamp * 1000).toLocaleDateString();
-};
+// const formatDate = (timestamp: number) => {
+//   return new Date(timestamp * 1000).toLocaleDateString();
+// };
 
-const refreshPortfolio = async () => {
-  if (address.value) {
-    await portfolioStore.refreshPortfolio(address.value);
-  }
-};
+// const refreshPortfolio = async () => {
+//   if (address.value) {
+//     await portfolioStore.refreshPortfolio(address.value);
+//   }
+// };
 
-const openAccountModal = () => {
-  walletStore.openAccountModal();
-};
+// const openAccountModal = () => {
+//   walletStore.openAccountModal();
+// };
 
-onMounted(async () => {
-  if (address.value) {
-    await refreshPortfolio();
-  }
-});
+// onMounted(async () => {
+//   if (address.value) {
+//     await refreshPortfolio();
+//   }
+// });
 </script>

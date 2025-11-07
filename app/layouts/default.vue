@@ -58,6 +58,8 @@
 
           <!-- Wallet Connection Status -->
           <appkit-button />
+          {{ address }}
+          {{ isConnected }}
         </div>
       </div>
     </nav>
@@ -82,12 +84,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useWalletStore } from "~/stores/wallet";
-
-const walletStore = useWalletStore();
-
-const isConnected = computed(() => walletStore.isConnected);
-
-console.log(isConnected);
+import { computed, onMounted } from "vue";
+import {
+  useAppKitAccount,
+  useAppKitNetwork,
+  useAppKit,
+  useDisconnect,
+} from "@reown/appkit/vue";
+// State
+const connectionError = ref<string | null>(null);
+const accountData = useAppKitAccount();
+const networkData = useAppKitNetwork();
+const isConnected = computed(() => accountData.value?.isConnected);
+const address = computed(() => accountData.value?.address);
+const chainId = computed(() => networkData.value?.chainId);
+const isConnecting = computed(() => accountData.value?.status === "connecting");
+const { open } = useAppKit();
 </script>
