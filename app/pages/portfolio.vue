@@ -4,7 +4,7 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-mint-500">Portfolio</h1>
-        <button @click="refreshPortfolio" class="btn-primary">Refresh</button>
+        <button @click="refetchPortfolio" class="btn-primary">Refresh</button>
       </div>
 
       <!-- Loading State -->
@@ -22,23 +22,7 @@
           <div class="card">
             <h3 class="text-sm font-medium text-gray-500 mb-2">Total Value</h3>
             <div class="text-2xl font-bold text-gray-900">
-              ${{ formatNumber(totalValue) }}
-            </div>
-          </div>
-          <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Tax-Free Value
-            </h3>
-            <div class="text-2xl font-bold text-crypto-green">
-              ${{ formatNumber(taxFreeValue) }}
-            </div>
-          </div>
-          <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Taxable Value
-            </h3>
-            <div class="text-2xl font-bold text-crypto-red">
-              ${{ formatNumber(taxableValue) }}
+              ${{ totalValue }}
             </div>
           </div>
         </div>
@@ -56,8 +40,10 @@
               />
             </div>
           </div>
+          {{ portfolio }}
+          {{ address }}
 
-          <div v-if="filteredAssets.length === 0" class="text-center py-12">
+          <!-- <div v-if="filteredAssets.length === 0" class="text-center py-12">
             <div class="text-4xl mb-4">📊</div>
             <p class="text-gray-600">No assets found</p>
             <p class="text-sm text-gray-500">
@@ -161,7 +147,7 @@
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> -->
         </div>
       </div>
     </main>
@@ -170,51 +156,25 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { useWalletStore } from "~/stores/wallet";
-import { usePortfolioStore } from "~/stores/portfolio";
+import { usePortfolio } from "~/composables/queries/usePortfolio";
+import { useAppKitAccount } from "@reown/appkit/vue";
 
-const walletStore = useWalletStore();
-const portfolioStore = usePortfolioStore();
+const accountData = useAppKitAccount();
+const address = computed<string | undefined>(() => accountData.value?.address);
+
+const {
+  data: portfolio,
+  isLoading,
+  refetch: refetchPortfolio,
+} = usePortfolio(address);
+
+const totalValue = computed<number>(() => portfolio.value?.totalValue || 0);
 
 const searchTerm = ref("");
 
-const address = computed(() => walletStore.address);
-const isLoading = computed(() => portfolioStore.isLoading);
-const totalValue = computed(() => portfolioStore.totalValue);
-
-const filteredAssets = computed(() => {
-  if (!searchTerm.value) return assets.value;
-
-  return assets.value.filter(
-    (asset: any) =>
-      asset.token.symbol
-        .toLowerCase()
-        .includes(searchTerm.value.toLowerCase()) ||
-      asset.token.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
+onMounted(async () => {
+  if (address.value) {
+    await refetchPortfolio();
+  }
 });
-
-const formatNumber = (num: number) => {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(num);
-};
-
-const formatBalance = (balance: string, decimals: number) => {
-  const num = parseFloat(balance) / Math.pow(10, decimals);
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 6,
-  }).format(num);
-};
-
-const refreshPortfolio = async () => {
-  // if (address.value) {
-  //   await portfolioStore.fetchPortfolio(address.value);
-  // }
-  await portfolioStore.fetchPortfolio2();
-};
-
-onMounted(async () => {});
 </script>
