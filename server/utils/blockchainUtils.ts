@@ -1,6 +1,6 @@
 import type { AlchemyToken } from "../types";
 import { formatUnits } from "viem";
-
+import { roundToTwoDecimals } from "./formatterUtils";
 /**
  * Calculates the USD value of a single token
  * @param token - The Alchemy token object with balance, decimals, and price info
@@ -46,8 +46,9 @@ export const calculateTokenUsdValue = (token: AlchemyToken): number => {
 export const calculatePortfolioTotalValue = (
   assets: AlchemyToken[]
 ): number => {
-  return assets.reduce((acc, asset) => {
+  const totalValue = assets.reduce((acc, asset) => {
     const tokenValue = calculateTokenUsdValue(asset);
     return acc + tokenValue;
   }, 0);
+  return roundToTwoDecimals(totalValue);
 };
