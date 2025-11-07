@@ -78,7 +78,7 @@ const getAlchemyTokensByAddress = async (
   );
 };
 
-export default defineEventHandler(async (event): Promise<PortfolioResponse> => {
+export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   const config = useRuntimeConfig(event);
   const alchemyApiKey = config.alchemyApiKey;
   const walletAddress = getRouterParam(event, "walletAddress");
