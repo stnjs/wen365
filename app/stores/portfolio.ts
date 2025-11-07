@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 
 export const usePortfolioStore = defineStore("portfolio", () => {
   // State
-  const portfolio = ref<PortfolioResponse | null>(null);
+  const portfolio = ref<PortfolioDto | null>(null);
 
   // Getters
   const totalValue = computed(() => portfolio.value?.totalValue ?? 0);
