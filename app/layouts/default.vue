@@ -58,8 +58,6 @@
 
           <!-- Wallet Connection Status -->
           <appkit-button />
-          {{ address }}
-          {{ isConnected }}
         </div>
       </div>
     </nav>
@@ -89,10 +87,8 @@ import {
   useAppKitAccount,
   useAppKitNetwork,
   useAppKit,
-  useDisconnect,
 } from "@reown/appkit/vue";
 // State
-const connectionError = ref<string | null>(null);
 const accountData = useAppKitAccount();
 const networkData = useAppKitNetwork();
 const isConnected = computed(() => accountData.value?.isConnected);

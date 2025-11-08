@@ -1,83 +1,9 @@
 import type { AlchemyTokensByAddressResponse } from "@server/types";
 import { calculatePortfolioTotalValue } from "@server/utils/blockchainUtils";
-
-const mockResponse: AlchemyTokensByAddressResponse = {
-  data: {
-    tokens: [
-      {
-        address: "0x867c61e6f2004f45fabfc9ca0a31720ed29038bf",
-        network: "eth-mainnet",
-        tokenAddress: null,
-        tokenBalance:
-          "0x0000000000000000000000000000000000000000000000000025194869f764f4",
-        tokenMetadata: {
-          symbol: null,
-          decimals: null,
-          name: null,
-          logo: null,
-        },
-        tokenPrices: [
-          {
-            currency: "usd",
-            value: "3401.580304953",
-            lastUpdatedAt: "2025-11-06T10:43:23Z",
-          },
-        ],
-      },
-      {
-        address: "0x867c61e6f2004f45fabfc9ca0a31720ed29038bf",
-        network: "eth-mainnet",
-        tokenAddress: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        tokenBalance:
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-        tokenMetadata: {
-          decimals: 18,
-          logo: "https://static.alchemyapi.io/images/assets/2396.png",
-          name: "WETH",
-          symbol: "WETH",
-        },
-        tokenPrices: [
-          {
-            currency: "usd",
-            value: "3401.255935411",
-            lastUpdatedAt: "2025-11-06T10:43:04Z",
-          },
-        ],
-      },
-    ],
-    pageKey: null,
-  },
-};
-const getMockResponse = async () => {
-  const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(
-    () => {
-      return mockResponse;
-    }
-  );
-  return response as AlchemyTokensByAddressResponse;
-};
-
-const getAlchemyTokensByAddress = async (
-  walletAddress: string,
-  alchemyApiKey: string
-): Promise<AlchemyTokensByAddressResponse> => {
-  const responseBody = {
-    addresses: [
-      {
-        address: walletAddress,
-        networks: ["eth-mainnet"],
-      },
-    ],
-  };
-  return await $fetch<AlchemyTokensByAddressResponse>(
-    `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`,
-    {
-      method: "POST",
-      body: responseBody,
-    }
-  );
-};
-
+import {
+  getAlchemyTokensByAddress,
+  getPortfolio,
+} from "@server/services/portfolio.service";
 export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   const config = useRuntimeConfig(event);
   const alchemyApiKey = config.alchemyApiKey;
@@ -90,19 +16,7 @@ export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   }
 
   try {
-    const alchemyTokensByAddress = await getAlchemyTokensByAddress(
-      walletAddress,
-      alchemyApiKey
-    );
-    console.log(alchemyTokensByAddress);
-    const totalValue = calculatePortfolioTotalValue(
-      alchemyTokensByAddress.data.tokens
-    );
-    return {
-      totalValue: totalValue,
-      totalValueChange24h: 0,
-      totalValueChangePercent24h: 0,
-    };
+    return await getPortfolio(walletAddress, alchemyApiKey);
   } catch (error: any) {
     console.error("Alchemy API error:", error);
     throw createError({
