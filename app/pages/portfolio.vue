@@ -40,9 +40,7 @@
               />
             </div>
           </div>
-          {{ portfolio }}
-          {{ address }}
-
+          {{ tokens }}
           <!-- <div v-if="filteredAssets.length === 0" class="text-center py-12">
             <div class="text-4xl mb-4">📊</div>
             <p class="text-gray-600">No assets found</p>
@@ -169,6 +167,7 @@ const {
 } = usePortfolio(address);
 
 const totalValue = computed<number>(() => portfolio.value?.totalValue || 0);
+const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
 
 const searchTerm = ref("");
 
