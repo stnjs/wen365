@@ -3,14 +3,18 @@
     <!-- Hero Section -->
     <section class="py-20 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto text-center">
-        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+        <h1
+          class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6"
+        >
           Track Your Crypto
           <span
             class="bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-400 bg-clip-text text-transparent"
             >Tax-Free Journey</span
           >
         </h1>
-        <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+        <p
+          class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto"
+        >
           Monitor your crypto holdings with FIFO logic and know exactly when
           your assets become tax-free. Perfect for DeFi users and tax planning
           in countries like Germany.
@@ -72,9 +76,14 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section
+      id="features"
+      class="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800"
+    >
       <div class="max-w-7xl mx-auto">
-        <h2 class="text-4xl font-bold text-center text-gray-900 mb-16">
+        <h2
+          class="text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-16"
+        >
           Why Choose HODLTracker?
         </h2>
 

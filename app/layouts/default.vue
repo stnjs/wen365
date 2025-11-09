@@ -1,10 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <!-- Navigation -->
-    <UHeader class="bg-white shadow-sm border-b border-gray-200">
+    <UHeader
+      class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700"
+    >
       <template #title>
-        <div
-          class="flex items-center space-x-2 text-xl font-bold text-gray-900"
+        <NuxtLink
+          to="/"
+          class="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-gray-100"
         >
           <div
             class="w-8 h-8 bg-primary-600 dark:bg-primary-500 rounded-lg flex items-center justify-center"
@@ -12,10 +15,8 @@
             <span class="text-white font-bold text-sm">H</span>
           </div>
           <span>HODL Tracker</span>
-        </div>
+        </NuxtLink>
       </template>
-      <!-- <div class="flex justify-between items-center h-16"> -->
-      <!-- Logo -->
 
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
@@ -34,23 +35,28 @@
           Settings
         </UButton>
       </div>
+
       <template #right>
-        <!-- Wallet Connection Status -->
-        <appkit-button />
+        <div class="flex items-center gap-2">
+          <!-- Wallet Connection Status -->
+          <appkit-button />
+          <UColorModeButton />
+        </div>
       </template>
-      <!-- </div> -->
     </UHeader>
 
     <!-- Main Content -->
-    <UMain>
+    <UMain class="flex-1">
       <slot />
     </UMain>
 
     <!-- Footer -->
-    <UFooter class="bg-white border-t border-gray-200 mt-auto">
+    <UFooter
+      class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto"
+    >
       <UContainer>
         <div class="py-6">
-          <div class="text-center text-gray-500 text-sm">
+          <div class="text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>HODL Tracker - Crypto Tax Tracking with FIFO Logic</p>
             <p class="mt-1">
               For informational purposes only. Consult a tax professional.
