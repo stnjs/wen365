@@ -1,12 +1,51 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+@theme static {
+  /* Perano color palette as perano */
+  --color-perano-50: #eff4fe;
+  --color-perano-100: #e2eafd;
+  --color-perano-200: #cbd7fa;
+  --color-perano-300: #a9bcf6;
+  --color-perano-400: #899af0;
+  --color-perano-500: #6c78e8;
+  --color-perano-600: #5154da;
+  --color-perano-700: #4242c0;
+  --color-perano-800: #38399b;
+  --color-perano-900: #34377b;
+  --color-perano-950: #1e1e48;
+}
+
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
   }
 }
+/* --color-azure-radiance-50: #f0f8fe;
+--color-azure-radiance-100: #ddeefc;
+--color-azure-radiance-200: #c3e3fa;
+--color-azure-radiance-300: #9ad2f6;
+--color-azure-radiance-400: #6ab9f0;
+--color-azure-radiance-500: #479cea;
+--color-azure-radiance-600: #3683df;
+--color-azure-radiance-700: #296bcc;
+--color-azure-radiance-800: #2757a6;
+--color-azure-radiance-900: #254a83;
+--color-azure-radiance-950: #1b2f50;
+ */
+
+/* --color-perano-50: #eff4fe;
+--color-perano-100: #e2eafd;
+--color-perano-200: #cbd7fa;
+--color-perano-300: #a9bcf6;
+--color-perano-400: #899af0;
+--color-perano-500: #6c78e8;
+--color-perano-600: #5154da;
+--color-perano-700: #4242c0;
+--color-perano-800: #38399b;
+--color-perano-900: #34377b;
+--color-perano-950: #1e1e48; */

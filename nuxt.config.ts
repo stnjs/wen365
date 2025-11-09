@@ -25,10 +25,15 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   // Plugins
-  plugins: ["~/plugins/01.vue-query"],
+  plugins: ["~/plugins/01.vue-query", "~/plugins/02.wagmi"],
 
   // Modules
   modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui"],
+
+  colorMode: {
+    preference: "system", // 'light', 'dark', or 'system'
+    fallback: "dark",
+  },
 
   // Runtime config for environment variables
   runtimeConfig: {
@@ -60,7 +65,7 @@ export default defineNuxtConfig({
           content:
             "Crypto-native web app for tracking crypto asset holding periods with FIFO logic for tax exemptions",
         },
-        { name: "theme-color", content: "#3b82f6" },
+        { name: "theme-color", content: "#5154da" }, // Perano-600
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
