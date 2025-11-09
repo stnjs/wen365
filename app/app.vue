@@ -1,11 +1,9 @@
 <template>
-  <div id="app">
+  <UApp>
     <NuxtLayout>
-      <UApp>
-        <NuxtPage />
-      </UApp>
+      <NuxtPage />
     </NuxtLayout>
-  </div>
+  </UApp>
 </template>
 
 <script setup lang="ts">
@@ -25,9 +23,3 @@ createAppKit({
   themeMode: "light",
 });
 </script>
-
-<style>
-#app {
-  font-family: "Inter", system-ui, sans-serif;
-}
-</style>

@@ -1,99 +1,67 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-      <div
-        class="flex justify-between h-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-      >
-        <!-- Logo and Navigation Links -->
-        <NuxtLink
-          to="/"
+    <UHeader class="bg-white shadow-sm border-b border-gray-200">
+      <template #title>
+        <div
           class="flex items-center space-x-2 text-xl font-bold text-gray-900"
         >
           <div
-            class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center"
+            class="w-8 h-8 bg-primary-600 dark:bg-primary-500 rounded-lg flex items-center justify-center"
           >
             <span class="text-white font-bold text-sm">H</span>
           </div>
           <span>HODL Tracker</span>
-        </NuxtLink>
-
-        <div class="hidden md:flex items-center space-x-1">
-          <NuxtLink
-            to="/"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Home
-          </NuxtLink>
-          <NuxtLink
-            to="/dashboard"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Dashboard
-          </NuxtLink>
-          <NuxtLink
-            to="/portfolio"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Portfolio
-          </NuxtLink>
-          <NuxtLink
-            to="/tax-free"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Tax Free
-          </NuxtLink>
-          <NuxtLink
-            to="/export"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Export
-          </NuxtLink>
-          <NuxtLink
-            to="/settings"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Settings
-          </NuxtLink>
-
-          <!-- Wallet Connection Status -->
-          <appkit-button />
         </div>
+      </template>
+      <!-- <div class="flex justify-between items-center h-16"> -->
+      <!-- Logo -->
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center space-x-1">
+        <UButton to="/" variant="ghost" color="gray"> Home </UButton>
+        <UButton to="/dashboard" variant="ghost" color="gray">
+          Dashboard
+        </UButton>
+        <UButton to="/portfolio" variant="ghost" color="gray">
+          Portfolio
+        </UButton>
+        <UButton to="/tax-free" variant="ghost" color="gray">
+          Tax Free
+        </UButton>
+        <UButton to="/export" variant="ghost" color="gray"> Export </UButton>
+        <UButton to="/settings" variant="ghost" color="gray">
+          Settings
+        </UButton>
       </div>
-    </nav>
+      <template #right>
+        <!-- Wallet Connection Status -->
+        <appkit-button />
+      </template>
+      <!-- </div> -->
+    </UHeader>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <UMain>
       <slot />
-    </main>
+    </UMain>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="text-center text-gray-500 text-sm">
-          <p>HODL Tracker - Crypto Tax Tracking with FIFO Logic</p>
-          <p class="mt-1">
-            For informational purposes only. Consult a tax professional.
-          </p>
+    <UFooter class="bg-white border-t border-gray-200 mt-auto">
+      <UContainer>
+        <div class="py-6">
+          <div class="text-center text-gray-500 text-sm">
+            <p>HODL Tracker - Crypto Tax Tracking with FIFO Logic</p>
+            <p class="mt-1">
+              For informational purposes only. Consult a tax professional.
+            </p>
+          </div>
         </div>
-      </div>
-    </footer>
+      </UContainer>
+    </UFooter>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
-import {
-  useAppKitAccount,
-  useAppKitNetwork,
-  useAppKit,
-} from "@reown/appkit/vue";
-// State
-const accountData = useAppKitAccount();
-const networkData = useAppKitNetwork();
-const isConnected = computed(() => accountData.value?.isConnected);
-const address = computed(() => accountData.value?.address);
-const chainId = computed(() => networkData.value?.chainId);
-const isConnecting = computed(() => accountData.value?.status === "connecting");
-const { open } = useAppKit();
+// Layout component - no script logic needed
 </script>
