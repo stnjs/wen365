@@ -69,5 +69,22 @@
 </template>
 
 <script setup lang="ts">
-// Layout component - no script logic needed
+import { watch } from "vue";
+import { useColorMode } from "#imports";
+import { useAppKitTheme } from "@reown/appkit/vue";
+
+// Sync AppKit theme with Nuxt UI color mode
+const colorMode = useColorMode();
+const { setThemeMode } = useAppKitTheme();
+
+// Watch for color mode changes and sync AppKit
+watch(
+  () => colorMode.value,
+  newMode => {
+    // AppKit supports 'light' and 'dark', map system to resolved value
+    const appKitMode = newMode === "dark" ? "dark" : "light";
+    setThemeMode(appKitMode);
+  },
+  { immediate: true }
+);
 </script>

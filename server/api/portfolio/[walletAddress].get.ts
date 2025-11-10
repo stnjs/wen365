@@ -1,9 +1,4 @@
-import type { AlchemyTokensByAddressResponse } from "@server/types";
-import { calculatePortfolioTotalValue } from "@server/utils/blockchainUtils";
-import {
-  getAlchemyTokensByAddress,
-  getPortfolio,
-} from "@server/services/portfolio.service";
+import { getPortfolio } from "@server/services/portfolio.service";
 export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   const config = useRuntimeConfig(event);
   const alchemyApiKey = config.alchemyApiKey;

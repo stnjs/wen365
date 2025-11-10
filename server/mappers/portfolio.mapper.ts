@@ -1,11 +1,10 @@
-import type {
-  AlchemyTokensByAddressResponse,
-  AlchemyToken,
-} from "@server/types";
-import { calculateTokenUsdValue } from "@server/utils/blockchainUtils";
+import type { AlchemyToken } from "@server/types";
+import {
+  calculateTokenUsdValue,
+  convertTokenBalanceToNumber,
+} from "@server/utils/blockchainUtils";
 
 export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
-  // Extract USD price (find USD in the prices array, fallback to first price)
   const usdPrice =
     alchemyToken.tokenPrices.find(p => p.currency.toLowerCase() === "usd") ||
     alchemyToken.tokenPrices[0];
@@ -13,10 +12,12 @@ export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
   const tokenPrice = usdPrice ? parseFloat(usdPrice.value) : 0;
   const tokenValue = calculateTokenUsdValue(alchemyToken);
 
+  const tokenBalance = convertTokenBalanceToNumber(alchemyToken);
+
   return {
     network: alchemyToken.network,
     tokenAddress: alchemyToken.tokenAddress,
-    tokenBalance: alchemyToken.tokenBalance,
+    tokenBalance,
     tokenMetadata: {
       symbol: alchemyToken.tokenMetadata.symbol,
       decimals: alchemyToken.tokenMetadata.decimals,
@@ -28,14 +29,20 @@ export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
   };
 }
 
+/**
+ * Maps data to PortfolioDto
+ * Pure transformation function - no business logic
+ * @param totalValue - Pre-calculated total portfolio value
+ * @param tokens - Pre-processed and filtered tokens
+ */
 export function mapToPortfolioDto(
-  alchemyResponse: AlchemyTokensByAddressResponse,
-  totalValue: number
+  totalValue: number,
+  tokens: TokenDto[]
 ): PortfolioDto {
   return {
     totalValue,
     totalValueChange24h: 0, // TODO: Implement 24h change calculation
     totalValueChangePercent24h: 0,
-    tokens: alchemyResponse.data.tokens.map(token => mapToTokenDto(token)),
+    tokens,
   };
 }

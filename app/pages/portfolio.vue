@@ -21,37 +21,12 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <UCard>
             <h3 class="text-sm font-medium text-gray-500 mb-2">Total Value</h3>
-            <div class="text-2xl font-bold text-gray-900">
-              ${{ totalValue }}
-            </div>
+            <div class="text-2xl font-bold">{{ totalValue }}</div>
           </UCard>
         </div>
-
         <!-- Assets Table -->
-        <UCard>
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-900">Your Assets</h2>
-            <div class="flex space-x-2">
-              <UInput
-                v-model="searchTerm"
-                placeholder="Search assets..."
-                class="w-64"
-              />
-            </div>
-          </div>
-          {{ tokens }}
-          <!-- <div v-if="filteredAssets.length === 0" class="text-center py-12">
-            <div class="text-4xl mb-4">📊</div>
-            <p class="text-gray-600">No assets found</p>
-            <p class="text-sm text-gray-500">
-              Connect your wallet to see your portfolio
-            </p>
-          </div>
-
-          <div v-else class="overflow-x-auto">
-            <UTable :rows="filteredAssets" :columns="tableColumns" />
-          </div> -->
-        </UCard>
+        <AssetsTable :tokens="tokens" />
+        {{ tokens }}
       </div>
     </main>
   </div>
@@ -61,6 +36,7 @@
 import { computed, onMounted, ref } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
+import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
 
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
@@ -71,7 +47,12 @@ const {
   refetch: refetchPortfolio,
 } = usePortfolio(address);
 
-const totalValue = computed<number>(() => portfolio.value?.totalValue || 0);
+const totalValue = computed<string>(() => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(portfolio.value?.totalValue || 0);
+});
 const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
 
 const searchTerm = ref("");
