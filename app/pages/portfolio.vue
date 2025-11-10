@@ -3,9 +3,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Portfolio
-        </h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Portfolio</h1>
         <UButton @click="refetchPortfolio" color="primary">Refresh</UButton>
       </div>
 
@@ -41,11 +39,7 @@ import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
 
-const {
-  data: portfolio,
-  isLoading,
-  refetch: refetchPortfolio,
-} = usePortfolio(address);
+const { data: portfolio, isLoading, refetch: refetchPortfolio } = usePortfolio(address);
 
 const totalValue = computed<string>(() => {
   return new Intl.NumberFormat("en-US", {
