@@ -121,23 +121,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { computed } from "vue";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 
-const router = useRouter();
 const accountData = useAppKitAccount();
 const { open } = useAppKit();
 
 const isConnected = computed(() => accountData.value?.isConnected);
 const isConnecting = computed(() => accountData.value?.status === "connecting");
-
-// Navigate to portfolio after wallet connection
-watch(isConnected, newValue => {
-  if (newValue) {
-    router.push("/portfolio");
-  }
-});
 
 const connectWallet = async () => {
   try {
