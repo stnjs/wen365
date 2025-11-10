@@ -33,7 +33,7 @@ export const useSettingsStore = defineStore("settings", () => {
   };
 
   const updateNotificationSettings = async (
-    notificationSettings: Partial<NotificationSettings>
+    notificationSettings: Partial<NotificationSettings>,
   ) => {
     settings.value.notifications = {
       ...settings.value.notifications,
@@ -80,8 +80,7 @@ export const useSettingsStore = defineStore("settings", () => {
         settings.value = { ...settings.value, ...data };
       }
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : "Failed to load settings";
+      error.value = err instanceof Error ? err.message : "Failed to load settings";
     } finally {
       isLoading.value = false;
     }
@@ -95,8 +94,7 @@ export const useSettingsStore = defineStore("settings", () => {
         body: settings.value,
       });
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : "Failed to save settings";
+      error.value = err instanceof Error ? err.message : "Failed to save settings";
     }
   };
 

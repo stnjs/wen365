@@ -1,8 +1,5 @@
 import type { AlchemyToken } from "@server/types";
-import {
-  calculateTokenUsdValue,
-  convertTokenBalanceToNumber,
-} from "@server/utils/blockchainUtils";
+import { calculateTokenUsdValue, convertTokenBalanceToNumber } from "@server/utils/blockchainUtils";
 
 export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
   const usdPrice =
@@ -35,10 +32,7 @@ export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
  * @param totalValue - Pre-calculated total portfolio value
  * @param tokens - Pre-processed and filtered tokens
  */
-export function mapToPortfolioDto(
-  totalValue: number,
-  tokens: TokenDto[]
-): PortfolioDto {
+export function mapToPortfolioDto(totalValue: number, tokens: TokenDto[]): PortfolioDto {
   return {
     totalValue,
     totalValueChange24h: 0, // TODO: Implement 24h change calculation

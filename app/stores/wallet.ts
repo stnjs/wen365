@@ -1,9 +1,5 @@
 import { ref, computed } from "vue";
-import {
-  useAppKit,
-  useAppKitAccount,
-  useAppKitNetwork,
-} from "@reown/appkit/vue";
+import { useAppKit, useAppKitAccount, useAppKitNetwork } from "@reown/appkit/vue";
 
 export const useWalletStore = defineStore("wallet", () => {
   // console.log("Wallet store is being initialized");

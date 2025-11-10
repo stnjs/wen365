@@ -20,10 +20,7 @@ export const calculateTokenUsdValue = (token: AlchemyToken): number => {
     const usdPrice = parseFloat(token.tokenPrices[0]?.value || "0");
     return balance * usdPrice;
   } catch (error) {
-    console.error(
-      `Error calculating value for token ${token.tokenAddress || "native"}:`,
-      error
-    );
+    console.error(`Error calculating value for token ${token.tokenAddress || "native"}:`, error);
     return 0;
   }
 };
@@ -33,9 +30,7 @@ export const calculateTokenUsdValue = (token: AlchemyToken): number => {
  * @param assets - Array of Alchemy token objects
  * @returns The total USD value of all tokens
  */
-export const calculatePortfolioTotalValue = (
-  assets: AlchemyToken[]
-): number => {
+export const calculatePortfolioTotalValue = (assets: AlchemyToken[]): number => {
   const totalValue = assets.reduce((acc, asset) => {
     const tokenValue = calculateTokenUsdValue(asset);
     return acc + tokenValue;

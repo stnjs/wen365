@@ -7,9 +7,7 @@ export const usePortfolioStore = defineStore("portfolio", () => {
 
   // Getters
   const totalValue = computed(() => portfolio.value?.totalValue ?? 0);
-  const totalValueChange24h = computed(
-    () => portfolio.value?.totalValueChange24h ?? 0
-  );
+  const totalValueChange24h = computed(() => portfolio.value?.totalValueChange24h ?? 0);
 
   return {
     // State
