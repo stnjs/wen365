@@ -12,13 +12,9 @@
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-lg font-semibold text-gray-900">Tax Settings</h2>
-            <p class="text-gray-600">
-              {{ country }} - {{ taxFreePeriodDays }} days to tax-free
-            </p>
+            <p class="text-gray-600">{{ country }} - {{ taxFreePeriodDays }} days to tax-free</p>
           </div>
-          <router-link to="/settings" class="btn-secondary">
-            Settings
-          </router-link>
+          <router-link to="/settings" class="btn-secondary"> Settings </router-link>
         </div>
       </div>
 
@@ -35,35 +31,27 @@
         <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Already Tax-Free
-            </h3>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Already Tax-Free</h3>
             <div class="text-2xl font-bold text-crypto-green">
               {{ taxFreeAssets.length }}
             </div>
             <div class="text-sm text-gray-500 mt-2">assets</div>
           </div>
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Tax-Free Value
-            </h3>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Tax-Free Value</h3>
             <div class="text-2xl font-bold text-crypto-green">
               ${{ formatNumber(taxFreeValue) }}
             </div>
           </div>
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Becoming Tax-Free Soon
-            </h3>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Becoming Tax-Free Soon</h3>
             <div class="text-2xl font-bold text-crypto-yellow">
               {{ becomingTaxFreeSoon.length }}
             </div>
             <div class="text-sm text-gray-500 mt-2">next 30 days</div>
           </div>
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Still Taxable
-            </h3>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Still Taxable</h3>
             <div class="text-2xl font-bold text-crypto-red">
               {{ taxableAssets.length }}
             </div>
@@ -73,9 +61,7 @@
 
         <!-- Tax-Free Assets -->
         <div class="card mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">
-            Already Tax-Free Assets
-          </h2>
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Already Tax-Free Assets</h2>
 
           <div v-if="taxFreeAssets.length === 0" class="text-center py-8">
             <div class="text-4xl mb-4">⏳</div>
@@ -106,10 +92,7 @@
                   <div class="text-sm text-crypto-green font-medium">
                     Tax-free since
                     {{
-                      formatDate(
-                        asset.acquisitionDate +
-                          taxFreePeriodDays * 24 * 60 * 60 * 1000
-                      )
+                      formatDate(asset.acquisitionDate + taxFreePeriodDays * 24 * 60 * 60 * 1000)
                     }}
                   </div>
                 </div>
@@ -118,9 +101,7 @@
                 <div class="font-medium text-gray-900">
                   {{ formatBalance(asset.quantity) }} {{ asset.tokenSymbol }}
                 </div>
-                <div class="text-sm text-gray-500">
-                  ${{ formatNumber(asset.quantityUsd || 0) }}
-                </div>
+                <div class="text-sm text-gray-500">${{ formatNumber(asset.quantityUsd || 0) }}</div>
                 <div class="text-sm text-crypto-green font-medium">
                   {{ asset.holdingDays }} days held
                 </div>
@@ -131,9 +112,7 @@
 
         <!-- Becoming Tax-Free Soon -->
         <div class="card mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">
-            Becoming Tax-Free Soon
-          </h2>
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Becoming Tax-Free Soon</h2>
 
           <div v-if="becomingTaxFreeSoon.length === 0" class="text-center py-8">
             <div class="text-4xl mb-4">📅</div>
@@ -150,9 +129,7 @@
                 <div
                   class="w-12 h-12 bg-crypto-yellow/20 rounded-full flex items-center justify-center mr-4"
                 >
-                  <span class="text-crypto-yellow font-semibold text-lg"
-                    >⏳</span
-                  >
+                  <span class="text-crypto-yellow font-semibold text-lg">⏳</span>
                 </div>
                 <div>
                   <div class="font-medium text-gray-900">
@@ -168,9 +145,7 @@
                 <div class="font-medium text-gray-900">
                   {{ formatBalance(asset.quantity) }} {{ asset.tokenSymbol }}
                 </div>
-                <div class="text-sm text-gray-500">
-                  ${{ formatNumber(asset.quantityUsd || 0) }}
-                </div>
+                <div class="text-sm text-gray-500">${{ formatNumber(asset.quantityUsd || 0) }}</div>
                 <div class="text-sm text-crypto-yellow font-medium">
                   {{ formatDate(asset.taxFreeDate || 0) }}
                 </div>
@@ -181,9 +156,7 @@
 
         <!-- Still Taxable Assets -->
         <div class="card">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">
-            Still Taxable Assets
-          </h2>
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Still Taxable Assets</h2>
 
           <div v-if="taxableAssets.length === 0" class="text-center py-8">
             <div class="text-4xl mb-4">🎉</div>
@@ -210,9 +183,7 @@
                   </div>
                   <div class="text-sm text-gray-500">{{ asset.tokenName }}</div>
                   <div class="text-sm text-gray-600">
-                    {{ asset.holdingDays }} days held ({{
-                      taxFreePeriodDays - asset.holdingDays
-                    }}
+                    {{ asset.holdingDays }} days held ({{ taxFreePeriodDays - asset.holdingDays }}
                     days remaining)
                   </div>
                 </div>
@@ -221,9 +192,7 @@
                 <div class="font-medium text-gray-900">
                   {{ formatBalance(asset.quantity) }} {{ asset.tokenSymbol }}
                 </div>
-                <div class="text-sm text-gray-500">
-                  ${{ formatNumber(asset.quantityUsd || 0) }}
-                </div>
+                <div class="text-sm text-gray-500">${{ formatNumber(asset.quantityUsd || 0) }}</div>
                 <div class="text-sm text-gray-600">
                   {{ formatDate(asset.taxFreeDate || 0) }}
                 </div>
@@ -263,8 +232,7 @@ const becomingTaxFreeSoon = computed(() => {
   const thirtyDaysFromNow = Date.now() + 30 * 24 * 60 * 60 * 1000;
   return taxableAssets.value.filter((asset: any) => {
     const taxFreeDate =
-      asset.taxFreeDate ||
-      asset.acquisitionDate + taxFreePeriodDays.value * 24 * 60 * 60 * 1000;
+      asset.taxFreeDate || asset.acquisitionDate + taxFreePeriodDays.value * 24 * 60 * 60 * 1000;
     return taxFreeDate <= thirtyDaysFromNow && taxFreeDate > Date.now();
   });
 });

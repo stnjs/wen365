@@ -21,19 +21,11 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
         <UButton to="/" variant="ghost" color="gray"> Home </UButton>
-        <UButton to="/dashboard" variant="ghost" color="gray">
-          Dashboard
-        </UButton>
-        <UButton to="/portfolio" variant="ghost" color="gray">
-          Portfolio
-        </UButton>
-        <UButton to="/tax-free" variant="ghost" color="gray">
-          Tax Free
-        </UButton>
+        <UButton to="/dashboard" variant="ghost" color="gray"> Dashboard </UButton>
+        <UButton to="/portfolio" variant="ghost" color="gray"> Portfolio </UButton>
+        <UButton to="/tax-free" variant="ghost" color="gray"> Tax Free </UButton>
         <UButton to="/export" variant="ghost" color="gray"> Export </UButton>
-        <UButton to="/settings" variant="ghost" color="gray">
-          Settings
-        </UButton>
+        <UButton to="/settings" variant="ghost" color="gray"> Settings </UButton>
       </div>
 
       <template #right>
@@ -58,9 +50,7 @@
         <div class="py-6">
           <div class="text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>HODL Tracker - Crypto Tax Tracking with FIFO Logic</p>
-            <p class="mt-1">
-              For informational purposes only. Consult a tax professional.
-            </p>
+            <p class="mt-1">For informational purposes only. Consult a tax professional.</p>
           </div>
         </div>
       </UContainer>
@@ -85,6 +75,6 @@ watch(
     const appKitMode = newMode === "dark" ? "dark" : "light";
     setThemeMode(appKitMode);
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

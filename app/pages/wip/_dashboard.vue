@@ -13,9 +13,7 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <div class="text-red-500 text-6xl mb-4">⚠️</div>
-        <h2 class="text-2xl font-semibold text-gray-900 mb-2">
-          Something went wrong
-        </h2>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
         <p class="text-gray-600 mb-4">{{ error }}</p>
         <button @click="refetchPortfolio" class="btn-primary">Try Again</button>
       </div>
@@ -25,19 +23,11 @@
         <!-- Portfolio Overview -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Total Portfolio Value
-            </h3>
-            <div class="text-2xl font-bold text-gray-900">
-              ${{ formatNumber(totalValue) }}
-            </div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Total Portfolio Value</h3>
+            <div class="text-2xl font-bold text-gray-900">${{ formatNumber(totalValue) }}</div>
             <div class="flex items-center mt-2">
               <span
-                :class="
-                  totalValueChangePercent24h >= 0
-                    ? 'text-crypto-green'
-                    : 'text-crypto-red'
-                "
+                :class="totalValueChangePercent24h >= 0 ? 'text-crypto-green' : 'text-crypto-red'"
               >
                 {{ totalValueChangePercent24h >= 0 ? "+" : ""
                 }}{{ totalValueChangePercent24h.toFixed(2) }}%
@@ -47,27 +37,17 @@
           </div>
 
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Tax-Free Value
-            </h3>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Tax-Free Value</h3>
             <div class="text-2xl font-bold text-crypto-green">
               ${{ formatNumber(taxFreeValue) }}
             </div>
-            <div class="text-sm text-gray-500 mt-2">
-              {{ taxFreeAssets.length }} assets
-            </div>
+            <div class="text-sm text-gray-500 mt-2">{{ taxFreeAssets.length }} assets</div>
           </div>
 
           <div class="card">
-            <h3 class="text-sm font-medium text-gray-500 mb-2">
-              Taxable Value
-            </h3>
-            <div class="text-2xl font-bold text-crypto-red">
-              ${{ formatNumber(taxableValue) }}
-            </div>
-            <div class="text-sm text-gray-500 mt-2">
-              {{ taxableAssets.length }} assets
-            </div>
+            <h3 class="text-sm font-medium text-gray-500 mb-2">Taxable Value</h3>
+            <div class="text-2xl font-bold text-crypto-red">${{ formatNumber(taxableValue) }}</div>
+            <div class="text-sm text-gray-500 mt-2">{{ taxableAssets.length }} assets</div>
           </div>
 
           <div class="card">
@@ -94,10 +74,7 @@
             </div>
           </router-link>
 
-          <router-link
-            to="/tax-free"
-            class="card hover:shadow-md transition-shadow cursor-pointer"
-          >
+          <router-link to="/tax-free" class="card hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex items-center">
               <div class="text-3xl mr-4">⏳</div>
               <div>
@@ -107,10 +84,7 @@
             </div>
           </router-link>
 
-          <router-link
-            to="/export"
-            class="card hover:shadow-md transition-shadow cursor-pointer"
-          >
+          <router-link to="/export" class="card hover:shadow-md transition-shadow cursor-pointer">
             <div class="flex items-center">
               <div class="text-3xl mr-4">📤</div>
               <div>
@@ -125,17 +99,13 @@
         <div class="card">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-gray-900">Recent Activity</h2>
-            <button @click="refreshPortfolio" class="btn-secondary text-sm">
-              Refresh
-            </button>
+            <button @click="refreshPortfolio" class="btn-secondary text-sm">Refresh</button>
           </div>
 
           <div v-if="transactions.length === 0" class="text-center py-8">
             <div class="text-4xl mb-4">📝</div>
             <p class="text-gray-600">No recent transactions found</p>
-            <p class="text-sm text-gray-500">
-              Connect your wallet to see your transaction history
-            </p>
+            <p class="text-sm text-gray-500">Connect your wallet to see your transaction history</p>
           </div>
 
           <div v-else class="space-y-4">
@@ -162,9 +132,7 @@
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-medium text-gray-900">
-                  {{ tx.value }} {{ tx.tokenSymbol }}
-                </div>
+                <div class="font-medium text-gray-900">{{ tx.value }} {{ tx.tokenSymbol }}</div>
                 <div class="text-sm text-gray-500">{{ tx.type }}</div>
               </div>
             </div>
