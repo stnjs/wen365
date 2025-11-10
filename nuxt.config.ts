@@ -6,9 +6,6 @@ const __dirname = dirname(__filename);
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // Compatibility date for Nitro
-  compatibilityDate: "2025-08-04",
-
   // Enable TypeScript
   typescript: {
     strict: true,
@@ -24,16 +21,8 @@ export default defineNuxtConfig({
   // CSS and styling
   css: ["~/assets/css/main.css"],
 
-  // Plugins
-  plugins: ["~/plugins/01.vue-query", "~/plugins/02.wagmi"],
-
   // Modules
-  modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint"],
-
-  colorMode: {
-    preference: "system", // 'light', 'dark', or 'system'
-    fallback: "dark",
-  },
+  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint"],
 
   // Runtime config for environment variables
   runtimeConfig: {
@@ -93,12 +82,5 @@ export default defineNuxtConfig({
   // Nitro server configuration
   nitro: {
     preset: "node-server",
-  },
-
-  // Vite configuration (for client-side)
-  vite: {
-    define: {
-      "process.env": {},
-    },
   },
 });
