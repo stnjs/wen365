@@ -21,11 +21,7 @@
       <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
         <UButton to="/" variant="ghost" color="gray"> Home </UButton>
-        <UButton to="/dashboard" variant="ghost" color="gray"> Dashboard </UButton>
         <UButton to="/portfolio" variant="ghost" color="gray"> Portfolio </UButton>
-        <UButton to="/tax-free" variant="ghost" color="gray"> Tax Free </UButton>
-        <UButton to="/export" variant="ghost" color="gray"> Export </UButton>
-        <UButton to="/settings" variant="ghost" color="gray"> Settings </UButton>
       </div>
 
       <template #right>
@@ -49,8 +45,7 @@
       <UContainer>
         <div class="py-6">
           <div class="text-center text-gray-500 dark:text-gray-400 text-sm">
-            <p>HODL Tracker - Crypto Tax Tracking with FIFO Logic</p>
-            <p class="mt-1">For informational purposes only. Consult a tax professional.</p>
+            <p>Portfolio Tracker - Track Your Crypto Assets Across Multiple Chains</p>
           </div>
         </div>
       </UContainer>

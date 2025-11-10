@@ -1,18 +1,8 @@
 <template>
   <UCard>
     <template #header>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Test</h3>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Assets</h3>
     </template>
-    <!--     <div class="flex px-4 py-3.5">
-      <UInput
-        :model-value="(table?.tableApi?.getColumn('email')?.getFilterValue() as string)"
-        class="max-w-sm min-w-[12ch]"
-        placeholder="Filter emails..."
-        @update:model-value="
-          table?.tableApi?.getColumn('email')?.setFilterValue($event)
-        "
-      />
-    </div> -->
 
     <UTable
       v-model:expanded="expanded"
@@ -22,7 +12,32 @@
       class="flex-1"
     >
       <template #expanded="{ row }">
-        <pre>{{ row.original }}</pre>
+        <div class="px-4 py-4 space-y-3">
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-gray-500 dark:text-gray-400">Network:</span>
+              <span class="ml-2 font-medium">{{ row.original.network }}</span>
+            </div>
+            <div>
+              <span class="text-gray-500 dark:text-gray-400">Token Address:</span>
+              <span class="ml-2 font-mono text-xs">
+                {{ row.original.tokenAddress || "Native Token" }}
+              </span>
+            </div>
+            <div>
+              <span class="text-gray-500 dark:text-gray-400">Balance:</span>
+              <span class="ml-2 font-medium">
+                {{ formatBalance(row.original.tokenBalance) }}
+              </span>
+            </div>
+            <div>
+              <span class="text-gray-500 dark:text-gray-400">Price:</span>
+              <span class="ml-2 font-medium">
+                {{ formatCurrency(row.original.tokenPrice) }}
+              </span>
+            </div>
+          </div>
+        </div>
       </template>
     </UTable>
   </UCard>
@@ -38,6 +53,23 @@ const props = defineProps<{
 }>();
 
 const expanded = ref<Record<string, boolean>>({});
+
+// Format balance with appropriate decimals
+const formatBalance = (balance: number): string => {
+  if (balance === 0) return "0";
+  if (balance < 0.0001) return balance.toExponential(2);
+  if (balance < 1) return balance.toFixed(6);
+  if (balance < 1000) return balance.toFixed(4);
+  return balance.toFixed(2);
+};
+
+// Format currency
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+};
 
 const UButton = resolveComponent("UButton");
 const columns: TableColumn<TokenDto>[] = [
@@ -70,9 +102,10 @@ const columns: TableColumn<TokenDto>[] = [
   },
   {
     accessorKey: "tokenBalance",
-    header: "Amount",
+    header: "Balance",
     cell: ({ row }) => {
-      return row.getValue("tokenBalance") as string;
+      const balance = row.getValue("tokenBalance") as number;
+      return formatBalance(balance);
     },
   },
   {
@@ -80,11 +113,7 @@ const columns: TableColumn<TokenDto>[] = [
     header: "Price",
     cell: ({ row }) => {
       const price = row.getValue("tokenPrice") as number;
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(price);
-      return formatted;
+      return formatCurrency(price);
     },
   },
   {
@@ -92,11 +121,7 @@ const columns: TableColumn<TokenDto>[] = [
     header: "Value",
     cell: ({ row }) => {
       const amount = row.getValue("tokenValue") as number;
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-      return formatted;
+      return formatCurrency(amount);
     },
   },
 ];
