@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
+import Token from "./Token.vue";
 
 const props = defineProps<{
   tokens: TokenDto[];
@@ -62,7 +63,9 @@ const columns: TableColumn<TokenDto>[] = [
     accessorKey: "tokenMetadata",
     header: "Token",
     cell: ({ row }) => {
-      return (row.getValue("tokenMetadata") as TokenMetadataDto).symbol || "ETH";
+      return h(Token, {
+        tokenMetadata: row.getValue("tokenMetadata") as TokenMetadataDto,
+      });
     },
   },
   {

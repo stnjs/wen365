@@ -45,7 +45,9 @@ export async function getPortfolio(
   const allTokenDtos = alchemyResponse.data.tokens.map(token => mapToTokenDto(token));
 
   // 3. Business logic: Filter tokens with value > 0
-  const activeTokens = allTokenDtos.filter(token => token.tokenValue > 0);
+  const activeTokens = allTokenDtos
+    .filter(token => token.tokenValue > 0)
+    .sort((a, b) => b.tokenValue - a.tokenValue);
 
   // 4. Business logic: Calculate total value from active tokens only
   const totalValue = roundToTwoDecimals(
