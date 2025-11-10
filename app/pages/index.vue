@@ -1,125 +1,105 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto text-center">
-        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-          Track Your Crypto
-          <span
-            class="bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-400 bg-clip-text text-transparent"
-            >Tax-Free Journey</span
-          >
-        </h1>
-        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-          Monitor your crypto holdings with FIFO logic and know exactly when your assets become
-          tax-free. Perfect for DeFi users and tax planning in countries like Germany.
-        </p>
+    <UPageHero>
+      <template #headline>
+        Track Your Crypto
+        <span
+          class="bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-400 bg-clip-text text-transparent"
+        >
+          Portfolio
+        </span>
+      </template>
+      <template #title>
+        Monitor your crypto assets across multiple chains in one place. Real-time prices, token
+        details, and portfolio insights.
+      </template>
+      <template #links>
+        <UButton
+          v-if="!isConnected"
+          @click="connectWallet"
+          :disabled="isConnecting"
+          color="primary"
+          size="xl"
+        >
+          <span v-if="isConnecting">Connecting...</span>
+          <span v-else>Connect Wallet</span>
+        </UButton>
+        <UButton v-else to="/portfolio" color="primary" size="xl" variant="solid">
+          View Portfolio
+        </UButton>
+      </template>
+    </UPageHero>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <UButton
-            v-if="!isConnected"
-            @click="connectWallet"
-            :disabled="isConnecting"
-            color="primary"
-            size="lg"
-          >
-            <span v-if="isConnecting">Connecting...</span>
-            <span v-else>🚀 Get Started</span>
-          </UButton>
-          <UButton v-else to="/dashboard" color="primary" size="lg" variant="solid">
-            📊 View Dashboard
-          </UButton>
-          <UButton href="#features" color="gray" variant="outline" size="lg">
-            📖 Learn More
-          </UButton>
-        </div>
-
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          <UCard class="text-center">
-            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">365</div>
-            <div class="text-gray-600">Days to Tax-Free</div>
-          </UCard>
-          <UCard class="text-center">
-            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">FIFO</div>
-            <div class="text-gray-600">First-In-First-Out Logic</div>
-          </UCard>
-          <UCard class="text-center">
-            <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">🔔</div>
-            <div class="text-gray-600">Smart Alerts</div>
-          </UCard>
-        </div>
+    <!-- Stats Section -->
+    <UPageSection>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <UCard class="text-center">
+          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
+            Multi-Chain
+          </div>
+          <div class="text-gray-600 dark:text-gray-400">Support for 10+ Networks</div>
+        </UCard>
+        <UCard class="text-center">
+          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
+            Real-Time
+          </div>
+          <div class="text-gray-600 dark:text-gray-400">Live Price Updates</div>
+        </UCard>
+        <UCard class="text-center">
+          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">Secure</div>
+          <div class="text-gray-600 dark:text-gray-400">Non-Custodial Tracking</div>
+        </UCard>
       </div>
-    </section>
+    </UPageSection>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
-      <div class="max-w-7xl mx-auto">
-        <h2 class="text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-16">
-          Why Choose HODLTracker?
-        </h2>
+    <UPageSection class="bg-white dark:bg-gray-800">
+      <template #title>Why Choose Portfolio Tracker?</template>
+      <template #description>
+        Everything you need to track and manage your crypto assets across multiple blockchains.
+      </template>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <UCard>
-            <div class="text-4xl mb-4">🔗</div>
-            <h3 class="text-xl font-semibold mb-3">Connect Any Wallet</h3>
-            <p class="text-gray-600">
-              Connect MetaMask, WalletConnect, or any Ethereum wallet to automatically import your
-              transactions.
-            </p>
-          </UCard>
-
-          <UCard>
-            <div class="text-4xl mb-4">📊</div>
-            <h3 class="text-xl font-semibold mb-3">FIFO Tracking</h3>
-            <p class="text-gray-600">
-              View per-token acquisition timeline using First-In-First-Out logic for accurate tax
-              calculations.
-            </p>
-          </UCard>
-
-          <UCard>
-            <div class="text-4xl mb-4">⏳</div>
-            <h3 class="text-xl font-semibold mb-3">Tax-Free Countdown</h3>
-            <p class="text-gray-600">
-              See exactly when your assets become tax-free with countdown timers and visual
-              indicators.
-            </p>
-          </UCard>
-
-          <UCard>
-            <div class="text-4xl mb-4">🔔</div>
-            <h3 class="text-xl font-semibold mb-3">Smart Alerts</h3>
-            <p class="text-gray-600">
-              Get email or Telegram notifications when tokens pass the tax-free threshold.
-            </p>
-          </UCard>
-
-          <UCard>
-            <div class="text-4xl mb-4">📤</div>
-            <h3 class="text-xl font-semibold mb-3">Export Data</h3>
-            <p class="text-gray-600">
-              Export CSV reports for your tax advisor with detailed holding information.
-            </p>
-          </UCard>
-
-          <UCard>
-            <div class="text-4xl mb-4">🛠️</div>
-            <h3 class="text-xl font-semibold mb-3">DeFi Ready</h3>
-            <p class="text-gray-600">
-              Manual classification for bridge, staking, and liquidity pool transactions.
-            </p>
-          </UCard>
-        </div>
-      </div>
-    </section>
+      <UPageGrid>
+        <UPageFeature
+          icon="i-lucide-wallet"
+          title="Connect Any Wallet"
+          description="Connect MetaMask, WalletConnect, or any Ethereum-compatible wallet to automatically import your tokens and balances."
+        />
+        <UPageFeature
+          icon="i-lucide-network"
+          title="Multi-Chain Support"
+          description="Track assets across Ethereum, Polygon, Base, Arbitrum, Optimism, and more. All in one unified view."
+        />
+        <UPageFeature
+          icon="i-lucide-trending-up"
+          title="Real-Time Prices"
+          description="Get up-to-date token prices and portfolio values. See your total portfolio value in USD with live updates."
+        />
+        <UPageFeature
+          icon="i-lucide-coins"
+          title="Token Details"
+          description="View detailed information about each token including balance, price, value, and metadata with beautiful token logos."
+        />
+        <UPageFeature
+          icon="i-lucide-shield-check"
+          title="Secure & Private"
+          description="Your wallet stays in your control. We never store your private keys or have access to your funds."
+        />
+        <UPageFeature
+          icon="i-lucide-zap"
+          title="Fast & Reliable"
+          description="Built with Nuxt 4 and modern web technologies for a fast, responsive experience across all devices."
+        />
+      </UPageGrid>
+    </UPageSection>
 
     <!-- CTA Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-600 to-purple-600">
+    <UPageSection class="bg-gradient-to-r from-primary-600 to-purple-600">
       <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold text-white mb-6">Ready to Track Your Crypto Tax Journey?</h2>
+        <h2 class="text-4xl font-bold text-white mb-6">Ready to Track Your Portfolio?</h2>
         <p class="text-xl text-white/90 mb-8">
-          Join thousands of DeFi users who trust HODLTracker for their tax planning.
+          Connect your wallet and start tracking your crypto assets across multiple chains today.
         </p>
         <UButton
           v-if="!isConnected"
@@ -127,28 +107,37 @@
           :disabled="isConnecting"
           color="white"
           variant="solid"
-          size="lg"
+          size="xl"
         >
           <span v-if="isConnecting">Connecting...</span>
           <span v-else>Connect Wallet Now</span>
         </UButton>
-        <UButton v-else to="/dashboard" color="white" variant="solid" size="lg">
-          Go to Dashboard
+        <UButton v-else to="/portfolio" color="white" variant="solid" size="xl">
+          Go to Portfolio
         </UButton>
       </div>
-    </section>
+    </UPageSection>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 
+const router = useRouter();
 const accountData = useAppKitAccount();
 const { open } = useAppKit();
 
 const isConnected = computed(() => accountData.value?.isConnected);
 const isConnecting = computed(() => accountData.value?.status === "connecting");
+
+// Navigate to portfolio after wallet connection
+watch(isConnected, newValue => {
+  if (newValue) {
+    router.push("/portfolio");
+  }
+});
 
 const connectWallet = async () => {
   try {

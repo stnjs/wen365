@@ -4,13 +4,34 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Portfolio</h1>
-        <UButton @click="refetchPortfolio" color="primary">Refresh</UButton>
+        <UButton @click="refetchPortfolio" color="primary" :disabled="isLoading">
+          <span v-if="isLoading">Loading...</span>
+          <span v-else>Refresh</span>
+        </UButton>
+      </div>
+
+      <!-- Empty State - No Wallet Connected -->
+      <div v-if="!address" class="text-center py-12">
+        <UEmpty icon="i-lucide-wallet" description="Connect your wallet to view your portfolio">
+          <template #actions>
+            <UButton to="/" color="primary"> Go to Home </UButton>
+          </template>
+        </UEmpty>
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-12">
+      <div v-else-if="isLoading" class="text-center py-12">
         <USpinner size="xl" class="mx-auto mb-4" />
-        <p class="text-gray-600">Loading your portfolio...</p>
+        <p class="text-gray-600 dark:text-gray-400">Loading your portfolio...</p>
+      </div>
+
+      <!-- Empty State - No Tokens -->
+      <div v-else-if="tokens.length === 0" class="text-center py-12">
+        <UEmpty icon="i-lucide-coins" description="No tokens found in your wallet">
+          <template #actions>
+            <UButton @click="refetchPortfolio" color="primary"> Refresh </UButton>
+          </template>
+        </UEmpty>
       </div>
 
       <!-- Portfolio Content -->
@@ -18,20 +39,39 @@
         <!-- Portfolio Summary -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <UCard>
-            <h3 class="text-sm font-medium text-gray-500 mb-2">Total Value</h3>
-            <div class="text-2xl font-bold">{{ totalValue }}</div>
+            <template #header>
+              <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Value</h3>
+            </template>
+            <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              {{ totalValue }}
+            </div>
+          </UCard>
+          <UCard>
+            <template #header>
+              <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tokens</h3>
+            </template>
+            <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              {{ tokens.length }}
+            </div>
+          </UCard>
+          <UCard>
+            <template #header>
+              <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Networks</h3>
+            </template>
+            <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              {{ uniqueNetworks }}
+            </div>
           </UCard>
         </div>
         <!-- Assets Table -->
         <AssetsTable :tokens="tokens" />
-        {{ tokens }}
       </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
@@ -47,9 +87,13 @@ const totalValue = computed<string>(() => {
     currency: "USD",
   }).format(portfolio.value?.totalValue || 0);
 });
+
 const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
 
-const searchTerm = ref("");
+const uniqueNetworks = computed<number>(() => {
+  const networks = new Set(tokens.value.map(token => token.network));
+  return networks.size;
+});
 
 onMounted(async () => {
   if (address.value) {

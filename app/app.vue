@@ -16,7 +16,7 @@ createAppKit({
   projectId,
   metadata: {
     name: "HODL Tracker",
-    description: "Crypto Tax Tracking with FIFO Logic",
+    description: "Track your crypto portfolio across multiple blockchains",
     url: "http://localhost:3030",
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },
