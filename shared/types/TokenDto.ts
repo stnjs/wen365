@@ -1,8 +1,9 @@
 import type { TokenMetadataDto } from "./TokenMetadataDto";
+import type { NetworkId } from "./NetworkId";
 
 export interface TokenDto {
   /** Network identifier (e.g., "eth-mainnet") */
-  network: string;
+  network: NetworkId;
   /** Token contract address (null for native tokens like ETH) */
   tokenAddress: string | null;
   /** Token balance as a decimal number */

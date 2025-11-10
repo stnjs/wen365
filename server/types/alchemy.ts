@@ -4,6 +4,8 @@
  * https://docs.alchemy.com/reference/gettokenbalances
  */
 
+import type { NetworkId } from "~~/shared/types/NetworkId";
+
 /**
  * Token price information
  */
@@ -37,7 +39,7 @@ export interface AlchemyToken {
   /** Wallet address that owns this token */
   address: string;
   /** Network identifier (e.g., "eth-mainnet") */
-  network: string;
+  network: NetworkId;
   /** Token contract address (null for native tokens like ETH) */
   tokenAddress: string | null;
   /** Token balance as hex string */
@@ -64,4 +66,10 @@ export interface AlchemyTokensData {
 export interface AlchemyTokensByAddressResponse {
   /** Response data containing tokens and pagination info */
   data: AlchemyTokensData;
+}
+
+export interface BlacklistedToken {
+  network: NetworkId;
+  address: string;
+  symbol?: string;
 }
