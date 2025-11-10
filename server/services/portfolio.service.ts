@@ -1,6 +1,9 @@
 import type { AlchemyTokensByAddressResponse } from "@server/types";
 import { alchemyTokensByAddressMock } from "@server/constants/mockData";
-import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
+import {
+  mapToPortfolioDto,
+  mapToTokenDto,
+} from "@server/mappers/portfolio.mapper";
 
 const getAlchemyTokensByAddressMock = async () => {
   const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(
@@ -32,17 +35,33 @@ export const getAlchemyTokensByAddress = async (
   );
 };
 
-// server/services/portfolio.service.ts (business logic)
+/**
+ * Gets portfolio data for a wallet address
+ * Handles business logic: filtering, calculations, orchestration
+ */
 export async function getPortfolio(
   walletAddress: string,
   alchemyApiKey: string
 ): Promise<PortfolioDto> {
-  // 1. Fetch (service)
-  const tokens = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey);
+  // 1. Fetch data from Alchemy API
+  const alchemyResponse = await getAlchemyTokensByAddress(
+    walletAddress,
+    alchemyApiKey
+  );
 
-  // 2. Calculate (util - pure function)
-  const totalValue = calculatePortfolioTotalValue(tokens.data.tokens);
+  // 2. Transform Alchemy tokens to DTOs (pure transformation)
+  const allTokenDtos = alchemyResponse.data.tokens.map(token =>
+    mapToTokenDto(token)
+  );
 
-  // 3. Transform (service - business logic)
-  return mapToPortfolioDto(tokens, totalValue);
+  // 3. Business logic: Filter tokens with value > 0
+  const activeTokens = allTokenDtos.filter(token => token.tokenValue > 0);
+
+  // 4. Business logic: Calculate total value from active tokens only
+  const totalValue = roundToTwoDecimals(
+    activeTokens.reduce((sum, token) => sum + token.tokenValue, 0)
+  );
+
+  // 5. Map to final PortfolioDto (pure transformation)
+  return mapToPortfolioDto(totalValue, activeTokens);
 }

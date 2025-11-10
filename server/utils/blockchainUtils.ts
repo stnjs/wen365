@@ -1,6 +1,14 @@
 import type { AlchemyToken } from "../types";
 import { formatUnits } from "viem";
 import { roundToTwoDecimals } from "./formatterUtils";
+
+export const convertTokenBalanceToNumber = (token: AlchemyToken): number => {
+  const balanceHex = token.tokenBalance;
+  const decimals = token.tokenMetadata.decimals ?? 18;
+  const balanceBigInt = BigInt(balanceHex);
+  return parseFloat(formatUnits(balanceBigInt, decimals));
+};
+
 /**
  * Calculates the USD value of a single token
  * @param token - The Alchemy token object with balance, decimals, and price info
@@ -8,27 +16,9 @@ import { roundToTwoDecimals } from "./formatterUtils";
  */
 export const calculateTokenUsdValue = (token: AlchemyToken): number => {
   try {
-    // Get the token balance as hex string
-    const balanceHex = token.tokenBalance;
-
-    // Default to 18 decimals for native ETH if decimals is null
-    const decimals = token.tokenMetadata.decimals ?? 18;
-
-    // Get USD price (default to 0 if not available)
+    const balance = convertTokenBalanceToNumber(token);
     const usdPrice = parseFloat(token.tokenPrices[0]?.value || "0");
-
-    // Convert hex balance to BigInt
-    const balanceBigInt = BigInt(balanceHex);
-
-    // Convert from wei/smallest unit to token units using viem's formatUnits
-    const balanceInTokenUnits = parseFloat(
-      formatUnits(balanceBigInt, decimals)
-    );
-
-    // Calculate USD value: balance * price
-    const usdValue = balanceInTokenUnits * usdPrice;
-
-    return usdValue;
+    return balance * usdPrice;
   } catch (error) {
     console.error(
       `Error calculating value for token ${token.tokenAddress || "native"}:`,
