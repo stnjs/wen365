@@ -6,7 +6,8 @@ const __dirname = dirname(__filename);
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // Enable TypeScript
+  compatibilityDate: "2025-11-10",
+
   typescript: {
     strict: true,
     typeCheck: true,
