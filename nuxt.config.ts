@@ -28,7 +28,7 @@ export default defineNuxtConfig({
   plugins: ["~/plugins/01.vue-query", "~/plugins/02.wagmi"],
 
   // Modules
-  modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui"],
+  modules: ["@nuxt/devtools", "@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint"],
 
   colorMode: {
     preference: "system", // 'light', 'dark', or 'system'
