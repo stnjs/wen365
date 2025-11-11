@@ -46,14 +46,14 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: "HODL Tracker - Crypto Tax Tracking",
+      title: "HODL Tracker - Portfolio & Tax Tracking",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
           content:
-            "Crypto-native web app for tracking crypto asset holding periods with FIFO logic for tax exemptions",
+            "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool. Track your crypto assets across multiple blockchains.",
         },
         { name: "theme-color", content: "#5154da" }, // Perano-600
       ],

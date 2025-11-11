@@ -2,7 +2,11 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <!-- Navigation -->
     <UHeader
-      class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700"
+      :class="[
+        isLandingPage
+          ? 'bg-transparent backdrop-blur-sm border-transparent'
+          : 'bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700',
+      ]"
     >
       <template #title>
         <NuxtLink
@@ -18,8 +22,8 @@
         </NuxtLink>
       </template>
 
-      <!-- Navigation Links -->
-      <div class="hidden md:flex items-center space-x-1">
+      <!-- Navigation Links - Only show on non-landing pages -->
+      <div v-if="!isLandingPage" class="hidden md:flex items-center space-x-1">
         <UButton to="/" variant="ghost" color="gray"> Home </UButton>
         <UButton to="/portfolio" variant="ghost" color="gray"> Portfolio </UButton>
       </div>
@@ -54,9 +58,15 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useColorMode } from "#imports";
 import { useAppKitTheme } from "@reown/appkit/vue";
+
+const route = useRoute();
+
+// Check if we're on the landing page
+const isLandingPage = computed(() => route.path === "/");
 
 // Sync AppKit theme with Nuxt UI color mode
 const colorMode = useColorMode();
