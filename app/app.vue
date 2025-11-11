@@ -16,7 +16,8 @@ createAppKit({
   projectId,
   metadata: {
     name: "HODL Tracker",
-    description: "Track your crypto portfolio across multiple blockchains",
+    description:
+      "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool.",
     url: "http://localhost:3030",
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },

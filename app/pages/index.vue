@@ -1,134 +1,123 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen relative overflow-hidden flex items-center justify-center">
+    <!-- Animated Background with Crypto Coins -->
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950 dark:from-primary-950 dark:via-primary-900 dark:to-black animate-gradient"
+    >
+      <!-- Crypto Coin Icons -->
+      <img
+        src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
+        alt="Bitcoin"
+        class="crypto-coin crypto-coin-btc animate-float"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/279/large/ethereum.png"
+        alt="Ethereum"
+        class="crypto-coin crypto-coin-eth animate-float-reverse"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/4128/large/solana.png"
+        alt="Solana"
+        class="crypto-coin crypto-coin-sol animate-float"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png"
+        alt="XRP"
+        class="crypto-coin crypto-coin-xrp animate-float-reverse"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
+        alt="BNB"
+        class="crypto-coin crypto-coin-bnb animate-glow"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+        alt="USDC"
+        class="crypto-coin crypto-coin-usdc animate-float"
+      />
+      <img
+        src="https://assets.coingecko.com/coins/images/325/large/Tether.png"
+        alt="USDT"
+        class="crypto-coin crypto-coin-usdt animate-float-reverse"
+      />
+    </div>
+
     <!-- Hero Section -->
-    <UPageHero>
-      <template #headline>
-        Track Your Crypto
+    <div class="relative z-10 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+      <!-- Badge -->
+      <div class="mb-6">
         <span
-          class="bg-gradient-to-r from-primary-600 to-purple-600 dark:from-primary-400 dark:to-purple-400 bg-clip-text text-transparent"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 text-sm font-medium text-white"
+        >
+          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+          Portfolio Tracker
+        </span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+        <span class="text-white">Track Your Crypto</span>
+        <br />
+        <span
+          class="bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent animate-gradient"
         >
           Portfolio
         </span>
-      </template>
-      <template #title>
-        Monitor your crypto assets across multiple chains in one place. Real-time prices, token
-        details, and portfolio insights.
-      </template>
-      <template #links>
+      </h1>
+
+      <!-- Subtitle -->
+      <p
+        class="text-xl sm:text-2xl text-gray-200 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
+      >
+        A comprehensive portfolio tracker, tax status tracker for held assets, and asset
+        visualization tool.
+      </p>
+
+      <!-- CTA Button -->
+      <div class="flex justify-center gap-4">
         <UButton
           v-if="!isConnected"
-          @click="connectWallet"
           :disabled="isConnecting"
+          :loading="isConnecting"
           color="primary"
           size="xl"
+          class="px-8 py-6 text-lg font-semibold purple-glow-strong"
+          @click="connectWallet"
         >
-          <span v-if="isConnecting">Connecting...</span>
-          <span v-else>Connect Wallet</span>
+          {{ isConnecting ? "Connecting..." : "Connect Wallet" }}
         </UButton>
-        <UButton v-else to="/portfolio" color="primary" size="xl" variant="solid">
+        <UButton
+          v-else
+          color="primary"
+          size="xl"
+          class="px-8 py-6 text-lg font-semibold purple-glow-strong"
+          to="/portfolio"
+        >
           View Portfolio
         </UButton>
-      </template>
-    </UPageHero>
-
-    <!-- Stats Section -->
-    <UPageSection>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <UCard class="text-center">
-          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-            Multi-Chain
-          </div>
-          <div class="text-gray-600 dark:text-gray-400">Support for 10+ Networks</div>
-        </UCard>
-        <UCard class="text-center">
-          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
-            Real-Time
-          </div>
-          <div class="text-gray-600 dark:text-gray-400">Live Price Updates</div>
-        </UCard>
-        <UCard class="text-center">
-          <div class="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">Secure</div>
-          <div class="text-gray-600 dark:text-gray-400">Non-Custodial Tracking</div>
-        </UCard>
       </div>
-    </UPageSection>
-
-    <!-- Features Section -->
-    <UPageSection class="bg-white dark:bg-gray-800">
-      <template #title>Why Choose Portfolio Tracker?</template>
-      <template #description>
-        Everything you need to track and manage your crypto assets across multiple blockchains.
-      </template>
-
-      <UPageGrid>
-        <UPageFeature
-          icon="i-lucide-wallet"
-          title="Connect Any Wallet"
-          description="Connect MetaMask, WalletConnect, or any Ethereum-compatible wallet to automatically import your tokens and balances."
-        />
-        <UPageFeature
-          icon="i-lucide-network"
-          title="Multi-Chain Support"
-          description="Track assets across Ethereum, Polygon, Base, Arbitrum, Optimism, and more. All in one unified view."
-        />
-        <UPageFeature
-          icon="i-lucide-trending-up"
-          title="Real-Time Prices"
-          description="Get up-to-date token prices and portfolio values. See your total portfolio value in USD with live updates."
-        />
-        <UPageFeature
-          icon="i-lucide-coins"
-          title="Token Details"
-          description="View detailed information about each token including balance, price, value, and metadata with beautiful token logos."
-        />
-        <UPageFeature
-          icon="i-lucide-shield-check"
-          title="Secure & Private"
-          description="Your wallet stays in your control. We never store your private keys or have access to your funds."
-        />
-        <UPageFeature
-          icon="i-lucide-zap"
-          title="Fast & Reliable"
-          description="Built with Nuxt 4 and modern web technologies for a fast, responsive experience across all devices."
-        />
-      </UPageGrid>
-    </UPageSection>
-
-    <!-- CTA Section -->
-    <UPageSection class="bg-gradient-to-r from-primary-600 to-purple-600">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold text-white mb-6">Ready to Track Your Portfolio?</h2>
-        <p class="text-xl text-white/90 mb-8">
-          Connect your wallet and start tracking your crypto assets across multiple chains today.
-        </p>
-        <UButton
-          v-if="!isConnected"
-          @click="connectWallet"
-          :disabled="isConnecting"
-          color="white"
-          variant="solid"
-          size="xl"
-        >
-          <span v-if="isConnecting">Connecting...</span>
-          <span v-else>Connect Wallet Now</span>
-        </UButton>
-        <UButton v-else to="/portfolio" color="white" variant="solid" size="xl">
-          Go to Portfolio
-        </UButton>
-      </div>
-    </UPageSection>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 
+const router = useRouter();
 const accountData = useAppKitAccount();
 const { open } = useAppKit();
 
 const isConnected = computed(() => accountData.value?.isConnected);
 const isConnecting = computed(() => accountData.value?.status === "connecting");
+
+// Navigate to portfolio after wallet connection
+watch(isConnected, newValue => {
+  if (newValue) {
+    router.push("/portfolio");
+  }
+});
 
 const connectWallet = async () => {
   try {
