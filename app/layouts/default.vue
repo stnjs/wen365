@@ -4,7 +4,7 @@
     <UHeader
       :class="[
         isLandingPage
-          ? 'bg-transparent backdrop-blur-sm border-transparent'
+          ? 'bg-transparent backdrop-blur-sm border-transparent shadow-none'
           : 'bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700',
       ]"
     >
@@ -38,14 +38,12 @@
     </UHeader>
 
     <!-- Main Content -->
-    <UMain class="flex-1">
+    <div class="absolute top-0 left-0 w-full h-full">
       <slot />
-    </UMain>
+    </div>
 
     <!-- Footer -->
-    <UFooter
-      class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto"
-    >
+    <UFooter class="absolute bottom-0 left-0 w-full z-10">
       <UContainer>
         <div class="py-6">
           <div class="text-center text-gray-500 dark:text-gray-400 text-sm">
