@@ -1,13 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-    <!-- Navigation -->
-    <UHeader
-      :class="[
-        isLandingPage
-          ? 'bg-transparent backdrop-blur-sm border-transparent shadow-none'
-          : 'bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700',
-      ]"
-    >
+    <!-- Header -->
+    <UHeader class="bg-transparent backdrop-blur-sm border-transparent shadow-none py-4">
       <template #title>
         <NuxtLink
           to="/"
@@ -21,17 +15,10 @@
           <span>HODL Tracker</span>
         </NuxtLink>
       </template>
-
-      <!-- Navigation Links - Only show on non-landing pages -->
-      <div v-if="!isLandingPage" class="hidden md:flex items-center space-x-1">
-        <UButton to="/" variant="ghost" color="gray"> Home </UButton>
-        <UButton to="/portfolio" variant="ghost" color="gray"> Portfolio </UButton>
-      </div>
-
       <template #right>
         <div class="flex items-center gap-2">
           <!-- Wallet Connection Status -->
-          <appkit-button />
+          <ConnectWalletButton size="md" :show-connected="false" label="Connect" />
           <UColorModeButton />
         </div>
       </template>
@@ -56,15 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from "vue";
-import { useRoute } from "vue-router";
+import { watch } from "vue";
 import { useColorMode } from "#imports";
 import { useAppKitTheme } from "@reown/appkit/vue";
-
-const route = useRoute();
-
-// Check if we're on the landing page
-const isLandingPage = computed(() => route.path === "/");
 
 // Sync AppKit theme with Nuxt UI color mode
 const colorMode = useColorMode();
