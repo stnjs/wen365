@@ -1,0 +1,221 @@
+---
+globs: app/components/**/*.vue, app/pages/**/*.vue, app/layouts/**/*.vue
+alwaysApply: false
+---
+
+# UI Components Guidelines
+
+This project uses **Nuxt 4**, **Nuxt UI 4**, and **Tailwind CSS 4** for building user interfaces.
+
+## Technology Stack
+
+- **Nuxt 4**: Full-stack Vue framework
+- **Nuxt UI 4**: Component library built on top of Tailwind CSS
+- **Tailwind CSS 4**: Utility-first CSS framework (comes bundled with Nuxt UI 4)
+
+## Documentation References
+
+When working with UI components, always refer to the latest official documentation:
+
+- **Nuxt UI 4 Components**: https://ui.nuxt.com/docs/components
+- **Nuxt 4 Guide**: https://nuxt.com/docs/4.x/guide
+
+## Best Practices
+
+### 1. Use Nuxt UI Components First
+
+Always prefer Nuxt UI components over custom implementations when available.
+
+<!-- ✅ Good: Use Nuxt UI components -->
+<template>
+  <UButton color="primary" variant="solid">Click me</UButton>
+  <UCard>
+    <template #header>Title</template>
+    Content here
+  </UCard>
+</template>
+
+<!-- ❌ Bad: Custom button when UButton exists -->
+<template>
+  <button class="custom-button">Click me</button>
+</template>### 2. Component Props and API
+
+Refer to the Nuxt UI documentation for component props, slots, and events:
+
+- Check available props: https://ui.nuxt.com/docs/components/button#api
+- Use TypeScript types for type safety
+- Follow component-specific patterns from documentation
+
+### 3. Styling with Tailwind CSS 4
+
+- Use Tailwind utility classes for styling
+- Leverage Nuxt UI's theme system for consistent colors and spacing
+- Use component-scoped styles (`<style scoped>`) for component-specific styling
+- Define global CSS variables in `app/assets/css/main.css` for theme customization
+
+<!-- ✅ Good: Use Tailwind utilities -->
+<template>
+  <div class="flex items-center gap-4 p-6 bg-white dark:bg-gray-900">
+    <UButton class="px-6 py-3">Button</UButton>
+  </div>
+</template>
+
+<!-- ❌ Bad: Inline styles or custom CSS when Tailwind can handle it -->
+<template>
+  <div style="display: flex; padding: 24px;">
+    <button style="padding: 12px 24px;">Button</button>
+  </div>
+</template>### 4. Component Composition
+
+- Break down complex UIs into smaller, reusable components
+- Use Nuxt UI components as building blocks
+- Create wrapper components when you need to extend Nuxt UI components with custom logic
+
+<!-- ✅ Good: Composable component using Nuxt UI -->
+<template>
+  <UButton
+    v-bind="$attrs"
+    :class="buttonClass"
+    @click="handleClick"
+  >
+    <slot />
+  </UButton>
+</template>
+
+<script setup lang="ts">
+// Custom logic while leveraging Nuxt UI
+</script>### 5. Dark Mode Support
+
+- Always consider dark mode when styling components
+- Use Nuxt UI's built-in dark mode support
+- Test components in both light and dark modes
+
+<!-- ✅ Good: Dark mode aware -->
+<template>
+  <div class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    Content
+  </div>
+</template>### 6. Responsive Design
+
+- Use Tailwind's responsive utilities (`sm:`, `md:`, `lg:`, `xl:`)
+- Test components on different screen sizes
+- Leverage Nuxt UI's responsive components when available
+
+### 7. Accessibility
+
+- Use semantic HTML elements
+- Ensure proper ARIA attributes when needed
+- Nuxt UI components include accessibility features by default
+
+## Common Nuxt UI Components
+
+### Layout Components
+
+- `UApp`: Root app wrapper
+- `UHeader`: Header component
+- `UFooter`: Footer component
+- `UContainer`: Content container
+- `UMain`: Main content area
+
+### Form Components
+
+- `UButton`: Button element
+- `UInput`: Text input
+- `UCard`: Card container
+- `UForm`: Form with validation
+- `UFormField`: Form field wrapper
+
+### Data Display
+
+- `UTable`: Table component
+- `UCard`: Card display
+- `UBadge`: Badge component
+- `UAvatar`: Avatar image
+
+### Navigation
+
+- `UTabs`: Tab navigation
+- `UBreadcrumb`: Breadcrumb navigation
+- `UPagination`: Pagination controls
+
+Refer to https://ui.nuxt.com/docs/components for the complete list of available components.
+
+## When to Create Custom Components
+
+Create custom components when:
+
+1. **Extending Nuxt UI components**: Wrap Nuxt UI components with additional logic
+2. **Domain-specific components**: Create components specific to your application domain
+3. **Complex compositions**: Combine multiple Nuxt UI components into reusable patterns
+
+Always check if a Nuxt UI component can fulfill your needs before creating a custom component.
+
+## Examples
+
+### Using Nuxt UI Button
+
+e
+<template>
+<UButton
+color="primary"
+variant="solid"
+size="lg"
+:loading="isLoading"
+@click="handleClick"
+
+>
+
+    Submit
+
+  </UButton>
+</template>### Using Nuxt UI Card
+
+<template>
+  <UCard>
+    <template #header>
+      <h3>Card Title</h3>
+    </template>
+    
+    <p>Card content goes here</p>
+    
+    <template #footer>
+      <UButton>Action</UButton>
+    </template>
+  </UCard>
+</template>### Custom Component Using Nuxt UI
+
+<template>
+  <UCard class="portfolio-card">
+    <template #header>
+      <div class="flex items-center justify-between">
+        <h3>{{ title }}</h3>
+        <UBadge :color="statusColor">{{ status }}</UBadge>
+      </div>
+    </template>
+    
+    <slot />
+  </UCard>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  title: string;
+  status: string;
+}
+
+const props = defineProps<Props>();
+
+const statusColor = computed(() => {
+  return props.status === 'active' ? 'green' : 'gray';
+});
+</script>
+
+<style scoped>
+.portfolio-card {
+  /* Component-specific styles if needed */
+}
+</style>## Version Compatibility
+
+- Ensure all Nuxt UI components are compatible with Nuxt UI 4
+- Check component documentation for version-specific features
+- Use Nuxt 4 APIs and patterns as documented in https://nuxt.com/docs/4.x/guide
