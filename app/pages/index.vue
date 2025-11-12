@@ -8,37 +8,37 @@
       <img
         src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
         alt="Bitcoin"
-        class="crypto-coin crypto-coin-btc animate-float"
+        class="crypto-coin crypto-coin-btc coin-glow-btc"
       />
       <img
         src="https://assets.coingecko.com/coins/images/279/large/ethereum.png"
         alt="Ethereum"
-        class="crypto-coin crypto-coin-eth animate-float-reverse"
+        class="crypto-coin crypto-coin-eth coin-glow-eth"
       />
       <img
         src="https://assets.coingecko.com/coins/images/4128/large/solana.png"
         alt="Solana"
-        class="crypto-coin crypto-coin-sol animate-float"
+        class="crypto-coin crypto-coin-sol coin-glow-sol"
       />
       <img
         src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png"
         alt="XRP"
-        class="crypto-coin crypto-coin-xrp animate-float-reverse"
+        class="crypto-coin crypto-coin-xrp coin-glow-xrp"
       />
       <img
         src="https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
         alt="BNB"
-        class="crypto-coin crypto-coin-bnb animate-glow"
+        class="crypto-coin crypto-coin-bnb coin-glow-bnb"
       />
       <img
         src="https://assets.coingecko.com/coins/images/6319/large/usdc.png"
         alt="USDC"
-        class="crypto-coin crypto-coin-usdc animate-float"
+        class="crypto-coin crypto-coin-usdc coin-glow-usdc"
       />
       <img
         src="https://assets.coingecko.com/coins/images/325/large/Tether.png"
         alt="USDT"
-        class="crypto-coin crypto-coin-usdt animate-float-reverse"
+        class="crypto-coin crypto-coin-usdt coin-glow-usdt"
       />
     </div>
 
