@@ -1,8 +1,33 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* ==========================================================================
+   CSS Variables & Theme Configuration
+   ========================================================================== */
+
+:root {
+  --ui-header-height: --spacing(24);
+
+  /* Crypto coin animation variables */
+  --coin-blur: 15px;
+  --coin-opacity: 0.3;
+  --coin-opacity-pulse-max: 0.4;
+  --coin-glow-base: 20px;
+  --coin-glow-max: 40px;
+  --coin-glow-intensity: 0.3;
+
+  /* Coin colors */
+  --coin-btc-color: rgba(247, 147, 26, 0.4);
+  --coin-eth-color: rgba(98, 126, 234, 0.4);
+  --coin-sol-color: rgba(0, 255, 163, 0.4);
+  --coin-xrp-color: rgba(34, 34, 34, 0.4);
+  --coin-bnb-color: rgba(243, 186, 47, 0.4);
+  --coin-usdc-color: rgba(38, 132, 255, 0.4);
+  --coin-usdt-color: rgba(38, 161, 123, 0.4);
+}
+
 @theme static {
-  /* Perano color palette as perano */
+  /* Perano color palette */
   --color-perano-50: #eff4fe;
   --color-perano-100: #e2eafd;
   --color-perano-200: #cbd7fa;
@@ -16,6 +41,10 @@
   --color-perano-950: #1e1e48;
 }
 
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
+
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
@@ -26,7 +55,12 @@
   }
 }
 
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
 @layer utilities {
+  /* Gradient animation for backgrounds */
   @keyframes gradient {
     0% {
       background-position: 0% 50%;
@@ -43,212 +77,4 @@
     background-size: 200% 200%;
     animation: gradient 15s ease infinite;
   }
-
-  /* Underwater floating animation */
-  @keyframes float-underwater {
-    0%,
-    100% {
-      transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-    }
-    25% {
-      transform: translateY(-15px) translateX(10px) rotate(2deg) scale(1.02);
-    }
-    50% {
-      transform: translateY(-25px) translateX(-5px) rotate(-2deg) scale(0.98);
-    }
-    75% {
-      transform: translateY(-10px) translateX(-10px) rotate(1deg) scale(1.01);
-    }
-  }
-
-  @keyframes float-underwater-reverse {
-    0%,
-    100% {
-      transform: translateY(0) translateX(0) rotate(0deg) scale(1);
-    }
-    25% {
-      transform: translateY(15px) translateX(-10px) rotate(-2deg) scale(0.98);
-    }
-    50% {
-      transform: translateY(25px) translateX(5px) rotate(2deg) scale(1.02);
-    }
-    75% {
-      transform: translateY(10px) translateX(10px) rotate(-1deg) scale(0.99);
-    }
-  }
-
-  @keyframes coin-glow-pulse {
-    0%,
-    100% {
-      filter: blur(15px) drop-shadow(0 0 20px currentColor);
-      opacity: 0.3;
-    }
-    50% {
-      filter: blur(15px) drop-shadow(0 0 40px currentColor);
-      opacity: 0.4;
-    }
-  }
-
-  /* Crypto coin styles */
-  .crypto-coin {
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    filter: blur(15px);
-    user-select: none;
-    pointer-events: none;
-    opacity: 0.3;
-    object-fit: contain;
-    z-index: 3;
-  }
-
-  .crypto-coin-btc {
-    top: 10%;
-    left: 8%;
-    width: 220px;
-    height: 220px;
-    animation: float-underwater 8s ease-in-out infinite;
-    color: rgba(247, 147, 26, 0.4);
-  }
-
-  .crypto-coin-eth {
-    bottom: 15%;
-    right: 12%;
-    width: 200px;
-    height: 200px;
-    animation: float-underwater-reverse 10s ease-out infinite;
-    color: rgba(98, 126, 234, 0.4);
-  }
-
-  .crypto-coin-sol {
-    top: 45%;
-    left: 5%;
-    width: 180px;
-    height: 180px;
-    animation: float-underwater 6s ease-in-out infinite;
-    color: rgba(0, 255, 163, 0.4);
-  }
-
-  .crypto-coin-xrp {
-    top: 20%;
-    right: 8%;
-    width: 190px;
-    height: 190px;
-    animation: float-underwater-reverse 12s ease-in-out infinite;
-    color: rgba(34, 34, 34, 0.4);
-  }
-
-  .crypto-coin-bnb {
-    bottom: 10%;
-    left: 15%;
-    width: 210px;
-    height: 210px;
-    animation: float-underwater 9s ease-out infinite;
-    color: rgba(243, 186, 47, 0.4);
-  }
-
-  .crypto-coin-usdc {
-    top: 60%;
-    right: 20%;
-    width: 180px;
-    height: 180px;
-    animation: float-underwater-reverse 11s ease-in-out infinite;
-    color: rgba(38, 132, 255, 0.4);
-  }
-
-  .crypto-coin-usdt {
-    bottom: 30%;
-    left: 25%;
-    width: 200px;
-    height: 200px;
-    animation: float-underwater 7s ease-out infinite;
-    color: rgba(38, 161, 123, 0.4);
-  }
-
-  /* Coin glow effects */
-  .coin-glow-btc {
-    animation:
-      float-underwater 8s ease-in-out infinite,
-      coin-glow-pulse 4s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(247, 147, 26, 0.3));
-  }
-
-  .coin-glow-eth {
-    animation:
-      float-underwater-reverse 10s ease-out infinite,
-      coin-glow-pulse 5s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(98, 126, 234, 0.3));
-  }
-
-  .coin-glow-sol {
-    animation:
-      float-underwater 6s ease-in-out infinite,
-      coin-glow-pulse 3.5s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(0, 255, 163, 0.3));
-  }
-
-  .coin-glow-xrp {
-    animation:
-      float-underwater-reverse 12s ease-in-out infinite,
-      coin-glow-pulse 6s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(34, 34, 34, 0.25));
-  }
-
-  .coin-glow-bnb {
-    animation:
-      float-underwater 9s ease-out infinite,
-      coin-glow-pulse 4.5s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(243, 186, 47, 0.3));
-  }
-
-  .coin-glow-usdc {
-    animation:
-      float-underwater-reverse 11s ease-in-out infinite,
-      coin-glow-pulse 5.5s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(38, 132, 255, 0.3));
-  }
-
-  .coin-glow-usdt {
-    animation:
-      float-underwater 7s ease-out infinite,
-      coin-glow-pulse 4s ease-in-out infinite;
-    filter: blur(15px) drop-shadow(0 0 30px rgba(38, 161, 123, 0.3));
-  }
-
-  /* Purple glow effects */
-  .purple-glow {
-    box-shadow:
-      0 0 60px rgba(139, 92, 246, 0.3),
-      0 0 100px rgba(147, 51, 234, 0.2);
-  }
-
-  .purple-glow-strong {
-    box-shadow:
-      0 0 80px rgba(139, 92, 246, 0.5),
-      0 0 120px rgba(147, 51, 234, 0.3);
-  }
 }
-/* --color-azure-radiance-50: #f0f8fe;
---color-azure-radiance-100: #ddeefc;
---color-azure-radiance-200: #c3e3fa;
---color-azure-radiance-300: #9ad2f6;
---color-azure-radiance-400: #6ab9f0;
---color-azure-radiance-500: #479cea;
---color-azure-radiance-600: #3683df;
---color-azure-radiance-700: #296bcc;
---color-azure-radiance-800: #2757a6;
---color-azure-radiance-900: #254a83;
---color-azure-radiance-950: #1b2f50;
- */
-
-/* --color-perano-50: #eff4fe;
---color-perano-100: #e2eafd;
---color-perano-200: #cbd7fa;
---color-perano-300: #a9bcf6;
---color-perano-400: #899af0;
---color-perano-500: #6c78e8;
---color-perano-600: #5154da;
---color-perano-700: #4242c0;
---color-perano-800: #38399b;
---color-perano-900: #34377b;
---color-perano-950: #1e1e48; */

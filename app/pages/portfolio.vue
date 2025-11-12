@@ -8,6 +8,7 @@
           <span v-if="isLoading">Loading...</span>
           <span v-else>Refresh</span>
         </UButton>
+        <appkit-button />
       </div>
 
       <!-- Empty State - No Wallet Connected -->
