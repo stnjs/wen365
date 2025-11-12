@@ -10,6 +10,16 @@ export default withNuxt({
     "vue/require-default-prop": "off", // TypeScript makes this redundant
     "vue/require-explicit-emits": "error", // Better type safety for emits
 
+    // Allow self-closing tags (works with Prettier)
+    "vue/html-self-closing": [
+      "error",
+      {
+        html: {
+          void: "always", // Allow self-closing for void elements
+        },
+      },
+    ],
+
     // TypeScript rules (only rules that don't require type information)
     "@typescript-eslint/no-unused-vars": [
       "error",

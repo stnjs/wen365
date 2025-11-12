@@ -1,103 +1,105 @@
 <template>
-  <div class="min-h-screen relative overflow-hidden flex items-center justify-center">
-    <!-- Animated Background with Crypto Coins -->
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950 dark:from-primary-950 dark:via-primary-900 dark:to-black animate-gradient"
-    >
-      <!-- Crypto Coin Icons -->
-      <img
-        src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png"
-        alt="Bitcoin"
-        class="crypto-coin crypto-coin-btc coin-glow-btc"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/279/large/ethereum.png"
-        alt="Ethereum"
-        class="crypto-coin crypto-coin-eth coin-glow-eth"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/4128/large/solana.png"
-        alt="Solana"
-        class="crypto-coin crypto-coin-sol coin-glow-sol"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png"
-        alt="XRP"
-        class="crypto-coin crypto-coin-xrp coin-glow-xrp"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png"
-        alt="BNB"
-        class="crypto-coin crypto-coin-bnb coin-glow-bnb"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/6319/large/usdc.png"
-        alt="USDC"
-        class="crypto-coin crypto-coin-usdc coin-glow-usdc"
-      />
-      <img
-        src="https://assets.coingecko.com/coins/images/325/large/Tether.png"
-        alt="USDT"
-        class="crypto-coin crypto-coin-usdt coin-glow-usdt"
-      />
-    </div>
-
-    <!-- Hero Section -->
-    <div class="relative z-10 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-      <!-- Badge -->
-      <div class="mb-6">
-        <span
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 text-sm font-medium text-white"
-        >
-          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          Portfolio Tracker
-        </span>
-      </div>
-
-      <!-- Headline -->
-      <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-        <span class="text-white">Track Your Crypto</span>
-        <br />
-        <span
-          class="bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent animate-gradient"
-        >
-          Portfolio
-        </span>
-      </h1>
-
-      <!-- Subtitle -->
-      <p
-        class="text-xl sm:text-2xl text-gray-200 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
+  <NuxtLayout name="landing-page">
+    <div class="min-h-screen relative overflow-hidden flex items-center justify-center">
+      <!-- Animated Background with Crypto Coins -->
+      <div
+        class="absolute inset-0 bg-gradient-to-br from-primary-800 via-primary-900 to-primary-950 dark:from-primary-950 dark:via-primary-900 dark:to-black animate-gradient"
       >
-        A comprehensive portfolio tracker, tax status tracker for held assets, and asset
-        visualization tool.
-      </p>
+        <!-- Crypto Coin Icons -->
+        <img
+          src="~/assets/images/coins/bitcoin.png"
+          alt="Bitcoin"
+          class="crypto-coin crypto-coin-btc coin-glow-btc"
+        />
+        <img
+          src="~/assets/images/coins/ethereum.png"
+          alt="Ethereum"
+          class="crypto-coin crypto-coin-eth coin-glow-eth"
+        />
+        <img
+          src="~/assets/images/coins/solana.png"
+          alt="Solana"
+          class="crypto-coin crypto-coin-sol coin-glow-sol"
+        />
+        <img
+          src="~/assets/images/coins/xrp.png"
+          alt="XRP"
+          class="crypto-coin crypto-coin-xrp coin-glow-xrp"
+        />
+        <img
+          src="~/assets/images/coins/bnb.png"
+          alt="BNB"
+          class="crypto-coin crypto-coin-bnb coin-glow-bnb"
+        />
+        <img
+          src="~/assets/images/coins/usdc.png"
+          alt="USDC"
+          class="crypto-coin crypto-coin-usdc coin-glow-usdc"
+        />
+        <img
+          src="~/assets/images/coins/usdt.png"
+          alt="USDT"
+          class="crypto-coin crypto-coin-usdt coin-glow-usdt"
+        />
+      </div>
 
-      <!-- CTA Button -->
-      <div class="flex justify-center gap-4">
-        <UButton
-          v-if="!isConnected"
-          :disabled="isConnecting"
-          :loading="isConnecting"
-          color="primary"
-          size="xl"
-          class="px-8 py-6 text-lg font-semibold purple-glow-strong"
-          @click="connectWallet"
+      <!-- Hero Section -->
+      <div class="relative z-10 w-full max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
+        <!-- Badge -->
+        <div class="mb-6">
+          <span
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 text-sm font-medium text-white"
+          >
+            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            Portfolio Tracker
+          </span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
+          <span class="text-white">Track Your Crypto</span>
+          <br />
+          <span
+            class="bg-gradient-to-r from-primary-400 via-purple-400 to-primary-400 bg-clip-text text-transparent animate-gradient"
+          >
+            Portfolio
+          </span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p
+          class="text-xl sm:text-2xl text-gray-200 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
         >
-          {{ isConnecting ? "Connecting..." : "Connect Wallet" }}
-        </UButton>
-        <UButton
-          v-else
-          color="primary"
-          size="xl"
-          class="px-8 py-6 text-lg font-semibold purple-glow-strong"
-          to="/portfolio"
-        >
-          View Portfolio
-        </UButton>
+          A comprehensive portfolio tracker, tax status tracker for held assets, and asset
+          visualization tool.
+        </p>
+
+        <!-- CTA Button -->
+        <div class="flex justify-center gap-4">
+          <UButton
+            v-if="!isConnected"
+            :disabled="isConnecting"
+            :loading="isConnecting"
+            color="primary"
+            size="xl"
+            class="px-8 py-6 text-lg font-semibold purple-glow-strong"
+            @click="connectWallet"
+          >
+            {{ isConnecting ? "Connecting..." : "Connect Wallet" }}
+          </UButton>
+          <UButton
+            v-else
+            color="primary"
+            size="xl"
+            class="px-8 py-6 text-lg font-semibold purple-glow-strong"
+            to="/portfolio"
+          >
+            View Portfolio
+          </UButton>
+        </div>
       </div>
     </div>
-  </div>
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
