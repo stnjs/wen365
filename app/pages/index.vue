@@ -96,7 +96,7 @@ watch(
   () => accountData.value?.isConnected,
   newValue => {
     if (newValue) {
-      router.push("/portfolio");
+      router.push("/dashboard");
     }
   },
 );
