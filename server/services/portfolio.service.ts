@@ -4,14 +4,15 @@ import { mapToPortfolioDto, mapToTokenDto } from "@server/mappers/portfolio.mapp
 import { SUPPORTED_NETWORKS } from "@server/constants/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
 import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
+import { alchemyTokensByAddressMock } from "../constants/mockData";
 
 // Unused mock function - kept for potential future use
-// const _getAlchemyTokensByAddressMock = async () => {
-//   const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
-//     return alchemyTokensByAddressMock;
-//   });
-//   return response as AlchemyTokensByAddressResponse;
-// };
+const _getAlchemyTokensByAddressMock = async () => {
+  const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
+    return alchemyTokensByAddressMock;
+  });
+  return response as AlchemyTokensByAddressResponse;
+};
 
 export const getAlchemyTokensByAddress = async (
   walletAddress: string,
@@ -76,7 +77,7 @@ export async function getPortfolio(
   alchemyApiKey: string,
 ): Promise<PortfolioDto> {
   // 1. Fetch data from Alchemy API
-  const alchemyResponse = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey);
+  const alchemyResponse = await _getAlchemyTokensByAddressMock();
   //console.log("alchemyResponse", JSON.stringify(alchemyResponse, null, 2));
   // 2. Enrich native tokens with predefined metadata
   const enrichedTokens = alchemyResponse.data.tokens.map(token => enrichNativeTokenMetadata(token));
