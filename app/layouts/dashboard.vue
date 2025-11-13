@@ -1,12 +1,7 @@
 <template>
   <UDashboardGroup class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <Sidebar />
-    <UDashboardPanel>
-      <template #header>
-        <UDashboardNavbar />
-      </template>
-      <slot />
-    </UDashboardPanel>
+    <slot />
   </UDashboardGroup>
 </template>
 <script setup lang="ts">
