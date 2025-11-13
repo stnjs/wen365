@@ -77,8 +77,7 @@ export async function getPortfolio(
 ): Promise<PortfolioDto> {
   // 1. Fetch data from Alchemy API
   const alchemyResponse = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey);
-  console.debug("alchemyResponse", alchemyResponse);
-
+  //console.log("alchemyResponse", JSON.stringify(alchemyResponse, null, 2));
   // 2. Enrich native tokens with predefined metadata
   const enrichedTokens = alchemyResponse.data.tokens.map(token => enrichNativeTokenMetadata(token));
 
