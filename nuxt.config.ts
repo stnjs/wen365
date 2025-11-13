@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   // Modules
-  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint"],
+  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint", "@nuxt/test-utils/module"],
 
   // Runtime config for environment variables
   runtimeConfig: {
