@@ -4,6 +4,7 @@ import { mapToPortfolioDto, mapToTokenDto } from "@server/mappers/portfolio.mapp
 import { SUPPORTED_NETWORKS } from "@server/constants/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
 import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
+import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 import { alchemyTokensByAddressMock } from "../constants/mockData";
 
 // Unused mock function - kept for potential future use
