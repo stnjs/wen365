@@ -1,0 +1,331 @@
+---
+globs: test/**/*.test.ts,test/**/*spec.ts
+alwaysApply: false
+---
+
+### Test File Naming
+
+- Use `.test.ts` or `.spec.ts` extension
+- Match source file structure: `sourceFile.test.ts`
+- Example: `formatterUtils.test.ts` tests `formatterUtils.ts`
+
+## Test Types
+
+### Unit Tests
+
+- **Environment**: `node`
+- **Location**: `test/unit/**/*.test.ts`
+- **Purpose**: Test pure functions, utilities, mappers, and business logic
+- **Run**: `pnpm test:unit`
+
+```typescript
+// Good example: Testing pure utility function
+import { describe, it, expect } from "vitest";
+import { roundToTwoDecimals } from "@server/utils/formatterUtils";
+
+describe("formatterUtils", () => {
+  describe("roundToTwoDecimals", () => {
+    it("should round 23.125 to 23.13", () => {
+      expect(roundToTwoDecimals(23.125)).toBe(23.13);
+    });
+  });
+});
+```
+
+### Nuxt Tests
+
+- **Environment**: `nuxt`
+- **Location**: `test/nuxt/**/*.test.ts`
+- **Purpose**: Test composables, components, and Nuxt-specific functionality
+- **Run**: `pnpm test:nuxt`
+
+```typescript
+// Good example: Testing Nuxt composable
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { usePortfolio } from "~/composables/queries/usePortfolio";
+import { ref } from "vue";
+
+describe("usePortfolio", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should disable query when address is null", () => {
+    const address = ref<string | null>(null);
+    usePortfolio(address);
+    // Assertions...
+  });
+});
+```
+
+## Best Practices
+
+### 1. Test Organization
+
+- Use `describe` blocks to group related tests
+- Use descriptive test names that explain expected behavior
+- Follow AAA pattern: Arrange, Act, Assert
+
+```typescript
+// Good example
+describe("portfolio.service", () => {
+  describe("getPortfolio", () => {
+    it("should filter tokens with zero balance", async () => {
+      // Arrange
+      const promise = getPortfolio("0x123", "test-key");
+
+      // Act
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      // Assert
+      expect(result.tokens.every(token => token.tokenValue > 0)).toBe(true);
+    });
+  });
+});
+```
+
+### 2. Mocking
+
+- Use `vi.mock()` for module-level mocks
+- Reset mocks in `beforeEach` for test isolation
+- Verify mock calls when testing integration
+
+```typescript
+// Good example: Proper mock setup
+const mockConvertTokenBalanceToNumber = vi.fn();
+const mockCalculateTokenUsdValue = vi.fn();
+
+vi.mock("@server/utils/blockchainUtils", () => ({
+  convertTokenBalanceToNumber: (token: AlchemyToken) => mockConvertTokenBalanceToNumber(token),
+  calculateTokenUsdValue: (token: AlchemyToken) => mockCalculateTokenUsdValue(token),
+}));
+
+describe("portfolio.mapper", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockConvertTokenBalanceToNumber.mockReturnValue(1);
+  });
+
+  it("should call mocked functions correctly", () => {
+    // Test implementation
+    expect(mockConvertTokenBalanceToNumber).toHaveBeenCalledWith(alchemyToken);
+  });
+});
+```
+
+### 3. Async Testing
+
+- Use `async/await` for async operations
+- Use `vi.useFakeTimers()` and `vi.runAllTimersAsync()` for time-based tests
+- Always restore real timers in `afterEach`
+
+```typescript
+// Good example: Fake timers for async tests
+describe("portfolio.service", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("should handle async operations", async () => {
+    const promise = getPortfolio("0x123", "test-key");
+    await vi.runAllTimersAsync();
+    const result = await promise;
+    expect(result).toBeDefined();
+  });
+});
+```
+
+### 4. Assertions
+
+- Use specific matchers (`toBe`, `toEqual`, `toHaveProperty`)
+- Use `toBeCloseTo` for floating-point comparisons
+- Test edge cases (null, undefined, empty arrays, zero values)
+
+```typescript
+// Good example: Comprehensive assertions
+it("should handle edge cases", () => {
+  expect(roundToTwoDecimals(0)).toBe(0);
+  expect(roundToTwoDecimals(-23.125)).toBe(-23.12);
+  expect(roundToTwoDecimals(0.005)).toBe(0.01);
+});
+
+// Good example: Floating-point comparison
+it("should handle fractional balances", () => {
+  const result = convertTokenBalanceToNumber(token);
+  expect(result).toBeCloseTo(0.001, 10);
+});
+```
+
+### 5. Test Isolation
+
+- Each test should be independent
+- Use `beforeEach`/`afterEach` for setup/teardown
+- Clear mocks between tests
+
+```typescript
+// Good example: Proper test isolation
+describe("usePortfolio", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFetch.mockResolvedValue({});
+  });
+
+  it("should test scenario A", () => {
+    // Test A
+  });
+
+  it("should test scenario B", () => {
+    // Test B - independent of Test A
+  });
+});
+```
+
+### 6. Error Handling
+
+- Test error scenarios explicitly
+- Verify error messages and types
+- Test graceful degradation
+
+```typescript
+// Good example: Error handling test
+it("should handle API errors gracefully", async () => {
+  const error = new Error("API Error");
+  mockFetch.mockRejectedValue(error);
+
+  const address = ref("0x123");
+  usePortfolio(address);
+
+  const call = mockUseQuery.mock.calls[0]?.[0];
+  if (call && call.queryFn) {
+    await expect(call.queryFn()).rejects.toThrow("API Error");
+  }
+});
+```
+
+## Test Coverage Goals
+
+- **Unit Tests**: Aim for 80%+ coverage of utility functions, mappers, and services
+- **Nuxt Tests**: Test all composables and critical component logic
+- **Edge Cases**: Always test null, undefined, empty, and error scenarios
+
+## Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run unit tests only
+pnpm test:unit
+
+# Run Nuxt tests only
+pnpm test:nuxt
+
+# Watch mode
+pnpm test:watch
+
+# Coverage report
+pnpm test:coverage
+```
+
+## Common Patterns
+
+### Testing Business Logic
+
+```typescript
+it("should filter and sort tokens correctly", async () => {
+  const result = await getPortfolio("0x123", "test-key");
+
+  // Verify filtering
+  expect(result.tokens.every(token => token.tokenValue > 0)).toBe(true);
+
+  // Verify sorting
+  if (result.tokens.length > 1) {
+    for (let i = 0; i < result.tokens.length - 1; i++) {
+      expect(result.tokens[i].tokenValue).toBeGreaterThanOrEqual(result.tokens[i + 1].tokenValue);
+    }
+  }
+});
+```
+
+### Testing Data Transformations
+
+```typescript
+it("should map Alchemy token to DTO correctly", () => {
+  const alchemyToken: AlchemyToken = {
+    /* ... */
+  };
+  const result = mapToTokenDto(alchemyToken);
+
+  expect(result.network).toBe("eth-mainnet");
+  expect(result.tokenAddress).toBe("0x123");
+  expect(result.tokenMetadata.symbol).toBe("ETH");
+});
+```
+
+## Anti-Patterns to Avoid
+
+❌ **Don't**: Test implementation details
+
+```typescript
+// Bad: Testing internal function calls
+expect(mockInternalFunction).toHaveBeenCalledTimes(3);
+```
+
+✅ **Do**: Test behavior and outcomes
+
+```typescript
+// Good: Testing the result
+expect(result.tokens.length).toBe(5);
+```
+
+❌ **Don't**: Use real timers for async tests
+
+```typescript
+// Bad: Slow tests
+await new Promise(resolve => setTimeout(resolve, 1000));
+```
+
+✅ **Do**: Use fake timers
+
+```typescript
+// Good: Fast tests
+vi.useFakeTimers();
+await vi.runAllTimersAsync();
+```
+
+❌ **Don't**: Share state between tests
+
+```typescript
+// Bad: Shared mutable state
+let sharedData = {};
+
+it("test 1", () => {
+  sharedData.value = 1;
+});
+
+it("test 2", () => {
+  // May depend on test 1
+});
+```
+
+✅ **Do**: Isolate test data
+
+```typescript
+// Good: Isolated test data
+it("test 1", () => {
+  const data = { value: 1 };
+  // Test with data
+});
+```
+
+## References
+
+- [Vitest Getting Started](https://vitest.dev/guide/)
+- [Vitest API Reference](https://vitest.dev/api/)
+- [Nuxt 4 Testing Guide](https://nuxt.com/docs/4.x/getting-started/testing)
+- [Vitest Migration Guide](https://vitest.dev/guide/migration)
