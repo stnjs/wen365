@@ -8,12 +8,7 @@
           alt="Wen365 Logo"
           class="w-10 h-10"
         />
-        <img
-          v-else-if="colorMode.value === 'dark'"
-          src="~/assets/images/wen365-logo-dark.svg"
-          alt="Wen365 Logo"
-        />
-        <img v-else src="~/assets/images/wen365-logo-light.svg" alt="Wen365 Logo" />
+        <Logo v-else />
       </NuxtLink>
     </template>
     <template #default="{ collapsed }">
@@ -32,12 +27,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
-const colorMode = useColorMode();
-const logo = computed<string>(() =>
-  colorMode.value === "dark"
-    ? "~/assets/images/wen365-logo-dark.svg"
-    : "~/assets/images/wen365-logo-light.svg",
-);
 const items = [
   [
     {
