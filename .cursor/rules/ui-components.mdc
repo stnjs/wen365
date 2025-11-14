@@ -107,6 +107,75 @@ Refer to the Nuxt UI documentation for component props, slots, and events:
 - Ensure proper ARIA attributes when needed
 - Nuxt UI components include accessibility features by default
 
+### 8. Component Structure
+
+Always structure Vue components following this order in `<script setup>`:
+
+1. **Imports** - All imports at the top
+2. **Props & Emits** - Component interface
+3. **Template Refs** - DOM element references
+4. **Reactive State** - All `ref()` variables
+5. **Computed Properties** - All `computed()` values
+6. **Methods** - All functions (formatting, event handlers)
+7. **Configuration** - Component configuration (e.g., table columns)
+8. **Lifecycle Hooks** - All hooks at the end
+
+<!-- ✅ Good: Well-structured component -->
+<script setup lang="ts">
+import { h, resolveComponent, computed, onBeforeUnmount } from "vue";
+import { debounce } from "lodash-es";
+import type { TableColumn } from "@nuxt/ui";
+import Token from "./Token.vue";
+
+const props = defineProps<{
+  tokens: TokenDto[];
+}>();
+
+const table = useTemplateRef("table");
+
+const searchQuery = ref<string>("");
+const debouncedSearchQuery = ref<string>("");
+
+const filteredTokens = computed<TokenDto[]>(() => {
+  // ... logic
+});
+
+const formatBalance = (balance: number): string => {
+  // ... logic
+};
+
+const handleSearchInput = (value: string) => {
+  // ... logic
+};
+
+const columns: TableColumn<TokenDto>[] = [
+  // ... column definitions
+];
+
+onBeforeUnmount(() => {
+  // ... cleanup
+});
+</script>
+
+<!-- ❌ Bad: Unstructured, everything mixed together -->
+<script setup lang="ts">
+import { ref } from "vue";
+const props = defineProps<{ tokens: TokenDto[] }>();
+const searchQuery = ref("");
+const filteredTokens = computed(() => { /* ... */ });
+const handleSearch = () => { /* ... */ };
+onBeforeUnmount(() => { /* ... */ });
+const formatBalance = (balance: number) => { /* ... */ };
+</script>
+
+**Key Principles:**
+
+- Group related code together
+- Maintain consistent order: imports → props → refs → state → computed → methods → config → lifecycle
+- Avoid `watch` functions when possible - prefer event handlers
+- Keep lifecycle hooks at the end
+- Place configuration objects (like table columns) in their own section
+
 ## Common Nuxt UI Components
 
 ### Layout Components
@@ -213,7 +282,9 @@ const statusColor = computed<string>(() => {
 .portfolio-card {
   /* Component-specific styles if needed */
 }
-</style>## Version Compatibility
+</style>
+
+## Version Compatibility
 
 - Ensure all Nuxt UI components are compatible with Nuxt UI 4
 - Check component documentation for version-specific features

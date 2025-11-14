@@ -11,16 +11,20 @@
             <appkit-button />
           </template>
         </UDashboardNavbar>
+        <UDashboardToolbar>
+          <template #right>
+            <UButton
+              icon="i-lucide-refresh-cw"
+              color="neutral"
+              variant="ghost"
+              :disabled="isLoading"
+              @click="refetchPortfolio()"
+            />
+          </template>
+        </UDashboardToolbar>
       </template>
       <template #body>
         <div>
-          <div class="flex justify-between items-center mb-8">
-            <UButton color="primary" :disabled="isLoading" @click="refetchPortfolio()">
-              <span v-if="isLoading">Loading...</span>
-              <span v-else>Refresh</span>
-            </UButton>
-          </div>
-
           <!-- Empty State - No Wallet Connected -->
           <div v-if="!address" class="text-center py-12">
             <UEmpty icon="i-lucide-wallet" description="Connect your wallet to view your portfolio">
@@ -87,7 +91,7 @@
 import { computed, onMounted } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
-import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
+import AssetsTable from "~/components/assetsTable/AssetsTable.vue";
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
 

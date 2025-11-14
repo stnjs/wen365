@@ -1,15 +1,25 @@
 <template>
   <UCard>
     <template #header>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Assets</h3>
+      <div class="flex justify-between items-center gap-4">
+        <div class="text-lg font-medium text-gray-900 dark:text-gray-100">Assets</div>
+        <UInput
+          v-model="searchQuery"
+          class="max-w-sm min-w-[12ch]"
+          placeholder="Search tokens..."
+          icon="i-lucide-search"
+          size="md"
+          clearable
+          @update:model-value="handleSearchInput"
+        />
+      </div>
     </template>
-
     <UTable
+      ref="table"
       v-model:expanded="expanded"
-      :data="tokens"
+      :data="filteredTokens"
       :columns="columns"
       :ui="{ tr: 'data-[expanded=true]:bg-elevated/50' }"
-      class="flex-1"
     >
       <template #expanded="{ row }">
         <div class="px-4 py-4 space-y-3">
@@ -40,11 +50,20 @@
         </div>
       </template>
     </UTable>
+    <template #footer>
+      <UPagination
+        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+        :total="table?.tableApi?.getFilteredRowModel().rows.length"
+        @update:page="p => table?.tableApi?.setPageIndex(p - 1)"
+      />
+    </template>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
+import { h, resolveComponent, computed, onBeforeUnmount } from "vue";
+import { debounce } from "lodash-es";
 import type { TableColumn } from "@nuxt/ui";
 import Token from "./Token.vue";
 
@@ -52,7 +71,26 @@ const props = defineProps<{
   tokens: TokenDto[];
 }>();
 
+const table = useTemplateRef("table");
+
+const searchQuery = ref<string>("");
+const debouncedSearchQuery = ref<string>("");
 const expanded = ref<Record<string, boolean>>({});
+
+const filteredTokens = computed<TokenDto[]>(() => {
+  if (!debouncedSearchQuery.value.trim()) {
+    return props.tokens;
+  }
+
+  const searchLower = debouncedSearchQuery.value.toLowerCase().trim();
+
+  return props.tokens.filter(token => {
+    const name = token.tokenMetadata?.name?.toLowerCase() || "";
+    const symbol = token.tokenMetadata?.symbol?.toLowerCase() || "";
+
+    return name.includes(searchLower) || symbol.includes(searchLower);
+  });
+});
 
 // Format balance with appropriate decimals
 const formatBalance = (balance: number): string => {
@@ -71,7 +109,23 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+// Debounce search updates
+const updateDebouncedSearch = debounce((value: string) => {
+  debouncedSearchQuery.value = value;
+}, 300);
+
+// Handle search input changes
+const handleSearchInput = (value: string) => {
+  if (!value.trim()) {
+    updateDebouncedSearch.cancel();
+    debouncedSearchQuery.value = "";
+    return;
+  }
+  updateDebouncedSearch(value);
+};
+
 const UButton = resolveComponent("UButton");
+
 const columns: TableColumn<TokenDto>[] = [
   {
     id: "expand",
@@ -118,11 +172,30 @@ const columns: TableColumn<TokenDto>[] = [
   },
   {
     accessorKey: "tokenValue",
-    header: "Value",
+    header: ({ column }) => {
+      const isSorted = column.getIsSorted();
+
+      return h(UButton, {
+        color: "neutral",
+        variant: "ghost",
+        label: "Value",
+        icon: isSorted
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2.5",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
+    },
     cell: ({ row }) => {
       const amount = row.getValue("tokenValue") as number;
       return formatCurrency(amount);
     },
   },
 ];
+
+onBeforeUnmount(() => {
+  updateDebouncedSearch.cancel();
+});
 </script>
