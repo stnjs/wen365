@@ -1,5 +1,5 @@
 {
-  "name": "hodltracker",
+  "name": "wen365",
   "version": "1.0.0",
   "description": "Crypto-native web app for tracking crypto asset holding periods with FIFO logic for tax exemptions",
   "private": true,

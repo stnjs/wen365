@@ -26,8 +26,8 @@ A modern crypto portfolio tracker built with Nuxt 4. Track your crypto assets ac
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/stnjs/HODLTracker.git
-   cd HODLTracker
+   git clone https://github.com/stnjs/wen365.git
+   cd wen365
    ```
 
 2. **Install dependencies**
