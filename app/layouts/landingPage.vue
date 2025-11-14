@@ -3,17 +3,7 @@
     <!-- Header -->
     <UHeader class="bg-transparent backdrop-blur-sm border-transparent shadow-none py-4">
       <template #title>
-        <NuxtLink
-          to="/"
-          class="flex items-center space-x-2 text-xl font-bold text-gray-900 dark:text-gray-100"
-        >
-          <div
-            class="w-8 h-8 bg-primary-600 dark:bg-primary-500 rounded-lg flex items-center justify-center"
-          >
-            <span class="text-white font-bold text-sm">H</span>
-          </div>
-          <span>HODL Tracker</span>
-        </NuxtLink>
+        <Logo />
       </template>
       <template #right>
         <div class="flex items-center gap-2">

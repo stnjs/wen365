@@ -13,7 +13,7 @@ createAppKit({
   networks,
   projectId,
   metadata: {
-    name: "HODL Tracker",
+    name: "wen365",
     description:
       "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool.",
     url: "http://localhost:3030",

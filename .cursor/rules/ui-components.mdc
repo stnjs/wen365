@@ -154,7 +154,6 @@ Always check if a Nuxt UI component can fulfill your needs before creating a cus
 
 ### Using Nuxt UI Button
 
-e
 <template>
 <UButton
 color="primary"
@@ -205,7 +204,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const statusColor = computed(() => {
+const statusColor = computed<string>(() => {
   return props.status === 'active' ? 'green' : 'gray';
 });
 </script>
