@@ -17,15 +17,21 @@ import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 export const getAlchemyTokensByAddress = async (
   walletAddress: string,
   alchemyApiKey: string,
+  pageKey?: string,
 ): Promise<AlchemyTokensByAddressResponse> => {
-  const responseBody = {
+  const responseBody: {
+    addresses: Array<{ address: string; networks: NetworkId[] }>;
+    pageKey?: string;
+  } = {
     addresses: [
       {
         address: walletAddress,
         networks: SUPPORTED_NETWORKS,
       },
     ],
+    pageKey: pageKey || undefined,
   };
+
   return await $fetch<AlchemyTokensByAddressResponse>(
     `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`,
     {
@@ -34,6 +40,28 @@ export const getAlchemyTokensByAddress = async (
     },
   );
 };
+
+/**
+ * Fetches all pages from Alchemy API by recursively following pageKey
+ * Aggregates all tokens from all pages into a single array
+ */
+async function fetchAllAlchemyPages(
+  walletAddress: string,
+  alchemyApiKey: string,
+): Promise<AlchemyToken[]> {
+  const allTokens: AlchemyToken[] = [];
+  let pageKey: string | undefined = undefined;
+
+  do {
+    console.log("pageKey", pageKey);
+    const response = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey, pageKey);
+    allTokens.push(...response.data.tokens);
+    console.log(JSON.stringify(response, null, 2));
+    pageKey = response.data.pageKey || undefined;
+  } while (pageKey);
+
+  return allTokens;
+}
 
 const isTokenBlacklisted = (token: TokenDto): boolean => {
   return BLACKLISTED_TOKENS.some(
@@ -71,16 +99,17 @@ function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
 /**
  * Gets portfolio data for a wallet address
  * Handles business logic: filtering, calculations, orchestration
+ * Fetches all pages from Alchemy to calculate accurate totalValue
  */
 export async function getPortfolio(
   walletAddress: string,
   alchemyApiKey: string,
 ): Promise<PortfolioDto> {
-  // 1. Fetch data from Alchemy API
-  const alchemyResponse = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey);
-  //console.log("alchemyResponse", JSON.stringify(alchemyResponse, null, 2));
+  // 1. Fetch ALL pages from Alchemy API
+  const allAlchemyTokens = await fetchAllAlchemyPages(walletAddress, alchemyApiKey);
+
   // 2. Enrich native tokens with predefined metadata
-  const enrichedTokens = alchemyResponse.data.tokens.map(token => enrichNativeTokenMetadata(token));
+  const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
 
   // 3. Transform Alchemy tokens to DTOs (pure transformation)
   const allTokenDtos = enrichedTokens.map(token => mapToTokenDto(token));

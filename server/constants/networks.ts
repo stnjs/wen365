@@ -1,7 +1,7 @@
 import type { NetworkId } from "~~/shared/types/NetworkId";
 export const SUPPORTED_NETWORKS: NetworkId[] = [
   "eth-mainnet",
-  //   "base-mainnet",
+  "base-mainnet",
   //   "matic-mainnet",
   //   "base-mainnet",
   //   "arb-mainnet",

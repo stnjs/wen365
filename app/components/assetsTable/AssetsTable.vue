@@ -17,7 +17,7 @@
     <UTable
       ref="table"
       v-model:expanded="expanded"
-      :data="filteredTokens"
+      :data="paginatedTokens"
       :columns="columns"
       :ui="{ tr: 'data-[expanded=true]:bg-elevated/50' }"
     >
@@ -52,10 +52,10 @@
     </UTable>
     <template #footer>
       <UPagination
-        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-        :total="table?.tableApi?.getFilteredRowModel().rows.length"
-        @update:page="p => table?.tableApi?.setPageIndex(p - 1)"
+        v-if="totalPages > 0"
+        :page="page"
+        :total="totalPages"
+        @update:page="handlePageChange"
       />
     </template>
   </UCard>
@@ -76,6 +76,8 @@ const table = useTemplateRef("table");
 const searchQuery = ref<string>("");
 const debouncedSearchQuery = ref<string>("");
 const expanded = ref<Record<string, boolean>>({});
+const page = ref(1);
+const pageSize = 20;
 
 const filteredTokens = computed<TokenDto[]>(() => {
   if (!debouncedSearchQuery.value.trim()) {
@@ -92,7 +94,14 @@ const filteredTokens = computed<TokenDto[]>(() => {
   });
 });
 
-// Format balance with appropriate decimals
+const paginatedTokens = computed<TokenDto[]>(() => {
+  const startIndex = (page.value - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  return filteredTokens.value.slice(startIndex, endIndex);
+});
+
+const totalPages = computed(() => Math.ceil(filteredTokens.value.length / pageSize));
+
 const formatBalance = (balance: number): string => {
   if (balance === 0) return "0";
   if (balance < 0.0001) return balance.toExponential(2);
@@ -101,7 +110,6 @@ const formatBalance = (balance: number): string => {
   return balance.toFixed(2);
 };
 
-// Format currency
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -109,19 +117,23 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
-// Debounce search updates
 const updateDebouncedSearch = debounce((value: string) => {
   debouncedSearchQuery.value = value;
 }, 300);
 
-// Handle search input changes
 const handleSearchInput = (value: string) => {
   if (!value.trim()) {
     updateDebouncedSearch.cancel();
     debouncedSearchQuery.value = "";
+    page.value = 1;
     return;
   }
+  page.value = 1;
   updateDebouncedSearch(value);
+};
+
+const handlePageChange = (newPage: number) => {
+  page.value = newPage;
 };
 
 const UButton = resolveComponent("UButton");
