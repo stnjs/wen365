@@ -78,12 +78,12 @@ async function fetchAllAlchemyPages(
   return allTokens;
 }
 
-const isTokenBlacklisted = (token: TokenDto): boolean => {
+function isTokenBlacklisted(token: TokenDto): boolean {
   return BLACKLISTED_TOKENS.some(
     blacklistedToken =>
       blacklistedToken.address === token.tokenAddress && blacklistedToken.network === token.network,
   );
-};
+}
 
 /**
  * Enriches native token metadata with predefined values
@@ -112,10 +112,30 @@ function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
 }
 
 /**
- * Gets portfolio data for a wallet address
- * Handles business logic: filtering, calculations, orchestration
- * Fetches all pages from Alchemy to calculate accurate totalValue
+ * Creates a unique key for a token based on network and address
  */
+function getTokenKey(token: TokenDto): string {
+  return `${token.network}:${token.tokenAddress || "native"}`;
+}
+
+/**
+ * Deduplicates tokens by network and address, keeping the one with higher value
+ */
+function deduplicateTokens(tokens: TokenDto[]): TokenDto[] {
+  const tokenMap = new Map<string, TokenDto>();
+
+  for (const token of tokens) {
+    const key = getTokenKey(token);
+    const existing = tokenMap.get(key);
+
+    if (!existing || token.tokenValue > existing.tokenValue) {
+      tokenMap.set(key, token);
+    }
+  }
+
+  return Array.from(tokenMap.values());
+}
+
 export async function getPortfolio(
   walletAddress: string,
   alchemyApiKey: string,
@@ -126,7 +146,9 @@ export async function getPortfolio(
 
   const allTokenDtos = enrichedTokens.map(token => mapToTokenDto(token));
 
-  const activeTokens = allTokenDtos
+  const uniqueTokens = deduplicateTokens(allTokenDtos);
+
+  const activeTokens = uniqueTokens
     .filter(token => token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token))
     .sort((a, b) => b.tokenValue - a.tokenValue);
 
