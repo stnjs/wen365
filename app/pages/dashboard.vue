@@ -13,13 +13,15 @@
         </UDashboardNavbar>
         <UDashboardToolbar>
           <template #right>
-            <UButton
-              icon="i-lucide-refresh-cw"
-              color="neutral"
-              variant="ghost"
-              :disabled="isLoading"
-              @click="refetchPortfolio()"
-            />
+            <UTooltip text="Refresh Portfolio">
+              <UButton
+                icon="i-lucide-refresh-cw"
+                color="neutral"
+                variant="ghost"
+                :disabled="isLoading"
+                @click="refetchPortfolio()"
+              />
+            </UTooltip>
           </template>
         </UDashboardToolbar>
       </template>
