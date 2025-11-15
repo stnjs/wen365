@@ -4,66 +4,299 @@ globs:
 alwaysApply: false
 ---
 
-# Cursor Rules Location
+# Cursor Rules Guide
 
-How to add new cursor rules to the project
+How to create and manage Cursor rules in this project. Based on [official Cursor documentation](https://cursor.com/docs/context/rules).
 
-1. Always place rule files in PROJECT_ROOT/.cursor/rules/:
+## Rule Location
 
-   ```
-   .cursor/rules/
-   ├── your-rule-name.mdc
-   ├── another-rule.mdc
-   └── ...
-   ```
+Always place rule files in `PROJECT_ROOT/.cursor/rules/`:
 
-2. Follow the naming convention:
-   - Use kebab-case for filenames
-   - Always use .mdc extension
-   - Make names descriptive of the rule's purpose
+```
+.cursor/rules/
+├── your-rule-name.mdc
+├── another-rule.mdc
+└── ...
+```
 
-3. Directory structure:
+## Naming Convention
 
-   ```
-   PROJECT_ROOT/
-   ├── .cursor/
-   │   └── rules/
-   │       ├── your-rule-name.mdc
-   │       └── ...
-   └── ...
-   ```
+- Use **kebab-case** for filenames
+- Always use **.mdc** extension
+- Make names descriptive of the rule's purpose
+- Examples: `server-api.mdc`, `ui-components.mdc`, `testing.mdc`
 
-4. Never place rule files:
-   - In the project root
-   - In subdirectories outside .cursor/rules
-   - In any other location
+## Rule Structure
 
-5. Cursor rules have the following structure:
+Each rule file uses **MDC** format with frontmatter metadata:
 
-````
+```md
 ---
 description: Short description of the rule's purpose
 globs: optional/path/pattern/**/*
 alwaysApply: false
 ---
+
 # Rule Title
 
 Main content explaining the rule with markdown formatting.
 
-1. Step-by-step instructions
-2. Code examples
-3. Guidelines
+## Section 1
 
-Example:
+Content here with examples.
+
+## Section 2
+
+More content...
+```
+
+### Frontmatter Properties
+
+- **`description`**: Brief description used for intelligent rule matching
+- **`globs`**: File path pattern (e.g., `server/**/*.ts`, `app/components/**/*.vue`)
+- **`alwaysApply`**: Set to `true` to apply to every chat session
+
+## Rule Types
+
+Configure rule type in Cursor Settings → Rules, which controls how rules are applied:
+
+| Rule Type                   | When Applied                     | Use Case                                |
+| --------------------------- | -------------------------------- | --------------------------------------- |
+| **Always Apply**            | Every chat session               | Critical project-wide standards         |
+| **Apply Intelligently**     | When Agent decides it's relevant | Domain-specific knowledge               |
+| **Apply to Specific Files** | When file matches glob pattern   | File-type specific guidelines           |
+| **Apply Manually**          | When @-mentioned                 | Templates, workflows, rarely-used rules |
+
+## Best Practices
+
+Follow these guidelines from [Cursor's official documentation](https://cursor.com/docs/context/rules):
+
+### 1. Keep Rules Focused and Actionable
+
+Rules should be focused, actionable, and scoped to specific domains.
+
+```md
+## <!-- ✅ Good: Focused rule for server code -->
+
+globs: server/\*_/_.ts
+description: Server and API implementation guidelines
+
+---
+
+# Server API Guidelines
+
+Specific guidelines for server-side code...
+
+## <!-- ❌ Bad: Too broad, tries to cover everything -->
+
+## description: All coding guidelines
+
+# Everything About Coding
+
+Frontend, backend, testing, deployment, everything...
+```
+
+### 2. Keep Rules Under 500 Lines
+
+If a rule exceeds 500 lines, split it into multiple composable rules.
+
+```md
+<!-- ✅ Good: Split into focused rules -->
+
+.cursor/rules/
+├── server-api.mdc # Server/API guidelines
+├── server-security.mdc # Security-specific rules
+└── server-testing.mdc # Testing patterns
+
+<!-- ❌ Bad: One massive rule file -->
+
+.cursor/rules/
+└── server-everything.mdc # 2000+ lines covering everything
+```
+
+### 3. Provide Concrete Examples
+
+Include concrete code examples showing good vs bad patterns.
+
+````md
+<!-- ✅ Good: Concrete examples -->
+
 ```typescript
-// Good example
-function goodExample() {
-  // Implementation following guidelines
+// ✅ Good: Validate all inputs
+const walletAddress = getRouterParam(event, "walletAddress");
+if (!walletAddress || !isAddress(walletAddress)) {
+  throw createError({ statusCode: 400, statusMessage: "Invalid address" });
 }
 
-// Bad example
-function badExample() {
-  // Implementation not following guidelines
-}
+// ❌ Bad: No validation
+const walletAddress = getRouterParam(event, "walletAddress");
 ```
 ````
+
+````
+
+### 4. Reference Files When Helpful
+
+Use `@filename.ts` to include actual project files in rule context.
+
+```md
+<!-- ✅ Good: Reference actual project files -->
+Reference existing code for patterns:
+
+- `@server/api/portfolio/[walletAddress].get.ts` - API handler example
+- `@server/services/portfolio.service.ts` - Service layer example
+````
+
+### 5. Write Like Clear Internal Docs
+
+Avoid vague guidance. Write rules as clear, actionable documentation.
+
+```md
+<!-- ✅ Good: Clear, specific guidance -->
+
+Always validate route parameters before processing:
+
+1. Extract parameter using `getRouterParam(event, "paramName")`
+2. Validate format using appropriate library (e.g., `isAddress` from viem)
+3. Throw `createError` with status 400 if invalid
+4. Process only after validation passes
+
+<!-- ❌ Bad: Vague guidance -->
+
+Make sure inputs are valid before using them.
+```
+
+### 6. Reuse Rules When Repeating Prompts
+
+If you find yourself repeating the same prompts in chat, create a rule instead.
+
+```md
+## <!-- ✅ Good: Create reusable rule -->
+
+description: Template for creating new API endpoints
+globs: server/api/\*_/_.ts
+
+---
+
+# API Endpoint Template
+
+When creating new API endpoints:
+
+1. Validate inputs first
+2. Call service layer
+3. Handle errors appropriately
+4. Return DTOs
+
+<!-- ❌ Bad: Keep repeating same prompt in chat -->
+
+User: "Create an API endpoint following our patterns..."
+[AI creates endpoint]
+User: "Create another endpoint following our patterns..."
+[AI creates endpoint again]
+```
+
+## Nested Rules
+
+Organize rules by placing them in `.cursor/rules` directories throughout your project:
+
+```
+project/
+  .cursor/rules/           # Project-wide rules
+  backend/
+    server/
+      .cursor/rules/       # Backend-specific rules
+  frontend/
+    .cursor/rules/         # Frontend-specific rules
+```
+
+Nested rules automatically attach when files in their directory are referenced.
+
+## Creating Rules
+
+### Method 1: Cursor Settings
+
+1. Go to **Cursor Settings → Rules**
+2. Click **New Cursor Rule**
+3. Configure rule type, description, and globs
+4. Write rule content
+
+### Method 2: Manual Creation
+
+1. Create file in `.cursor/rules/your-rule-name.mdc`
+2. Add frontmatter with metadata
+3. Write rule content following best practices
+
+### Method 3: Ask Agent
+
+Ask the agent in chat: "Create a new rule for [purpose]"
+
+## Examples
+
+Reference existing rules in this project:
+
+- `@.cursor/rules/server-api.mdc` - Server/API implementation guidelines
+- `@.cursor/rules/ui-components.mdc` - UI component standards
+- `@.cursor/rules/testing.mdc` - Testing patterns and practices
+
+## Rule Precedence
+
+When multiple rules apply, they are merged in this order:
+
+1. **Team Rules** (if on Team/Enterprise plan)
+2. **Project Rules** (`.cursor/rules/`)
+3. **User Rules** (global preferences)
+
+Earlier sources take precedence when guidance conflicts.
+
+## Common Patterns
+
+### Rule for Specific File Types
+
+```md
+---
+globs: server/**/*.ts
+description: Server-side TypeScript guidelines
+alwaysApply: false
+---
+```
+
+### Always-Applied Rule
+
+```md
+---
+description: Project-wide coding standards
+alwaysApply: true
+---
+```
+
+### Manual-Only Rule (Template)
+
+```md
+---
+description: API endpoint template
+globs:
+alwaysApply: false
+---
+
+Use this template when creating API endpoints:
+@api-template.ts
+```
+
+## Anti-Patterns to Avoid
+
+❌ **Don't**: Create one massive rule covering everything
+✅ **Do**: Split into focused, composable rules
+
+❌ **Don't**: Write vague, abstract guidance
+✅ **Do**: Provide concrete examples and clear instructions
+
+❌ **Don't**: Create rules that duplicate existing documentation
+✅ **Do**: Reference official docs and add project-specific context
+
+❌ **Don't**: Create rules longer than 500 lines
+✅ **Do**: Split large rules into multiple files
+
+## Additional Resources
+
+- [Official Cursor Rules Documentation](https://cursor.com/docs/context/rules)
+- [MDC Format Reference](https://cursor.com/docs/context/rules#rule-anatomy)

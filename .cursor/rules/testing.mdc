@@ -1,9 +1,14 @@
 ---
+description: Testing patterns and best practices for unit and Nuxt tests
 globs: test/**/*.test.ts,test/**/*spec.ts
 alwaysApply: false
 ---
 
-### Test File Naming
+# Testing Guidelines
+
+This project uses **Vitest** for testing. Follow these patterns for writing maintainable, isolated tests.
+
+## Test File Naming
 
 - Use `.test.ts` or `.spec.ts` extension
 - Match source file structure: `sourceFile.test.ts`
@@ -19,7 +24,7 @@ alwaysApply: false
 - **Run**: `pnpm test:unit`
 
 ```typescript
-// Good example: Testing pure utility function
+// ✅ Good: Testing pure utility function
 import { describe, it, expect } from "vitest";
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 
@@ -40,7 +45,7 @@ describe("formatterUtils", () => {
 - **Run**: `pnpm test:nuxt`
 
 ```typescript
-// Good example: Testing Nuxt composable
+// ✅ Good: Testing Nuxt composable
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { ref } from "vue";
@@ -67,7 +72,7 @@ describe("usePortfolio", () => {
 - Follow AAA pattern: Arrange, Act, Assert
 
 ```typescript
-// Good example
+// ✅ Good: Well-organized test
 describe("portfolio.service", () => {
   describe("getPortfolio", () => {
     it("should filter tokens with zero balance", async () => {
@@ -92,7 +97,7 @@ describe("portfolio.service", () => {
 - Verify mock calls when testing integration
 
 ```typescript
-// Good example: Proper mock setup
+// ✅ Good: Proper mock setup
 const mockConvertTokenBalanceToNumber = vi.fn();
 const mockCalculateTokenUsdValue = vi.fn();
 
@@ -121,7 +126,7 @@ describe("portfolio.mapper", () => {
 - Always restore real timers in `afterEach`
 
 ```typescript
-// Good example: Fake timers for async tests
+// ✅ Good: Fake timers for async tests
 describe("portfolio.service", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -147,7 +152,7 @@ describe("portfolio.service", () => {
 - Test edge cases (null, undefined, empty arrays, zero values)
 
 ```typescript
-// Good example: Comprehensive assertions
+// ✅ Good: Comprehensive assertions
 it("should handle edge cases", () => {
   expect(roundToTwoDecimals(0)).toBe(0);
   expect(roundToTwoDecimals(-23.125)).toBe(-23.12);
@@ -168,7 +173,7 @@ it("should handle fractional balances", () => {
 - Clear mocks between tests
 
 ```typescript
-// Good example: Proper test isolation
+// ✅ Good: Proper test isolation
 describe("usePortfolio", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -192,7 +197,7 @@ describe("usePortfolio", () => {
 - Test graceful degradation
 
 ```typescript
-// Good example: Error handling test
+// ✅ Good: Error handling test
 it("should handle API errors gracefully", async () => {
   const error = new Error("API Error");
   mockFetch.mockRejectedValue(error);

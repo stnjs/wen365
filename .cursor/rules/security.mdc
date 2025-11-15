@@ -1,15 +1,26 @@
 ---
-description: Security checklist for development
+description: Security best practices and checklist for secure development
 alwaysApply: false
 ---
 
 # Security Checklist
+
+Security considerations for development. See `@.cursor/rules/server-api.mdc` for detailed API security guidelines.
 
 ## Configuration Security
 
 - [x] Detect secrets in code
 - [x] Identify secrets committed to version control
 - [x] Flag hardcoded credentials
+
+```typescript
+// ✅ Good: Use environment variables
+const config = useRuntimeConfig(event);
+const apiKey = config.alchemyApiKey;
+
+// ❌ Bad: Hardcoded secrets
+const apiKey = "sk_live_1234567890abcdef";
+```
 
 ## Authentication & Authorization
 
@@ -24,16 +35,55 @@ alwaysApply: false
 - [x] Find XSS vulnerabilities through missing output encoding
 - [x] Identify SQL injection vulnerabilities
 
+```typescript
+// ✅ Good: Validate all inputs
+import { isAddress } from "viem";
+if (!walletAddress || !isAddress(walletAddress)) {
+  throw createError({ statusCode: 400, statusMessage: "Invalid address" });
+}
+
+// ❌ Bad: No validation
+const walletAddress = getRouterParam(event, "walletAddress");
+// Use directly without validation
+```
+
 ## API Security
 
 - [x] Detect missing rate limiting
 - [x] Identify improper error handling that leaks information
 - [x] Find missing input validation in API endpoints
 
+```typescript
+// ✅ Good: Sanitized error messages
+catch (error: any) {
+  logger.error({ error: error.message }, "Request failed");
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Internal server error",
+  });
+}
+
+// ❌ Bad: Leaks error details
+catch (error: any) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: error.message, // May contain sensitive info
+  });
+}
+```
+
 ## Logging & Monitoring
 
 - [x] Identify sensitive information in logs
 - [x] Detect missing error logging
+
+```typescript
+// ✅ Good: Exclude sensitive data
+logger.info({ requestId }, "API call successful");
+
+// ❌ Bad: Log sensitive data
+logger.info({ apiKey, token, password }, "API call");
+```
 
 ## Dependency Management
 
@@ -46,7 +96,20 @@ alwaysApply: false
 - [x] Identify potential DoS vulnerabilities
 - [x] Find missing timeout configurations
 
+```typescript
+// ✅ Good: Timeout configured
+return await $fetch(url, { timeout: 30000 });
+
+// ❌ Bad: No timeout
+return await $fetch(url);
+```
+
 ## SDLC Security
 
 - [x] Identify common security issues through static analysis
 - [x] Suggest security improvements in code reviews
+
+## Additional Resources
+
+- See `@.cursor/rules/server-api.mdc` for detailed security guidelines
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
