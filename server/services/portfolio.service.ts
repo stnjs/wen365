@@ -5,6 +5,7 @@ import { SUPPORTED_NETWORKS } from "@server/constants/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
 import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
+import { fetchWithRetry } from "@server/utils/retryUtils";
 
 // Unused mock function - kept for potential future use
 // const _getAlchemyTokensByAddressMock = async () => {
@@ -32,11 +33,18 @@ export const getAlchemyTokensByAddress = async (
     pageKey: pageKey || undefined,
   };
 
-  return await $fetch<AlchemyTokensByAddressResponse>(
-    `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`,
+  const url = `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`;
+
+  return await fetchWithRetry<AlchemyTokensByAddressResponse>(
+    url,
     {
       method: "POST",
       body: responseBody,
+      timeout: 30000,
+    },
+    {
+      maxRetries: 3,
+      baseDelay: 1000,
     },
   );
 };
@@ -51,13 +59,18 @@ async function fetchAllAlchemyPages(
 ): Promise<AlchemyToken[]> {
   const allTokens: AlchemyToken[] = [];
   let pageKey: string | undefined = undefined;
+  const MAX_PAGES = 100;
+  let pageCount = 0;
 
   do {
-    console.log("pageKey", pageKey);
+    if (pageCount >= MAX_PAGES) {
+      throw new Error("Maximum page limit reached");
+    }
+
     const response = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey, pageKey);
     allTokens.push(...response.data.tokens);
-    console.log(JSON.stringify(response, null, 2));
     pageKey = response.data.pageKey || undefined;
+    pageCount++;
   } while (pageKey);
 
   return allTokens;
