@@ -1,0 +1,520 @@
+---
+description: Server and API implementation guidelines for production-ready, secure code
+globs: server/**/*.ts
+alwaysApply: false
+---
+
+# Server and API Implementation Guidelines
+
+This project uses **Nuxt 4** with **Nitro** for server-side and API implementation. These guidelines ensure production-ready, secure, and maintainable server code.
+
+## Technology Stack
+
+- **Nuxt 4**: Full-stack Vue framework
+- **Nitro**: Nuxt's server engine
+- **TypeScript**: Type-safe server code with strict mode
+
+## Type Imports
+
+Nuxt 4 automatically imports all types from `shared/types/`. **Do not** explicitly import types from `shared/types/` - they are available globally.
+
+```typescript
+// ✅ Good: Use types directly (auto-imported)
+export async function getPortfolio(...): Promise<PortfolioDto> {
+  const tokens: TokenDto[] = [];
+  // Types are automatically available
+}
+
+// ❌ Bad: Unnecessary explicit import
+import type { PortfolioDto, TokenDto } from "~/shared/types/PortfolioDto";
+import type { TokenDto } from "~/shared/types/TokenDto";
+export async function getPortfolio(...): Promise<PortfolioDto> {
+  // ...
+}
+```
+
+## Documentation References
+
+When working with server code, always refer to the latest official documentation:
+
+- **Nuxt 4 Server**: https://nuxt.com/docs/4.x/guide/directory-structure/server
+- **Nitro API Routes**: https://nitro.unjs.io/guide/routing
+- **Nitro Utilities**: https://nitro.unjs.io/guide/utils
+
+## Production Readiness Checklist
+
+Before deploying server code to production, ensure:
+
+- [ ] All input parameters are validated
+- [ ] Error handling is implemented with proper categorization
+- [ ] Timeouts are configured for all external API calls
+- [ ] Retry logic is implemented for transient failures
+- [ ] Resource limits are enforced (max pages, max requests, etc.)
+- [ ] Configuration values are validated (API keys, environment variables)
+- [ ] Health check endpoints are available
+- [ ] No `console.log` statements in production code
+- [ ] Sensitive data is never exposed in error messages
+
+## Security Best Practices
+
+### Input Validation and Sanitization
+
+Always validate and sanitize ALL inputs (route parameters, query parameters, request body).
+
+```typescript
+// ✅ Good: Validate all inputs
+import { isAddress } from "viem"; // For blockchain addresses
+import { z } from "zod"; // For general validation
+
+const walletAddress = getRouterParam(event, "walletAddress");
+if (!walletAddress || !isAddress(walletAddress)) {
+  throw createError({
+    statusCode: 400,
+    statusMessage: "Invalid wallet address format",
+  });
+}
+
+const query = getQuery(event);
+const schema = z.object({
+  page: z.number().int().positive().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+});
+const validatedQuery = schema.parse(query);
+
+// ❌ Bad: No validation, trust user input
+const walletAddress = getRouterParam(event, "walletAddress");
+const page = getQuery(event).page; // Could be anything
+```
+
+### API Key and Configuration Validation
+
+Always validate that required configuration values exist before using them.
+
+```typescript
+// ✅ Good: Validate configuration
+const config = useRuntimeConfig(event);
+const apiKey = config.alchemyApiKey;
+
+if (!apiKey) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Server configuration error",
+  });
+}
+
+// ❌ Bad: Assume configuration exists
+const apiKey = config.alchemyApiKey; // Could be undefined
+```
+
+### Error Message Sanitization
+
+Never expose sensitive information in error messages. Log detailed errors server-side, but return generic messages to clients.
+
+```typescript
+// ✅ Good: Sanitized error messages
+catch (error: any) {
+  logger.error({ error: error.message, requestId }, "Request failed");
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Internal server error",
+  });
+}
+
+// ❌ Bad: Leaks error details
+catch (error: any) {
+  throw createError({
+    statusCode: error.statusCode || 500,
+    statusMessage: error.message, // May contain sensitive info
+  });
+}
+```
+
+### Rate Limiting Considerations
+
+Consider implementing rate limiting to prevent abuse (per-IP, per-user, per-endpoint). Use middleware or API gateway for rate limiting.
+
+## API Design Principles
+
+### RESTful Conventions
+
+Follow RESTful conventions: Use appropriate HTTP methods (GET, POST, PUT, DELETE), resource-based URLs, appropriate status codes, and consistent response structures.
+
+### HTTP Status Codes
+
+Use appropriate HTTP status codes: `200 OK` (successful GET/PUT/PATCH), `201 Created` (POST success), `400 Bad Request` (invalid input), `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `429 Too Many Requests`, `500 Internal Server Error`, `503 Service Unavailable`.
+
+```typescript
+// ✅ Good: Appropriate status codes
+if (!walletAddress) {
+  throw createError({
+    statusCode: 400,
+    statusMessage: "Wallet address is required",
+  });
+}
+
+if (error.statusCode === 429) {
+  throw createError({
+    statusCode: 503,
+    statusMessage: "Service temporarily unavailable",
+  });
+}
+
+// ❌ Bad: Wrong status codes
+if (!walletAddress) {
+  throw createError({
+    statusCode: 500, // Should be 400
+    statusMessage: "Wallet address is required",
+  });
+}
+```
+
+### Request/Response Structure
+
+Use DTOs (Data Transfer Objects) for API contracts. Define DTOs in `shared/types/` for client-server shared types. Use consistent response structures and version APIs when making breaking changes.
+
+### Error Response Format
+
+Standardize error responses:
+
+```typescript
+// ✅ Good: Consistent error format
+throw createError({
+  statusCode: 400,
+  statusMessage: "Invalid input parameter",
+  data: {
+    field: "walletAddress",
+    reason: "Invalid format",
+  },
+});
+
+// ❌ Bad: Inconsistent error format
+throw createError({
+  statusCode: 400,
+  message: "Invalid input", // Inconsistent property name
+});
+```
+
+## Code Structure & Organization
+
+### Separation of Concerns
+
+Follow the layered architecture pattern:
+
+1. **API Handlers** (`server/api/`): Handle HTTP requests/responses
+2. **Services** (`server/services/`): Business logic and orchestration
+3. **Mappers** (`server/mappers/`): Pure transformation functions
+4. **Utils** (`server/utils/`): Reusable utility functions
+
+```typescript
+// ✅ Good: Clear separation
+// See @server/api/portfolio/[walletAddress].get.ts for API handler pattern
+// See @server/services/portfolio.service.ts for service layer pattern
+
+// ❌ Bad: Everything in one file
+export default defineEventHandler(async event => {
+  // Validation, business logic, API calls, transformation all mixed together
+});
+```
+
+### Service Layer Pattern
+
+Services handle business logic and orchestration: call external APIs, coordinate between data sources, apply business rules. Services should be testable (can be mocked).
+
+### Pure Functions
+
+Mappers and utilities should be pure functions: no side effects, same input always produces same output, easy to test, reusable. See `@server/mappers/portfolio.mapper.ts` for examples.
+
+### Function Naming Conventions
+
+Use clear, descriptive function names: Services (`getPortfolio`, `createUser`), Mappers (`mapToTokenDto`), Utils (`formatBalance`), Validators (`validateWalletAddress`).
+
+## Error Handling
+
+### Standardized Error Responses
+
+Always use `createError` from Nuxt for error responses. Never throw generic `Error` objects.
+
+### Error Categorization
+
+Categorize errors appropriately:
+
+- **Client Errors (4xx)**: Invalid input, missing parameters, unauthorized
+- **Server Errors (5xx)**: Internal errors, external API failures, configuration issues
+
+```typescript
+// ✅ Good: Categorized errors
+catch (error: any) {
+  if (error.statusCode === 429) {
+    // Rate limit - treat as service unavailable
+    throw createError({
+      statusCode: 503,
+      statusMessage: "Service temporarily unavailable",
+    });
+  }
+  if (error.statusCode >= 400 && error.statusCode < 500) {
+    // Client error - pass through with sanitization
+    throw createError({
+      statusCode: error.statusCode,
+      statusMessage: "Invalid request",
+    });
+  }
+  // Server error - log and return generic message
+  logger.error({ error: error.message }, "Request failed");
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Internal server error",
+  });
+}
+
+// ❌ Bad: All errors treated the same
+catch (error: any) {
+  throw createError({
+    statusCode: error.statusCode || 500,
+    statusMessage: error.message,
+  });
+}
+```
+
+### Error Logging
+
+Log errors with context but never expose sensitive data:
+
+```typescript
+// ✅ Good: Structured logging with context
+const requestId = crypto.randomUUID();
+logger.error(
+  {
+    requestId,
+    walletAddress,
+    error: error.message,
+    statusCode: error.statusCode,
+  },
+  "Portfolio fetch failed",
+);
+
+// ❌ Bad: Console.log with sensitive data
+console.error("Error:", error);
+console.log("Wallet:", walletAddress);
+```
+
+### Request ID for Tracing
+
+Include request IDs for tracing requests across services. Generate with `crypto.randomUUID()` and include in logs and optionally in error responses.
+
+## External API Integration
+
+### Timeout Configuration
+
+Always configure timeouts for external API calls (minimum 30 seconds):
+
+```typescript
+// ✅ Good: Timeout configured
+return await $fetch<ResponseType>(url, {
+  method: "POST",
+  body: requestBody,
+  timeout: 30000, // 30 seconds
+});
+
+// ❌ Bad: No timeout
+return await $fetch<ResponseType>(url, {
+  method: "POST",
+  body: requestBody,
+});
+```
+
+### Retry Logic
+
+Implement retry logic with exponential backoff for transient failures:
+
+```typescript
+// ✅ Good: Retry with exponential backoff
+const maxRetries = 3;
+let retries = 0;
+
+while (retries < maxRetries) {
+  try {
+    return await $fetch(url, { timeout: 30000 });
+  } catch (error: any) {
+    if (retries === maxRetries - 1) throw error;
+
+    // Exponential backoff: 1s, 2s, 4s
+    const delay = 1000 * Math.pow(2, retries);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    retries++;
+  }
+}
+
+// ❌ Bad: No retry logic
+try {
+  return await $fetch(url);
+} catch (error) {
+  throw error; // Fails immediately on transient errors
+}
+```
+
+### Maximum Retry Attempts
+
+Limit retry attempts to prevent excessive API calls. Default: 3 retries. Adjust based on API provider's rate limits. Consider circuit breaker pattern for frequently failing APIs.
+
+### API Key Management
+
+Never hardcode API keys. Always use environment variables:
+
+```typescript
+// ✅ Good: From environment
+const config = useRuntimeConfig(event);
+const apiKey = config.alchemyApiKey;
+
+// ❌ Bad: Hardcoded
+const apiKey = "hardcoded-key-here";
+```
+
+## Logging & Monitoring
+
+### Structured Logging
+
+Use structured logging instead of `console.log`:
+
+```typescript
+// ✅ Good: Structured logging
+import { logger } from "~/server/utils/logger";
+
+logger.info({ requestId, walletAddress }, "Fetching portfolio");
+logger.error({ error: error.message }, "Request failed");
+
+// ❌ Bad: Console.log in production
+console.log("Fetching portfolio for", walletAddress);
+console.log(JSON.stringify(response, null, 2));
+```
+
+### Log Levels
+
+Use appropriate log levels: `debug` (detailed debugging), `info` (general messages), `warn` (potential issues), `error` (failures).
+
+### Sensitive Data Exclusion
+
+Never log sensitive data:
+
+```typescript
+// ✅ Good: Exclude sensitive data
+logger.info({ requestId }, "API call successful");
+// Don't log API keys, tokens, passwords
+
+// ❌ Bad: Log sensitive data
+logger.info({ apiKey, token }, "API call");
+```
+
+### Performance Metrics
+
+Consider logging performance metrics:
+
+```typescript
+// ✅ Good: Performance tracking
+const startTime = Date.now();
+try {
+  const result = await getPortfolio(...);
+  const duration = Date.now() - startTime;
+  logger.info({ duration, requestId }, "Portfolio fetched");
+  return result;
+} catch (error) {
+  const duration = Date.now() - startTime;
+  logger.error({ duration, error }, "Portfolio fetch failed");
+  throw error;
+}
+```
+
+## Input Validation
+
+### Validate All Inputs
+
+Validate ALL input parameters before processing:
+
+- Route parameters (`getRouterParam`)
+- Query parameters (`getQuery`)
+- Request body (`readBody`)
+- Headers (if needed)
+
+```typescript
+// ✅ Good: Comprehensive validation
+import { z } from "zod";
+
+const walletAddress = getRouterParam(event, "walletAddress");
+if (!walletAddress || !isAddress(walletAddress)) {
+  throw createError({
+    statusCode: 400,
+    statusMessage: "Invalid wallet address format",
+  });
+}
+
+const query = getQuery(event);
+const querySchema = z.object({
+  page: z.number().int().positive().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+});
+const validatedQuery = querySchema.parse(query);
+
+// ❌ Bad: No validation
+const walletAddress = getRouterParam(event, "walletAddress");
+const page = getQuery(event).page;
+```
+
+### Use Appropriate Validation Libraries
+
+Choose validation libraries based on use case:
+
+- **viem**: For blockchain addresses (`isAddress`)
+- **zod**: For general schema validation
+- **Custom validators**: For domain-specific validation
+
+### Validation Error Messages
+
+Provide clear, actionable validation error messages. Avoid vague messages like "Invalid request" - be specific about what's wrong.
+
+### Fail Fast
+
+Validate inputs early and fail fast. Don't perform expensive operations before validating inputs. See `@server/api/portfolio/[walletAddress].get.ts` for pattern.
+
+## Resource Management
+
+### Maximum Page Limits
+
+Always enforce maximum limits for pagination loops to prevent infinite loops. See `@server/services/portfolio.service.ts` for implementation pattern.
+
+### Request Timeout Limits
+
+Set appropriate timeout limits: External API calls (30s minimum), Database queries (10s), File operations (60s).
+
+### Memory and Loop Safety
+
+Be mindful of memory usage: Don't load all data into memory at once, use streaming for large datasets, implement pagination for large collections. Prevent infinite loops: Always have a maximum iteration limit, use counters to track iterations, validate loop conditions.
+
+```typescript
+// ✅ Good: Safe loop with counter
+const MAX_ITERATIONS = 1000;
+let iterations = 0;
+while (condition && iterations < MAX_ITERATIONS) {
+  iterations++;
+}
+if (iterations >= MAX_ITERATIONS) {
+  throw new Error("Maximum iterations reached");
+}
+
+// ❌ Bad: No safety check
+while (condition) {
+  // Could loop forever
+}
+```
+
+## Code Examples Reference
+
+Reference existing code for patterns:
+
+- `@server/api/portfolio/[walletAddress].get.ts` - API handler example
+- `@server/services/portfolio.service.ts` - Service layer example
+- `@server/mappers/portfolio.mapper.ts` - Mapper pattern example
+
+## Additional Resources
+
+- [Nuxt 4 Server Guide](https://nuxt.com/docs/4.x/guide/directory-structure/server)
+- [Nitro Documentation](https://nitro.unjs.io/)
+- [TypeScript Best Practices](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html)

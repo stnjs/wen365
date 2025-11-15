@@ -1,4 +1,5 @@
 ---
+description: UI component guidelines for Nuxt 4, Nuxt UI 4, and Tailwind CSS 4
 globs: app/components/**/*.vue, app/pages/**/*.vue, app/layouts/**/*.vue
 alwaysApply: false
 ---
@@ -12,6 +13,26 @@ This project uses **Nuxt 4**, **Nuxt UI 4**, and **Tailwind CSS 4** for building
 - **Nuxt 4**: Full-stack Vue framework
 - **Nuxt UI 4**: Component library built on top of Tailwind CSS
 - **Tailwind CSS 4**: Utility-first CSS framework (comes bundled with Nuxt UI 4)
+
+## Type Imports
+
+Nuxt 4 automatically imports all types from `shared/types/`. **Do not** explicitly import types from `shared/types/` - they are available globally.
+
+```typescript
+// ✅ Good: Use types directly (auto-imported)
+const props = defineProps<{
+  tokens: TokenDto[];
+  portfolio: PortfolioDto;
+}>();
+
+// ❌ Bad: Unnecessary explicit import
+import type { TokenDto } from "~/shared/types/TokenDto";
+import type { PortfolioDto } from "~/shared/types/PortfolioDto";
+const props = defineProps<{
+  tokens: TokenDto[];
+  portfolio: PortfolioDto;
+}>();
+```
 
 ## Documentation References
 
