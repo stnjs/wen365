@@ -7,6 +7,8 @@ import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTok
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 import { fetchWithRetry } from "@server/utils/retryUtils";
 
+const MIN_TOKEN_VALUE_USD = 0.03;
+
 // Unused mock function - kept for potential future use
 // const _getAlchemyTokensByAddressMock = async () => {
 //   const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
@@ -118,25 +120,19 @@ export async function getPortfolio(
   walletAddress: string,
   alchemyApiKey: string,
 ): Promise<PortfolioDto> {
-  // 1. Fetch ALL pages from Alchemy API
   const allAlchemyTokens = await fetchAllAlchemyPages(walletAddress, alchemyApiKey);
 
-  // 2. Enrich native tokens with predefined metadata
   const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
 
-  // 3. Transform Alchemy tokens to DTOs (pure transformation)
   const allTokenDtos = enrichedTokens.map(token => mapToTokenDto(token));
 
-  // 4. Business logic: Filter tokens with value > 0 and not blacklisted
   const activeTokens = allTokenDtos
-    .filter(token => token.tokenValue > 0 && !isTokenBlacklisted(token))
+    .filter(token => token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token))
     .sort((a, b) => b.tokenValue - a.tokenValue);
 
-  // 5. Business logic: Calculate total value from active tokens only
   const totalValue = roundToTwoDecimals(
     activeTokens.reduce((sum, token) => sum + token.tokenValue, 0),
   );
 
-  // 6. Map to final PortfolioDto (pure transformation)
   return mapToPortfolioDto(totalValue, activeTokens);
 }
