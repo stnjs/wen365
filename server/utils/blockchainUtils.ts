@@ -20,7 +20,6 @@ export const calculateTokenUsdValue = (token: AlchemyToken): number => {
     const usdPrice = parseFloat(token.tokenPrices[0]?.value || "0");
     return balance * usdPrice;
   } catch (error) {
-    console.error(`Error calculating value for token ${token.tokenAddress || "native"}:`, error);
     return 0;
   }
 };
