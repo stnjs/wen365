@@ -17,7 +17,11 @@
     <UTable
       ref="table"
       v-model:expanded="expanded"
-      :data="paginatedTokens"
+      v-model:pagination="pagination"
+      :pagination-options="{
+        getPaginationRowModel: getPaginationRowModel(),
+      }"
+      :data="filteredTokens"
       :columns="columns"
       :ui="{ tr: 'data-[expanded=true]:bg-elevated/50' }"
     >
@@ -52,10 +56,10 @@
     </UTable>
     <template #footer>
       <UPagination
-        v-if="totalPages > 0"
-        :page="page"
-        :total="totalPages"
-        @update:page="handlePageChange"
+        :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+        :items-per-page="table?.tableApi?.getState().pagination.pageSize"
+        :total="table?.tableApi?.getFilteredRowModel().rows.length"
+        @update:page="p => table?.tableApi?.setPageIndex(p - 1)"
       />
     </template>
   </UCard>
@@ -65,7 +69,9 @@
 import { h, resolveComponent, computed, onBeforeUnmount } from "vue";
 import { debounce } from "lodash-es";
 import type { TableColumn } from "@nuxt/ui";
+import ChainIcon from "./ChainIcon.vue";
 import Token from "./Token.vue";
+import { getPaginationRowModel } from "@tanstack/vue-table";
 
 const props = defineProps<{
   tokens: TokenDto[];
@@ -76,9 +82,10 @@ const table = useTemplateRef("table");
 const searchQuery = ref<string>("");
 const debouncedSearchQuery = ref<string>("");
 const expanded = ref<Record<string, boolean>>({});
-const page = ref(1);
-const pageSize = 20;
-
+const pagination = ref<{ pageIndex: number; pageSize: number }>({
+  pageIndex: 0,
+  pageSize: 10,
+});
 const filteredTokens = computed<TokenDto[]>(() => {
   if (!debouncedSearchQuery.value.trim()) {
     return props.tokens;
@@ -93,14 +100,6 @@ const filteredTokens = computed<TokenDto[]>(() => {
     return name.includes(searchLower) || symbol.includes(searchLower);
   });
 });
-
-const paginatedTokens = computed<TokenDto[]>(() => {
-  const startIndex = (page.value - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  return filteredTokens.value.slice(startIndex, endIndex);
-});
-
-const totalPages = computed(() => Math.ceil(filteredTokens.value.length / pageSize));
 
 const formatBalance = (balance: number): string => {
   if (balance === 0) return "0";
@@ -125,15 +124,11 @@ const handleSearchInput = (value: string) => {
   if (!value.trim()) {
     updateDebouncedSearch.cancel();
     debouncedSearchQuery.value = "";
-    page.value = 1;
+    pagination.value.pageIndex = 0; // Reset to first page when search is cleared
     return;
   }
-  page.value = 1;
+  pagination.value.pageIndex = 0; // Reset to first page when search changes
   updateDebouncedSearch(value);
-};
-
-const handlePageChange = (newPage: number) => {
-  page.value = newPage;
 };
 
 const UButton = resolveComponent("UButton");
@@ -163,6 +158,15 @@ const columns: TableColumn<TokenDto>[] = [
     cell: ({ row }) => {
       return h(Token, {
         tokenMetadata: row.getValue("tokenMetadata") as TokenMetadataDto,
+      });
+    },
+  },
+  {
+    accessorKey: "network",
+    header: "Chain",
+    cell: ({ row }) => {
+      return h(ChainIcon, {
+        network: row.getValue("network") as NetworkId,
       });
     },
   },

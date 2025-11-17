@@ -19,7 +19,7 @@
 
 ## Overview
 
-HODL Tracker is a modern crypto portfolio tracking application built with **Nuxt 4** and **Vue 3**. The application follows a **layered architecture** with clear separation of concerns between the client-side application, server-side API, and shared types.
+Wen365 is a modern crypto portfolio tracking application built with **Nuxt 4** and **Vue 3**. The application follows a **layered architecture** with clear separation of concerns between the client-side application, server-side API, and shared types.
 
 ### Core Features
 
@@ -82,7 +82,7 @@ HODL Tracker is a modern crypto portfolio tracking application built with **Nuxt
 ## Project Structure
 
 ```
-HODLTracker/
+wen365/
 ├── app/                          # Client-side application
 │   ├── assets/                   # Static assets
 │   │   ├── css/
