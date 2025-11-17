@@ -7,6 +7,7 @@
 <script setup lang="ts">
 import { createAppKit } from "@reown/appkit/vue";
 import { projectId, wagmiAdapter, networks } from "./config/wagmi";
+import { siweConfig } from "./config/siwe";
 
 createAppKit({
   adapters: [wagmiAdapter],
@@ -24,5 +25,6 @@ createAppKit({
     "--apkt-font-family": "Inter, system-ui, sans-serif", // Match your app font
     "--apkt-border-radius-master": "8px", // Match Nuxt UI border radius
   },
+  siweConfig,
 });
 </script>

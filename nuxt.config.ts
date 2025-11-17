@@ -33,14 +33,19 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 
   // Modules
-  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/eslint", "@nuxt/test-utils/module"],
+  modules: [
+    "@pinia/nuxt",
+    "@nuxt/ui",
+    "@nuxt/eslint",
+    "@nuxt/test-utils/module",
+    "nuxt-auth-utils",
+  ],
 
   // Runtime config for environment variables
   runtimeConfig: {
     // Private keys (only available on server-side)
     reownProjectId: process.env.REOWN_PROJECT_ID,
     alchemyApiKey: process.env.ALCHEMY_API_KEY,
-
     supportedNetworks: process.env.SUPPORTED_NETWORKS,
 
     /*

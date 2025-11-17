@@ -36,20 +36,14 @@
             </UEmpty>
           </div>
 
-          <!-- Loading State -->
-          <div v-else-if="isLoading" class="text-center py-12">
-            <USpinner size="xl" class="mx-auto mb-4" />
-            <p class="text-gray-600 dark:text-gray-400">Loading your portfolio...</p>
-          </div>
-
           <!-- Empty State - No Tokens -->
-          <div v-else-if="tokens.length === 0" class="text-center py-12">
+          <!-- <div v-else-if="tokens.length === 0" class="text-center py-12">
             <UEmpty icon="i-lucide-coins" description="No tokens found in your wallet">
               <template #actions>
                 <UButton color="primary" @click="refetchPortfolio()"> Refresh </UButton>
               </template>
             </UEmpty>
-          </div>
+          </div> -->
 
           <!-- Portfolio Content -->
           <div v-else>
@@ -81,7 +75,7 @@
               </UCard>
             </div>
             <!-- Assets Table -->
-            <AssetsTable :tokens="tokens" />
+            <AssetsTable :tokens="tokens" :is-loading="isLoading" />
           </div>
         </div>
       </template>
@@ -94,6 +88,11 @@ import { computed, onMounted } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
+
+// Protect this route with auth middleware
+definePageMeta({
+  middleware: "auth",
+});
 
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);

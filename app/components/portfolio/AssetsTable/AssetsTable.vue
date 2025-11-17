@@ -23,6 +23,7 @@
       }"
       :data="filteredTokens"
       :columns="columns"
+      :loading="isLoading"
       :ui="{ tr: 'data-[expanded=true]:bg-elevated/50' }"
     >
       <template #expanded="{ row }">
@@ -75,6 +76,7 @@ import { getPaginationRowModel } from "@tanstack/vue-table";
 
 const props = defineProps<{
   tokens: TokenDto[];
+  isLoading: boolean;
 }>();
 
 const table = useTemplateRef("table");
