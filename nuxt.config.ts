@@ -41,6 +41,8 @@ export default defineNuxtConfig({
     reownProjectId: process.env.REOWN_PROJECT_ID,
     alchemyApiKey: process.env.ALCHEMY_API_KEY,
 
+    supportedNetworks: process.env.SUPPORTED_NETWORKS,
+
     /*
     alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
     etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
