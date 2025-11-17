@@ -93,7 +93,7 @@
 import { computed, onMounted } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
-import AssetsTable from "~/components/portfolio/AssetsTable.vue";
+import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
 
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
