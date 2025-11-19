@@ -1,7 +1,8 @@
+import type { Address } from "viem";
 import { createPublicClient, http, getAddress } from "viem";
-import { SiweMessage } from "siwe";
 import { handleServiceError } from "@server/utils/errorHandler";
 import { isValidSignatureFormat, validateSiweMessage } from "@server/utils/authUtils";
+import { logError } from "@server/utils/logger";
 
 const REQUEST_TIMEOUT_MS = 60000; // 60 seconds
 
@@ -68,6 +69,8 @@ export default defineEventHandler(async event => {
     });
   }
 
+  let normalizedAddress: Address | undefined;
+
   try {
     // Validate SIWE message structure and content
     const siweMessage = validateSiweMessage(message, host, origin);
@@ -80,7 +83,7 @@ export default defineEventHandler(async event => {
       });
     }
 
-    const normalizedAddress = getAddress(siweMessage.address);
+    normalizedAddress = getAddress(siweMessage.address);
 
     // Extract chainId from parsed SIWE message (already a number)
     const chainIdNumber = siweMessage.chainId;
@@ -113,11 +116,9 @@ export default defineEventHandler(async event => {
     ]);
 
     if (!isValid) {
-      // Log failed authentication attempt
-      console.error(`[Auth] Failed signature verification`, {
+      logError("Failed signature verification", {
         requestId,
         address: normalizedAddress,
-        timestamp: new Date().toISOString(),
       });
 
       throw createError({
@@ -136,23 +137,13 @@ export default defineEventHandler(async event => {
 
     return { success: true };
   } catch (error: unknown) {
-    // Log failed authentication attempt
     const httpError = error as { statusCode?: number; message?: string };
-    const address = (() => {
-      try {
-        const siweMsg = new SiweMessage(message);
-        return getAddress(siweMsg.address).slice(0, 10) + "...";
-      } catch {
-        return "unknown";
-      }
-    })();
 
-    console.error(`[Auth] Authentication failed`, {
+    logError("Authentication failed", {
       requestId,
-      address,
+      address: normalizedAddress,
       statusCode: httpError.statusCode || 500,
       error: httpError.message || "Unknown error",
-      timestamp: new Date().toISOString(),
     });
 
     // Clear session on error
