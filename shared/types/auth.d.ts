@@ -3,6 +3,11 @@ declare module "#auth-utils" {
     address: string;
     chainId: number;
   }
+
+  interface UserSession {
+    nonce?: string;
+    nonceExpiresAt?: number;
+  }
 }
 
 export {};
