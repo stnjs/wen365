@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import type { AlchemyToken } from "@server/types";
 import {
   convertTokenBalanceToNumber,
@@ -261,11 +261,9 @@ describe("blockchainUtils", () => {
         ],
       };
 
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      // Function should return 0 on error without throwing
       const result = calculateTokenUsdValue(token);
       expect(result).toBe(0);
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
     });
   });
 

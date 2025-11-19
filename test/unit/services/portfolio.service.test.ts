@@ -1,9 +1,21 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { getPortfolio } from "@server/services/portfolio.service";
 
+// Mock $fetch for unit tests (Nuxt auto-import not available in node environment)
+const mockFetch = vi.fn();
+global.$fetch = mockFetch as unknown as typeof global.$fetch;
+
 describe("portfolio.service", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    vi.clearAllMocks();
+    // Mock successful API response with proper Alchemy API structure
+    mockFetch.mockResolvedValue({
+      data: {
+        tokens: [],
+        pageKey: null,
+      },
+    });
   });
 
   afterEach(() => {
