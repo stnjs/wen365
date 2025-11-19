@@ -104,16 +104,11 @@ export default defineEventHandler(async event => {
       ),
     });
 
-    const isValid = await Promise.race([
-      publicClient.verifyMessage({
-        message,
-        address: normalizedAddress,
-        signature: signature as `0x${string}`,
-      }),
-      new Promise<boolean>((_, reject) =>
-        setTimeout(() => reject(new Error("Signature verification timeout")), REQUEST_TIMEOUT_MS),
-      ),
-    ]);
+    const isValid = await publicClient.verifyMessage({
+      message,
+      address: normalizedAddress,
+      signature: signature as `0x${string}`,
+    });
 
     if (!isValid) {
       logError("Failed signature verification", {
