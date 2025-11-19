@@ -41,7 +41,6 @@ export default defineEventHandler(async event => {
     });
   }
 
-  // Validate signature format
   if (!isValidSignatureFormat(signature)) {
     throw createError({
       statusCode: 400,
@@ -49,12 +48,10 @@ export default defineEventHandler(async event => {
     });
   }
 
-  // Get session to check nonce
   const session = await getUserSession(event);
   const storedNonce = session.nonce;
   const nonceExpiresAt = session.nonceExpiresAt;
 
-  // Validate nonce exists and is not expired
   if (!storedNonce) {
     throw createError({
       statusCode: 400,
@@ -72,10 +69,8 @@ export default defineEventHandler(async event => {
   let normalizedAddress: Address | undefined;
 
   try {
-    // Validate SIWE message structure and content
     const siweMessage = validateSiweMessage(message, host, origin);
 
-    // Validate nonce matches
     if (siweMessage.nonce !== storedNonce) {
       throw createError({
         statusCode: 400,
@@ -85,7 +80,6 @@ export default defineEventHandler(async event => {
 
     normalizedAddress = getAddress(siweMessage.address);
 
-    // Extract chainId from parsed SIWE message (already a number)
     const chainIdNumber = siweMessage.chainId;
     if (chainIdNumber <= 0) {
       throw createError({
@@ -122,7 +116,6 @@ export default defineEventHandler(async event => {
       });
     }
 
-    // Store user session using nuxt-auth-utils (nonce is automatically cleared)
     await setUserSession(event, {
       user: {
         address: normalizedAddress,
