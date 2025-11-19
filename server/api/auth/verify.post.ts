@@ -1,8 +1,12 @@
-import { createPublicClient, http } from "viem";
-import { getAddressFromMessage, getChainIdFromMessage } from "@reown/appkit-siwe";
+import { createPublicClient, http, getAddress } from "viem";
+import { SiweMessage } from "siwe";
 import { handleServiceError } from "@server/utils/errorHandler";
+import { isValidSignatureFormat, validateSiweMessage } from "@server/utils/authUtils";
+
+const REQUEST_TIMEOUT_MS = 60000; // 60 seconds
 
 export default defineEventHandler(async event => {
+  const requestId = crypto.randomUUID();
   const config = useRuntimeConfig(event);
   const projectId = config.public.reownProjectId;
 
@@ -13,76 +17,154 @@ export default defineEventHandler(async event => {
     });
   }
 
+  // Get server domain and origin for SIWE validation
+  const host = getHeader(event, "host") || "";
+  const protocol = getHeader(event, "x-forwarded-proto") || "http";
+  const origin = `${protocol}://${host}`;
+
   const body = await readBody(event);
   const { message, signature } = body;
 
-  if (!message || !signature) {
+  // Input validation
+  if (!message || typeof message !== "string" || message.trim().length === 0) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Message and signature are required",
+      statusMessage: "Message is required and must be a non-empty string",
+    });
+  }
+
+  if (!signature || typeof signature !== "string") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Signature is required and must be a string",
+    });
+  }
+
+  // Validate signature format
+  if (!isValidSignatureFormat(signature)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid signature format",
+    });
+  }
+
+  // Get session to check nonce
+  const session = await getUserSession(event);
+  const storedNonce = session.nonce;
+  const nonceExpiresAt = session.nonceExpiresAt;
+
+  // Validate nonce exists and is not expired
+  if (!storedNonce) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Nonce not found. Please request a new nonce.",
+    });
+  }
+
+  if (nonceExpiresAt && nonceExpiresAt < Date.now()) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Nonce has expired. Please request a new nonce.",
     });
   }
 
   try {
-    // Extract address and chainId from message
-    const address = getAddressFromMessage(message);
-    let chainId = getChainIdFromMessage(message);
+    // Validate SIWE message structure and content
+    const siweMessage = validateSiweMessage(message, host, origin);
 
-    // Handle chainId format (may include ":" separator)
-    if (typeof chainId === "string" && chainId.includes(":")) {
-      const parts = chainId.split(":");
-      // Use part after ":" if it exists, otherwise use the original value
-      const extractedChainId = parts[1];
-      if (extractedChainId) {
-        chainId = extractedChainId;
-      }
+    // Validate nonce matches
+    if (siweMessage.nonce !== storedNonce) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Invalid nonce",
+      });
     }
 
-    // Convert chainId to number
-    const chainIdString = typeof chainId === "string" ? chainId : String(chainId);
-    const chainIdNumber = Number(chainIdString);
-    if (isNaN(chainIdNumber)) {
+    const normalizedAddress = getAddress(siweMessage.address);
+
+    // Extract chainId from parsed SIWE message (already a number)
+    const chainIdNumber = siweMessage.chainId;
+    if (chainIdNumber <= 0) {
       throw createError({
         statusCode: 400,
         statusMessage: "Invalid chainId",
       });
     }
 
-    // Verify signature using viem (recommended for social logins)
+    // Verify signature using viem with timeout
     const publicClient = createPublicClient({
       transport: http(
         `https://rpc.walletconnect.org/v1/?chainId=${chainIdNumber}&projectId=${projectId}`,
+        {
+          timeout: REQUEST_TIMEOUT_MS,
+        },
       ),
     });
 
-    const isValid = await publicClient.verifyMessage({
-      message,
-      address: address as `0x${string}`,
-      signature: signature as `0x${string}`,
-    });
+    const isValid = await Promise.race([
+      publicClient.verifyMessage({
+        message,
+        address: normalizedAddress,
+        signature: signature as `0x${string}`,
+      }),
+      new Promise<boolean>((_, reject) =>
+        setTimeout(() => reject(new Error("Signature verification timeout")), REQUEST_TIMEOUT_MS),
+      ),
+    ]);
 
     if (!isValid) {
+      // Log failed authentication attempt
+      console.error(`[Auth] Failed signature verification`, {
+        requestId,
+        address: normalizedAddress,
+        timestamp: new Date().toISOString(),
+      });
+
       throw createError({
         statusCode: 401,
         statusMessage: "Invalid signature",
       });
     }
 
-    // Store session using nuxt-auth-utils
+    // Store user session using nuxt-auth-utils (nonce is automatically cleared)
     await setUserSession(event, {
       user: {
-        address,
+        address: normalizedAddress,
         chainId: chainIdNumber,
       },
     });
 
     return { success: true };
   } catch (error: unknown) {
+    // Log failed authentication attempt
+    const httpError = error as { statusCode?: number; message?: string };
+    const address = (() => {
+      try {
+        const siweMsg = new SiweMessage(message);
+        return getAddress(siweMsg.address).slice(0, 10) + "...";
+      } catch {
+        return "unknown";
+      }
+    })();
+
+    console.error(`[Auth] Authentication failed`, {
+      requestId,
+      address,
+      statusCode: httpError.statusCode || 500,
+      error: httpError.message || "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
+
     // Clear session on error
     try {
       await clearUserSession(event);
     } catch {
       // Ignore session errors during cleanup
+    }
+
+    // Re-throw createError instances, handle others
+    if (httpError.statusCode) {
+      throw error;
     }
 
     handleServiceError(error);
