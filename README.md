@@ -2,6 +2,21 @@
 
 A modern crypto portfolio tracker built with Nuxt 4. Track your crypto assets across multiple blockchains in one unified view.
 
+## ✨ Features
+
+### Current Features
+
+- **Multi-Chain Portfolio Tracking**: Track your crypto tokens across multiple blockchains (Ethereum, Base, Polygon, and more)
+- **Wallet Integration**: Connect your wallet securely using SIWE (Sign-In With Ethereum) authentication
+
+### Planned Features
+
+- **Multi-Wallet Support**: Track multiple wallets and aggregate portfolio data across all connected wallets
+- **NFT Tracking**: Track NFTs across multiple chains alongside your token portfolio
+- **Tax Optimization**: Track holding time of assets for tax optimization (FIFO logic for tax exemptions)
+- **Asset Flow Visualization**: Visualize asset flows and transaction history
+- **Maturity Notifications**: Get notified when assets reach maturity thresholds for tax benefits
+
 ## 🛠 Tech Stack
 
 | Layer           | Stack                                  |
