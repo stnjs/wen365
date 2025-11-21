@@ -1,5 +1,5 @@
 <template>
-  <UApp>
+  <UApp :locale="en">
     <NuxtPage />
   </UApp>
 </template>
@@ -8,6 +8,7 @@
 import { createAppKit } from "@reown/appkit/vue";
 import { projectId, wagmiAdapter, networks } from "./config/wagmi";
 import { siweConfig } from "./config/siwe";
+import { en } from "@nuxt/ui/locale";
 
 createAppKit({
   adapters: [wagmiAdapter],

@@ -1,36 +1,5 @@
 <template>
   <NuxtLayout name="landing-page">
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 border-b border-white/5 bg-black/50 backdrop-blur-xl">
-      <div class="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-            <div class="w-2 h-2 bg-black rounded-full" />
-          </div>
-          <span class="text-white font-medium tracking-tighter text-base">wen365</span>
-        </div>
-        <div class="hidden md:flex items-center gap-8 text-sm text-zinc-400 font-medium">
-          <a href="#features" class="hover:text-white transition-colors">Features</a>
-          <a href="#" class="hover:text-white transition-colors">Tax Engine</a>
-          <a href="#" class="hover:text-white transition-colors">Chains</a>
-          <a href="#" class="hover:text-white transition-colors">Pricing</a>
-        </div>
-        <div class="flex items-center gap-4">
-          <a
-            href="#"
-            class="text-xs text-zinc-400 hover:text-white font-medium transition-colors hidden sm:block"
-            >Log in</a
-          >
-          <ConnectWalletButton
-            size="sm"
-            :show-connected="false"
-            label="Start Tracking"
-            class="bg-white text-black text-xs font-medium px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors tracking-tight"
-          />
-        </div>
-      </div>
-    </nav>
-
     <!-- Hero Section -->
     <section class="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 px-6">
       <div class="max-w-4xl mx-auto text-center">
@@ -571,44 +540,6 @@
         <p class="text-xs text-zinc-600 mt-6">No spam. Unsubscribe anytime.</p>
       </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/5 py-12 bg-black">
-      <div
-        class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-8"
-      >
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-3 h-3 bg-white rounded-full" />
-            <span class="text-white font-medium tracking-tighter">wen365</span>
-          </div>
-          <p class="text-zinc-500 text-xs max-w-[200px]">
-            © 2025 wen365 Inc.<br />
-            Mastering time and value on-chain.
-          </p>
-        </div>
-
-        <div class="flex gap-16">
-          <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-white uppercase tracking-widest mb-1"
-              >Product</span
-            >
-            <a href="#features" class="text-zinc-500 text-xs hover:text-white transition-colors"
-              >Features</a
-            >
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors"
-              >Integrations</a
-            >
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors">Pricing</a>
-          </div>
-          <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-white uppercase tracking-widest mb-1">Legal</span>
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors">Privacy</a>
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors">Terms</a>
-          </div>
-        </div>
-      </div>
-    </footer>
   </NuxtLayout>
 </template>
 
@@ -660,7 +591,3 @@ const handleWaitlistSubmit = () => {
   email.value = "";
 };
 </script>
-
-<style scoped>
-/* Additional component-specific styles if needed */
-</style>
