@@ -1,12 +1,10 @@
 <template>
   <NuxtLink :to="to">
-    <img :src="src" alt="Wen365 Logo" :style="style" />
+    <img src="~/assets/images/wen365-logo-dark.svg" alt="Wen365 Logo" :style="style" />
   </NuxtLink>
 </template>
 <script setup lang="ts">
 // Import assets statically so Nuxt can process them at build time
-import logoDark from "~/assets/images/wen365-logo-dark.svg";
-import logoLight from "~/assets/images/wen365-logo-light.svg";
 
 // Original SVG dimensions: 202x64 (for logo), 64x64 (for icon)
 const ORIGINAL_WIDTH = 202;
@@ -29,10 +27,6 @@ const props = withDefaults(
     to: "/dashboard",
   },
 );
-
-const colorMode = useColorMode();
-const src = computed<string>(() => (colorMode.value === "dark" ? logoDark : logoLight));
-
 const style = computed(() => {
   return {
     width: `${ORIGINAL_WIDTH * SIZES_SCALE[props.size]}px`,

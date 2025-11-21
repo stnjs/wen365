@@ -2,7 +2,7 @@
   <UCard>
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <div class="text-lg font-medium text-gray-900 dark:text-gray-100">Assets</div>
+        <div class="text-lg font-medium text-gray-100">Assets</div>
         <UInput
           v-model="searchQuery"
           class="max-w-sm min-w-[12ch]"
@@ -30,23 +30,23 @@
         <div class="px-4 py-4 space-y-3">
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span class="text-gray-500 dark:text-gray-400">Network:</span>
+              <span class="text-gray-400">Network:</span>
               <span class="ml-2 font-medium">{{ row.original.network }}</span>
             </div>
             <div>
-              <span class="text-gray-500 dark:text-gray-400">Token Address:</span>
+              <span class="text-gray-400">Token Address:</span>
               <span class="ml-2 font-mono text-xs">
                 {{ row.original.tokenAddress || "Native Token" }}
               </span>
             </div>
             <div>
-              <span class="text-gray-500 dark:text-gray-400">Balance:</span>
+              <span class="text-gray-400">Balance:</span>
               <span class="ml-2 font-medium">
                 {{ formatBalance(row.original.tokenBalance) }}
               </span>
             </div>
             <div>
-              <span class="text-gray-500 dark:text-gray-400">Price:</span>
+              <span class="text-gray-400">Price:</span>
               <span class="ml-2 font-medium">
                 {{ formatCurrency(row.original.tokenPrice) }}
               </span>

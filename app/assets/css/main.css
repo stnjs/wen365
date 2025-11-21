@@ -1,34 +1,14 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-/* ==========================================================================
-   CSS Variables & Theme Configuration
-   ========================================================================== */
-
 :root {
   --ui-header-height: --spacing(24);
-
-  /* Crypto coin animation variables */
-  --coin-blur: 15px;
-  --coin-opacity: 0.3;
-  --coin-opacity-pulse-max: 0.4;
-  --coin-glow-base: 20px;
-  --coin-glow-max: 40px;
-  --coin-glow-intensity: 0.3;
-
-  /* Coin colors */
-  --coin-btc-color: rgba(247, 147, 26, 0.4);
-  --coin-eth-color: rgba(98, 126, 234, 0.4);
-  --coin-sol-color: rgba(0, 255, 163, 0.4);
-  --coin-xrp-color: rgba(34, 34, 34, 0.4);
-  --coin-bnb-color: rgba(243, 186, 47, 0.4);
-  --coin-usdc-color: rgba(38, 132, 255, 0.4);
-  --coin-usdt-color: rgba(38, 161, 123, 0.4);
 }
 
-@theme static {
-  /* Perano color palette */
-  --color-perano-50: #eff4fe;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /*   --color-perano-50: #eff4fe;
   --color-perano-100: #e2eafd;
   --color-perano-200: #cbd7fa;
   --color-perano-300: #a9bcf6;
@@ -38,43 +18,59 @@
   --color-perano-700: #4242c0;
   --color-perano-800: #38399b;
   --color-perano-900: #34377b;
-  --color-perano-950: #1e1e48;
+  --color-perano-950: #1e1e48; */
 }
 
-/* ==========================================================================
-   Base Styles
-   ========================================================================== */
+@utility bg-grid {
+  background-size: 60px 60px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
 
-@layer base {
-  html {
-    font-family: "Inter", system-ui, sans-serif;
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-
-  body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* ==========================================================================
-   Animations
-   ========================================================================== */
-
-@layer utilities {
-  /* Gradient animation for backgrounds */
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+@keyframes draw-line {
+  0% {
+    stroke-dashoffset: 1000;
   }
-
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 15s ease infinite;
+  100% {
+    stroke-dashoffset: 0;
   }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.8s ease-out forwards;
+}
+
+@utility animate-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-line 2.5s ease-out forwards;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }

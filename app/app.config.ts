@@ -1,7 +1,5 @@
 export default defineAppConfig({
   ui: {
-    colors: {
-      primary: "perano",
-    },
+    // Using default neutral colors for monochrome design
   },
 });
