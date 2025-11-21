@@ -53,9 +53,9 @@ const handleConnect = async () => {
 const buttonClass = computed(() => {
   const baseClasses = `
     rounded-full
-    bg-white/10 dark:bg-white/5
+    bg-white/5
     backdrop-blur-md
-    border border-white/20 dark:border-white/10
+    border border-white/10
     shadow-[0_8px_32px_rgba(0,0,0,0.1),0_0_40px_rgba(139,92,246,0.2),inset_0_1px_0_rgba(255,255,255,0.1)]
     hover:bg-white/20 hover:border-white/30 hover:scale-105
     hover:shadow-[0_12px_40px_rgba(0,0,0,0.15),0_0_60px_rgba(139,92,246,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]

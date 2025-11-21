@@ -72,7 +72,7 @@ export default defineNuxtConfig({
           content:
             "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool. Track your crypto assets across multiple blockchains.",
         },
-        { name: "theme-color", content: "#5154da" }, // Perano-600
+        { name: "theme-color", content: "#000000" }, // Black theme
       ],
       link: [
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },

@@ -51,25 +51,25 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <UCard>
                 <template #header>
-                  <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Value</h3>
+                  <h3 class="text-sm font-medium text-gray-400">Total Value</h3>
                 </template>
-                <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <div class="text-3xl font-bold text-gray-100">
                   {{ totalValue }}
                 </div>
               </UCard>
               <UCard>
                 <template #header>
-                  <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tokens</h3>
+                  <h3 class="text-sm font-medium text-gray-400">Total Tokens</h3>
                 </template>
-                <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <div class="text-3xl font-bold text-gray-100">
                   {{ tokens.length }}
                 </div>
               </UCard>
               <UCard>
                 <template #header>
-                  <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Networks</h3>
+                  <h3 class="text-sm font-medium text-gray-400">Networks</h3>
                 </template>
-                <div class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                <div class="text-3xl font-bold text-gray-100">
                   {{ uniqueNetworks }}
                 </div>
               </UCard>
