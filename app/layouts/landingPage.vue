@@ -45,7 +45,7 @@
             <span class="text-white font-medium tracking-tighter">wen365</span>
           </div>
           <p class="text-zinc-500 text-xs max-w-[200px] mb-4">
-            © 2025 wen365 Inc.<br />
+            © 2025 wen365<br />
             Mastering time and value on-chain.
           </p>
           <div class="flex items-center gap-4">
