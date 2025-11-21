@@ -2,7 +2,7 @@
 @import "@nuxt/ui";
 
 :root {
-  --ui-header-height: --spacing(24);
+  --ui-header-height: --spacing(18);
 }
 
 @theme {
@@ -26,6 +26,15 @@
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+@utility bg-radial-glow {
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(113, 113, 122, 0.4),
+    rgba(39, 39, 42, 0.2) 50%,
+    transparent 70%
+  );
 }
 
 @keyframes fade-up {
