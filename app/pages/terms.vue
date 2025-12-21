@@ -2,17 +2,17 @@
   <NuxtLayout name="landing-page">
     <section class="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 px-6">
       <div class="max-w-4xl mx-auto">
-        <UCard class="bg-zinc-900/50 border-white/5">
+        <UCard class="bg-app-card border-muted">
           <template #header>
             <h1 class="text-4xl md:text-5xl font-medium text-white tracking-tighter mb-2">
               Terms of Service
             </h1>
-            <p class="text-zinc-500 text-sm">Last updated: [LAST_UPDATED_DATE]</p>
+            <p class="text-dimmed text-sm">Last updated: [LAST_UPDATED_DATE]</p>
           </template>
 
           <div class="prose prose-invert max-w-none space-y-8">
             <div>
-              <p class="text-zinc-400 leading-relaxed">
+              <p class="text-muted leading-relaxed">
                 These Terms of Service ("Terms") govern your access to and use of wen365, a
                 cryptocurrency portfolio tracking application operated by [YOUR_NAME] ("we", "our", or
                 "us"). By accessing or using our service, you agree to be bound by these Terms.
@@ -21,7 +21,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">1. Acceptance of Terms</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   By accessing or using wen365, you agree to comply with and be bound by these Terms.
                   If you do not agree to these Terms, you may not use our service.
@@ -31,7 +31,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">2. Description of Service</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   wen365 is a portfolio tracking application that allows you to:
                 </p>
@@ -50,7 +50,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">3. User Responsibilities</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>You agree to:</p>
                 <ul class="list-disc list-inside space-y-2 ml-4">
                   <li>Use the service only for lawful purposes</li>
@@ -64,7 +64,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">4. Wallet Connection</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   When you connect your wallet to wen365, you are using Sign-In With Ethereum (SIWE)
                   authentication. You are solely responsible for:
@@ -83,7 +83,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">5. Data Accuracy</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   Portfolio data is retrieved from third-party blockchain APIs (including Alchemy
                   API). While we strive to provide accurate information, we cannot guarantee:
@@ -102,7 +102,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">6. Account Termination</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   We reserve the right to suspend or terminate your access to wen365 at any time,
                   with or without cause, and with or without notice, for any reason including:
@@ -120,7 +120,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">7. Limitation of Liability</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE SHALL NOT BE LIABLE FOR:
                 </p>
@@ -140,7 +140,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">8. Disclaimer of Warranties</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND,
                   EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
@@ -151,7 +151,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">9. Changes to Terms</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   We reserve the right to modify these Terms at any time. We will notify you of any
                   material changes by posting the updated Terms on this page and updating the "Last
@@ -163,7 +163,7 @@
 
             <div>
               <h2 class="text-2xl font-medium text-white mb-4 mt-8">10. Contact Us</h2>
-              <div class="space-y-4 text-zinc-400">
+              <div class="space-y-4 text-muted">
                 <p>
                   If you have any questions about these Terms, please contact us at
                   <a href="mailto:[YOUR_EMAIL]" class="text-white hover:underline">[YOUR_EMAIL]</a>.

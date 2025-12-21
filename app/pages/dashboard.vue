@@ -32,7 +32,7 @@
             <UEmpty
               icon="i-lucide-wallet"
               description="Connect your wallet to view your portfolio"
-              class="text-zinc-400"
+              class="text-muted"
             >
               <template #actions>
                 <UButton to="/" color="primary"> Go to Home </UButton>
@@ -54,17 +54,17 @@
             <!-- Top Section: Net Worth & Graph -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <!-- Net Worth Card -->
-              <UCard class="bg-zinc-900/50 border-white/5">
+              <UCard class="bg-app-card border-muted">
                 <div
                   class="p-8 flex flex-col justify-between relative overflow-hidden min-h-[200px]"
                 >
                   <div class="relative z-10">
                     <div class="flex items-center gap-2 mb-1">
-                      <span class="text-xs font-medium text-zinc-500 uppercase tracking-wider"
+                      <span class="text-xs font-medium text-dimmed uppercase tracking-wider"
                         >Total Net Worth</span
                       >
                     </div>
-                    <div class="text-4xl text-white font-semibold tracking-tight mb-2">
+                    <div class="text-4xl text-default font-semibold tracking-tight mb-2">
                       <span>{{ netWorthDollars }}</span
                       ><span class="text-2xl">.{{ netWorthCents }}</span>
                     </div>
@@ -83,12 +83,12 @@
               </UCard>
 
               <!-- Portfolio Graph Card -->
-              <UCard class="bg-zinc-900/50 border-white/5 lg:col-span-2">
+              <UCard class="bg-app-card border-muted lg:col-span-2">
                 <div class="p-6 relative h-[200px] flex items-end overflow-hidden">
                   <div class="absolute top-6 right-6 flex gap-2 z-10">
-                    <div class="text-[10px] text-white bg-white/10 px-2 py-0.5 rounded">1D</div>
-                    <div class="text-[10px] text-zinc-500 px-2 py-0.5 rounded">1W</div>
-                    <div class="text-[10px] text-zinc-500 px-2 py-0.5 rounded">1M</div>
+                    <div class="text-[10px] text-default bg-white/10 px-2 py-0.5 rounded">1D</div>
+                    <div class="text-[10px] text-dimmed px-2 py-0.5 rounded">1W</div>
+                    <div class="text-[10px] text-dimmed px-2 py-0.5 rounded">1M</div>
                   </div>
                   <!-- SVG Line Graph -->
                   <svg
@@ -123,11 +123,11 @@
             <!-- Middle Section: Asset Maturity & Allocation -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <!-- Asset Maturity Card -->
-              <UCard class="bg-zinc-900/50 border-white/5 lg:col-span-2">
+              <UCard class="bg-app-card border-muted lg:col-span-2">
                 <template #header>
                   <div class="flex items-center justify-between">
                     <span class="text-xs font-medium">Asset Maturity (Tax Status)</span>
-                    <span class="text-[10px] text-zinc-600">Threshold: 365 Days</span>
+                    <span class="text-[10px] text-toned">Threshold: 365 Days</span>
                   </div>
                 </template>
                 <div class="p-6 space-y-5">
@@ -139,7 +139,7 @@
                       class="space-y-1.5"
                     >
                       <div class="flex justify-between text-xs mb-1.5">
-                        <div class="flex items-center gap-2 text-white">
+                        <div class="flex items-center gap-2 text-default">
                           <UIcon
                             :name="getTokenIcon(token.tokenMetadata?.symbol || '')"
                             class="w-3.5 h-3.5"
@@ -147,7 +147,7 @@
                           />
                           {{ token.tokenMetadata?.symbol || "Token" }}
                         </div>
-                        <span class="text-zinc-400">Short Term</span>
+                        <span class="text-muted">Short Term</span>
                       </div>
                       <div
                         class="w-full bg-zinc-800/50 h-1.5 rounded-full overflow-hidden relative"
@@ -156,24 +156,24 @@
                       </div>
                     </div>
                   </div>
-                  <div v-else class="text-zinc-500 text-sm text-center py-4">
+                  <div v-else class="text-dimmed text-sm text-center py-4">
                     Connect wallet to see asset maturity
                   </div>
                 </div>
               </UCard>
 
               <!-- Asset Allocation Card -->
-              <UCard class="bg-zinc-900/50 border-white/5">
+              <UCard class="bg-app-card border-muted">
                 <template #header>
-                  <span class="text-xs font-medium text-zinc-400">Asset Allocation</span>
+                  <span class="text-xs font-medium text-muted">Asset Allocation</span>
                 </template>
                 <div class="p-6 flex flex-col justify-center items-center relative">
                   <div
                     class="w-24 h-24 rounded-full border-[6px] border-zinc-800 border-t-emerald-500 border-r-blue-500 border-b-purple-500 border-l-orange-500 rotate-45"
                   />
                   <div class="absolute inset-0 flex items-center justify-center flex-col">
-                    <span class="text-white text-sm font-medium">{{ tokens.length }}</span>
-                    <span class="text-[10px] text-zinc-500 uppercase">Assets</span>
+                    <span class="text-default text-sm font-medium">{{ tokens.length }}</span>
+                    <span class="text-[10px] text-dimmed uppercase">Assets</span>
                   </div>
                 </div>
               </UCard>
@@ -239,7 +239,7 @@ const getTokenIconColor = (symbol: string): string => {
     USDC: "text-blue-400",
     USDT: "text-green-400",
   };
-  return colorMap[symbol.toUpperCase()] || "text-zinc-400";
+  return colorMap[symbol.toUpperCase()] || "text-muted";
 };
 
 onMounted(async () => {

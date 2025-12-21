@@ -5,6 +5,13 @@
   --ui-header-height: --spacing(18);
 }
 
+/* Ensure dark mode is active globally */
+@layer base {
+  body {
+    @apply antialiased;
+  }
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -19,6 +26,27 @@
   --color-perano-800: #38399b;
   --color-perano-900: #34377b;
   --color-perano-950: #1e1e48; */
+}
+
+/* Custom Background Utilities - Match Original Design */
+@utility bg-app {
+  background-color: #000000; /* black */
+}
+
+@utility bg-app-card {
+  background-color: rgba(24, 24, 27, 0.5); /* zinc-900/50 */
+}
+
+@utility bg-app-card-light {
+  background-color: rgba(24, 24, 27, 0.2); /* zinc-900/20 */
+}
+
+@utility bg-app-overlay {
+  background-color: rgba(0, 0, 0, 0.5); /* black/50 */
+}
+
+@utility bg-app-overlay-light {
+  background-color: rgba(0, 0, 0, 0.4); /* black/40 */
 }
 
 @utility bg-grid {
