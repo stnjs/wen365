@@ -1,5 +1,5 @@
 <template>
-  <UDashboardGroup class="min-h-screen bg-gray-900">
+  <UDashboardGroup class="min-h-screen bg-[#0c0c0e]">
     <Sidebar />
     <slot />
   </UDashboardGroup>

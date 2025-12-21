@@ -10,6 +10,9 @@ import { projectId, wagmiAdapter, networks } from "./config/wagmi";
 import { siweConfig } from "./config/siwe";
 import { en } from "@nuxt/ui/locale";
 
+const colorMode = useColorMode();
+colorMode.preference = "dark";
+
 createAppKit({
   adapters: [wagmiAdapter],
   networks,

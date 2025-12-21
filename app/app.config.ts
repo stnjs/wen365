@@ -7,7 +7,7 @@ export default defineAppConfig({
       warning: "amber", // Gelb für Warnings
       error: "red", // Rot für Errors
       info: "blue", // Blau für Info
-      neutral: "white", // Neutral für Text/Hintergründe
+      neutral: "zinc", // Neutral für Text/Hintergründe
     },
   },
 });
