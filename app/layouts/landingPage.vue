@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-black text-zinc-300 font-sans antialiased selection:bg-white selection:text-black overflow-x-hidden relative"
+    class="min-h-screen bg-app text-default font-sans antialiased selection:bg-white selection:text-black overflow-x-hidden relative"
   >
     <!-- Background Atmosphere -->
     <div
@@ -10,16 +10,16 @@
       class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[600px] pointer-events-none z-0 blur-3xl bg-radial-glow"
     />
 
-    <UHeader class="fixed w-full border-b border-white/5 bg-black/50 backdrop-blur-xl">
+    <UHeader class="fixed w-full border-b border-muted bg-app-overlay backdrop-blur-xl">
       <template #title>
         <Logo size="sm" />
       </template>
 
-      <div class="hidden md:flex items-center gap-8 text-sm text-zinc-400 font-medium">
-        <a href="#features" class="hover:text-white transition-colors">Features</a>
-        <a href="#" class="hover:text-white transition-colors">Tax Engine</a>
-        <a href="#" class="hover:text-white transition-colors">Chains</a>
-        <a href="#" class="hover:text-white transition-colors">Pricing</a>
+      <div class="hidden md:flex items-center gap-8 text-sm text-muted font-medium">
+        <a href="#features" class="hover:text-default transition-colors">Features</a>
+        <a href="#" class="hover:text-default transition-colors">Tax Engine</a>
+        <a href="#" class="hover:text-default transition-colors">Chains</a>
+        <a href="#" class="hover:text-default transition-colors">Pricing</a>
       </div>
       <template #right>
         <ConnectWalletButton
@@ -37,14 +37,14 @@
     </UMain>
 
     <!-- Footer -->
-    <UFooter class="border-t border-white/5 py-12 bg-black">
+    <UFooter class="border-t border-muted py-12 bg-app">
       <template #left>
         <div>
           <div class="flex items-center gap-2 mb-4">
             <div class="w-3 h-3 bg-white rounded-full" />
-            <span class="text-white font-medium tracking-tighter">wen365</span>
+            <span class="text-default font-medium tracking-tighter">wen365</span>
           </div>
-          <p class="text-zinc-500 text-xs max-w-[200px] mb-4">
+          <p class="text-dimmed text-xs max-w-[200px] mb-4">
             © 2025 wen365<br />
             Mastering time and value on-chain.
           </p>
@@ -53,7 +53,7 @@
               href=""
               target="_blank"
               rel="noopener noreferrer"
-              class="text-zinc-500 hover:text-white transition-colors"
+              class="text-dimmed hover:text-default transition-colors"
               aria-label="Follow us on X"
             >
               <UIcon name="i-lucide-twitter" class="w-5 h-5" />
@@ -62,7 +62,7 @@
               href=""
               target="_blank"
               rel="noopener noreferrer"
-              class="text-zinc-500 hover:text-white transition-colors"
+              class="text-dimmed hover:text-default transition-colors"
               aria-label="Follow us on LinkedIn"
             >
               <UIcon name="i-lucide-linkedin" class="w-5 h-5" />
@@ -74,31 +74,33 @@
       <template #right>
         <div class="flex gap-16">
           <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-white uppercase tracking-widest mb-1"
+            <span class="text-xs font-medium text-default uppercase tracking-widest mb-1"
               >Product</span
             >
-            <a href="#features" class="text-zinc-500 text-xs hover:text-white transition-colors"
+            <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors"
               >Features</a
             >
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors"
+            <a href="#" class="text-dimmed text-xs hover:text-default transition-colors"
               >Integrations</a
             >
-            <a href="#" class="text-zinc-500 text-xs hover:text-white transition-colors">Pricing</a>
+            <a href="#" class="text-dimmed text-xs hover:text-default transition-colors">Pricing</a>
           </div>
           <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-white uppercase tracking-widest mb-1">Legal</span>
-            <NuxtLink to="/privacy" class="text-zinc-500 text-xs hover:text-white transition-colors"
+            <span class="text-xs font-medium text-default uppercase tracking-widest mb-1"
+              >Legal</span
+            >
+            <NuxtLink to="/privacy" class="text-dimmed text-xs hover:text-default transition-colors"
               >Privacy</NuxtLink
             >
-            <NuxtLink to="/terms" class="text-zinc-500 text-xs hover:text-white transition-colors"
+            <NuxtLink to="/terms" class="text-dimmed text-xs hover:text-default transition-colors"
               >Terms</NuxtLink
             >
             <NuxtLink
               to="/disclaimer"
-              class="text-zinc-500 text-xs hover:text-white transition-colors"
+              class="text-dimmed text-xs hover:text-default transition-colors"
               >Disclaimer</NuxtLink
             >
-            <NuxtLink to="/cookies" class="text-zinc-500 text-xs hover:text-white transition-colors"
+            <NuxtLink to="/cookies" class="text-dimmed text-xs hover:text-default transition-colors"
               >Cookie Policy</NuxtLink
             >
           </div>

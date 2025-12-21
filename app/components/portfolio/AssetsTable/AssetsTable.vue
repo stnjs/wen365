@@ -1,8 +1,8 @@
 <template>
-  <UCard class="bg-zinc-900/50 border-white/5">
+  <UCard class="bg-app-card border-muted">
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <div class="text-lg font-medium text-white">Assets</div>
+        <div class="text-lg font-medium text-default">Assets</div>
         <UInput
           v-model="searchQuery"
           class="max-w-sm min-w-[12ch]"
@@ -30,24 +30,24 @@
         <div class="px-4 py-4 space-y-3">
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span class="text-zinc-400">Network:</span>
-              <span class="ml-2 font-medium text-white">{{ row.original.network }}</span>
+              <span class="text-muted">Network:</span>
+              <span class="ml-2 font-medium text-default">{{ row.original.network }}</span>
             </div>
             <div>
-              <span class="text-zinc-400">Token Address:</span>
-              <span class="ml-2 font-mono text-xs text-zinc-300">
+              <span class="text-muted">Token Address:</span>
+              <span class="ml-2 font-mono text-xs text-default">
                 {{ row.original.tokenAddress || "Native Token" }}
               </span>
             </div>
             <div>
-              <span class="text-zinc-400">Balance:</span>
-              <span class="ml-2 font-medium text-white">
+              <span class="text-muted">Balance:</span>
+              <span class="ml-2 font-medium text-default">
                 {{ formatBalance(row.original.tokenBalance) }}
               </span>
             </div>
             <div>
-              <span class="text-zinc-400">Price:</span>
-              <span class="ml-2 font-medium text-white">
+              <span class="text-muted">Price:</span>
+              <span class="ml-2 font-medium text-default">
                 {{ formatCurrency(row.original.tokenPrice) }}
               </span>
             </div>
