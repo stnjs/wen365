@@ -1,20 +1,16 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 
-:root {
-  --ui-header-height: --spacing(18);
-}
-
-/* Ensure dark mode is active globally */
-@layer base {
-  body {
-    @apply antialiased;
-  }
-}
-
 @theme {
+  --ui-header-height: --spacing(18);
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    @apply antialiased font-sans;
+  }
 }
 
 @utility bg-app {
