@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-app text-default font-sans antialiased selection:bg-white selection:text-black overflow-x-hidden relative"
+    class="min-h-screen bg-app text-default selection:bg-white selection:text-black overflow-x-hidden relative"
   >
     <!-- Background Atmosphere -->
     <div
