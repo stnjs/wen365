@@ -4,7 +4,7 @@
     <section class="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 px-6">
       <div class="max-w-4xl mx-auto text-center">
         <div
-          class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-default bg-white/5 backdrop-blur-sm mb-8 animate-fade-up opacity-0"
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-default bg-white/5 backdrop-blur-sm mb-8 animate-fade-up"
           :style="{ animationDelay: '0ms' }"
         >
           <span class="relative flex h-2 w-2">
@@ -19,7 +19,7 @@
         </div>
 
         <h1
-          class="text-5xl md:text-7xl font-medium text-default tracking-tighter mb-6 leading-[1.1] animate-fade-up opacity-0"
+          class="text-5xl md:text-7xl font-medium text-default tracking-tighter mb-6 leading-[1.1] animate-fade-up"
           :style="{ animationDelay: '100ms' }"
         >
           Portfolio clarity.<br />
@@ -27,7 +27,7 @@
         </h1>
 
         <p
-          class="text-lg md:text-xl text-muted max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up opacity-0"
+          class="text-lg md:text-xl text-muted max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up"
           :style="{ animationDelay: '200ms' }"
         >
           Visualize asset flows across chains and optimize your tax burden with intelligent holding
@@ -35,7 +35,7 @@
         </p>
 
         <div
-          class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up opacity-0"
+          class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up"
           :style="{ animationDelay: '300ms' }"
         >
           <ConnectWalletButton
@@ -282,7 +282,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
@@ -292,17 +292,6 @@ const accountData = useAppKitAccount();
 const email = ref("");
 
 const isConnected = computed<boolean>(() => accountData.value?.isConnected || false);
-
-// Trigger fade-up animations on mount
-onMounted(() => {
-  const elements = document.querySelectorAll(".animate-fade-up");
-  elements.forEach((el, index) => {
-    const delay = index * 100;
-    setTimeout(() => {
-      el.classList.remove("opacity-0");
-    }, delay);
-  });
-});
 
 const handleViewDemo = () => {
   // Navigate to dashboard or show demo

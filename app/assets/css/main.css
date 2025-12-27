@@ -71,6 +71,7 @@
 
 @utility animate-fade-up {
   animation: fade-up 0.8s ease-out forwards;
+  opacity: 0;
 }
 
 @utility animate-draw {
