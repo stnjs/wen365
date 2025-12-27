@@ -24,10 +24,12 @@ createAppKit({
     url: "http://localhost:3030",
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },
+  themeMode: "dark",
   themeVariables: {
-    "--apkt-accent": "#5154da", // Perano-600 - main accent color
-    "--apkt-font-family": "Inter, system-ui, sans-serif", // Match your app font
-    "--apkt-border-radius-master": "8px", // Match Nuxt UI border radius
+    "--apkt-font-family": "Inter, system-ui, sans-serif",
+    "--apkt-accent": "#9f9fa9", // primary accent color
+    "--apkt-color-mix": "#9f9fa9", // blend color
+    "--apkt-border-radius-master": "9999px",
   },
   siweConfig,
 });
