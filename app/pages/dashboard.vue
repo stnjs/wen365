@@ -8,7 +8,7 @@
           </template>
 
           <template #right>
-            <appkit-button />
+            <ConnectWalletButton />
           </template>
         </UDashboardNavbar>
         <UDashboardToolbar>
@@ -39,16 +39,6 @@
               </template>
             </UEmpty>
           </div>
-
-          <!-- Empty State - No Tokens -->
-          <!-- <div v-else-if="tokens.length === 0" class="text-center py-12">
-            <UEmpty icon="i-lucide-coins" description="No tokens found in your wallet">
-              <template #actions>
-                <UButton color="primary" @click="refetchPortfolio()"> Refresh </UButton>
-              </template>
-            </UEmpty>
-          </div> -->
-
           <!-- Portfolio Content -->
           <div v-else class="space-y-6">
             <!-- Top Section: Net Worth & Graph -->

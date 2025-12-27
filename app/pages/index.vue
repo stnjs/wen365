@@ -38,20 +38,27 @@
           class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up opacity-0"
           :style="{ animationDelay: '300ms' }"
         >
+          <ConnectWalletButton
+            v-if="!isConnected"
+            class="transition-all sm:w-auto"
+            label="Get Started"
+            trailing-icon="i-lucide-arrow-right"
+            size="lg"
+          />
           <UButton
-            class="group relative h-10 px-6 rounded-full bg-white text-black font-medium text-sm overflow-hidden transition-all hover:scale-105 active:scale-95 w-full sm:w-auto hover:bg-zinc-200"
-            @click="handleConnectWallet"
+            v-else
+            to="/dashboard"
+            class="rounded-full transition-all sm:w-auto"
+            color="neutral"
+            trailing-icon="i-lucide-arrow-right"
+            size="lg"
           >
-            <div
-              class="absolute inset-0 bg-gradient-to-r from-zinc-200 to-white opacity-0 group-hover:opacity-100 transition-opacity"
-            />
-            <span class="relative flex items-center justify-center gap-2">
-              Connect Wallet
-              <UIcon name="i-lucide-arrow-right" class="w-4 h-4" />
-            </span>
+            Go to Dashboard
           </UButton>
           <UButton
-            class="h-10 px-6 rounded-full border border-zinc-800 text-default font-medium text-sm hover:bg-zinc-900 hover:text-default transition-all w-full sm:w-auto"
+            class="rounded-full transition-all sm:w-auto"
+            color="primary"
+            size="lg"
             @click="handleViewDemo"
           >
             View Demo
@@ -275,24 +282,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useAppKitAccount, useAppKit } from "@reown/appkit/vue";
+import { useAppKitAccount } from "@reown/appkit/vue";
 import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
 
 const router = useRouter();
 const accountData = useAppKitAccount();
 const email = ref("");
 
-// Navigate to dashboard after wallet connection
-watch(
-  () => accountData.value?.isConnected,
-  newValue => {
-    if (newValue) {
-      router.push("/dashboard");
-    }
-  },
-);
+const isConnected = computed<boolean>(() => accountData.value?.isConnected || false);
 
 // Trigger fade-up animations on mount
 onMounted(() => {
@@ -304,12 +303,6 @@ onMounted(() => {
     }, delay);
   });
 });
-
-const { open } = useAppKit();
-
-const handleConnectWallet = () => {
-  open({ view: "Connect" });
-};
 
 const handleViewDemo = () => {
   // Navigate to dashboard or show demo

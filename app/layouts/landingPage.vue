@@ -22,12 +22,7 @@
         <a href="#" class="hover:text-default transition-colors">Pricing</a>
       </div>
       <template #right>
-        <ConnectWalletButton
-          size="sm"
-          :show-connected="false"
-          label="Connect Wallet"
-          class="bg-white text-black text-xs font-medium px-4 py-2 rounded-full hover:bg-zinc-200 transition-colors tracking-tight"
-        />
+        <ConnectWalletButton />
       </template>
     </UHeader>
 
