@@ -238,6 +238,7 @@ describe("portfolio.mapper", () => {
           },
           tokenPrice: 3000,
           tokenValue: 3000,
+          percentage: 60,
         },
         {
           network: "eth-mainnet",
@@ -251,6 +252,7 @@ describe("portfolio.mapper", () => {
           },
           tokenPrice: 1,
           tokenValue: 2000,
+          percentage: 40,
         },
       ];
 

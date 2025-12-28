@@ -100,5 +100,53 @@ describe("portfolio.service", () => {
         expect(token.tokenMetadata.decimals).toBeGreaterThanOrEqual(0);
       });
     });
+
+    it("should include percentage field in all tokens", async () => {
+      const promise = getPortfolio("0x123", "test-key");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+      result.tokens.forEach(token => {
+        expect(token).toHaveProperty("percentage");
+        expect(typeof token.percentage).toBe("number");
+        expect(token.percentage).toBeGreaterThanOrEqual(0);
+        expect(token.percentage).toBeLessThanOrEqual(100);
+      });
+    });
+
+    it("should calculate percentages that sum to approximately 100", async () => {
+      // Mock with actual token data
+      mockFetch.mockResolvedValue({
+        data: {
+          tokens: [
+            {
+              address: "0x123",
+              network: "eth-mainnet",
+              tokenAddress: null,
+              tokenBalance: "0x1",
+              tokenMetadata: { symbol: "ETH", decimals: 18, name: "Ethereum", logo: null },
+              tokenPrices: [{ currency: "usd", value: "3000", lastUpdatedAt: "2025-01-01" }],
+            },
+            {
+              address: "0x123",
+              network: "eth-mainnet",
+              tokenAddress: "0xusdc",
+              tokenBalance: "0x1",
+              tokenMetadata: { symbol: "USDC", decimals: 6, name: "USD Coin", logo: null },
+              tokenPrices: [{ currency: "usd", value: "1000", lastUpdatedAt: "2025-01-01" }],
+            },
+          ],
+          pageKey: null,
+        },
+      });
+
+      const promise = getPortfolio("0x123", "test-key");
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      if (result.tokens.length > 0) {
+        const totalPercentage = result.tokens.reduce((sum, token) => sum + token.percentage, 0);
+        expect(totalPercentage).toBeCloseTo(100, 0);
+      }
+    });
   });
 });

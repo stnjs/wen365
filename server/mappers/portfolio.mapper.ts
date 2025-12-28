@@ -23,6 +23,7 @@ export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
     },
     tokenPrice,
     tokenValue,
+    percentage: 0, // Placeholder - calculated by addPercentageToTokens in service
   };
 }
 
