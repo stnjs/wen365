@@ -10,7 +10,7 @@
       class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[600px] pointer-events-none z-0 blur-3xl bg-radial-glow"
     />
 
-    <UHeader class="fixed w-full border-b border-muted bg-app-overlay backdrop-blur-xl">
+    <UHeader class="fixed w-full bg-app-overlay backdrop-blur-xl">
       <template #title>
         <Logo size="sm" />
       </template>

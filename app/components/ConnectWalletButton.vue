@@ -46,13 +46,12 @@ const isConnecting = computed(() => accountData.value?.status === "connecting");
 
 const handleConnect = async () => {
   try {
-    open({ view: "Connect", namespace: "eip155" });
+    await open({ view: "Connect", namespace: "eip155" });
   } catch (error) {
     console.error("Failed to connect wallet:", error);
   }
 };
 
-// Glassmorphism button styles using Tailwind - matching original design
 const buttonClass = `
     rounded-full
     cursor-pointer

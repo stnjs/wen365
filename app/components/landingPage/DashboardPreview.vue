@@ -1,7 +1,7 @@
 <template>
   <!-- Hero Visual: Dashboard Interface -->
   <div
-    class="mt-24 relative max-w-6xl mx-auto animate-fade-up opacity-0 group cursor-default"
+    class="mt-24 relative max-w-6xl mx-auto animate-fade-up group cursor-default"
     :style="{ animationDelay: '400ms' }"
   >
     <!-- Glow effect behind -->
