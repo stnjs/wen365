@@ -8,7 +8,7 @@
           alt="Wen365 Logo"
           class="w-10 h-10"
         />
-        <Logo v-else />
+        <Logo v-else size="md" />
       </NuxtLink>
     </template>
     <template #default="{ collapsed }">

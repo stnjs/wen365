@@ -5,11 +5,11 @@
     :disabled="isConnecting"
     :loading="isConnecting"
     :size="size"
-    :class="buttonClass"
+    class="rounded-full cursor-pointer"
     :color="color"
     @click="handleConnect"
   >
-    <slot name="label">
+    <slot>
       {{ isConnecting ? "Connecting..." : label }}
     </slot>
   </UButton>
@@ -22,7 +22,6 @@ import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 
 interface ConnectWalletButtonProps {
   label?: string;
-  connectedLabel?: string;
   showConnected?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   variant?: "solid" | "outline" | "soft" | "subtle" | "ghost" | "link";
@@ -31,7 +30,6 @@ interface ConnectWalletButtonProps {
 
 withDefaults(defineProps<ConnectWalletButtonProps>(), {
   label: "Connect Wallet",
-  connectedLabel: "Connect Wallet",
   showConnected: true,
   size: "md",
   variant: "soft",
@@ -51,9 +49,4 @@ const handleConnect = async () => {
     console.error("Failed to connect wallet:", error);
   }
 };
-
-const buttonClass = `
-    rounded-full
-    cursor-pointer
-  `.trim();
 </script>
