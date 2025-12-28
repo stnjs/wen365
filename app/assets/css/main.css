@@ -11,15 +11,6 @@
   body {
     @apply antialiased font-sans;
   }
-
-  :root {
-    /* AppKit theme variables */
-    --apkt-font-family: "Inter", system-ui, sans-serif !important;
-    --apkt-accent: var(--ui-primary) !important;
-    --apkt-color-mix: var(--ui-primary) !important;
-    --apkt-border-radius-master: 9999px !important;
-    /* --apkt-tokens-theme-foregroundPrimary: var(--color-zinc-900) !important; */
-  }
 }
 
 @utility bg-app {

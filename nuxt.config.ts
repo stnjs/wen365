@@ -8,6 +8,15 @@ const __dirname = dirname(__filename);
 export default defineNuxtConfig({
   compatibilityDate: "2025-11-10",
 
+  vue: {
+    compilerOptions: {
+      isCustomElement: tag => {
+        // AppKit Web Components
+        return tag.startsWith("appkit-") || tag.startsWith("wui-") || tag.startsWith("w3m-");
+      },
+    },
+  },
+
   typescript: {
     strict: true,
     typeCheck: true,
@@ -47,12 +56,6 @@ export default defineNuxtConfig({
     reownProjectId: process.env.REOWN_PROJECT_ID,
     alchemyApiKey: process.env.ALCHEMY_API_KEY,
     supportedNetworks: process.env.SUPPORTED_NETWORKS,
-
-    /*
-    alchemyApiKey: process.env.VITE_ALCHEMY_API_KEY,
-    etherscanApiKey: process.env.VITE_ETHERSCAN_API_KEY,
-    sendgridApiKey: process.env.VITE_SENDGRID_API_KEY,
-    telegramBotToken: process.env.VITE_TELEGRAM_BOT_TOKEN, */
 
     // Public keys (exposed to client-side)
     public: {

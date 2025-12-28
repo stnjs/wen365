@@ -21,15 +21,15 @@ createAppKit({
     name: "wen365",
     description:
       "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool.",
-    url: "http://localhost:3030",
+    url: "http://localhost:3000",
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   },
   themeMode: "dark",
   themeVariables: {
-    // "--apkt-font-family": "Inter, system-ui, sans-serif",
+    "--apkt-font-family": "Inter, system-ui, sans-serif",
     // "--apkt-accent": "#9f9fa9 !important", // primary accent color
     // "--apkt-color-mix": "#9f9fa9 !important", // blend color
-    // "--apkt-border-radius-master": "9999px",
+    "--apkt-border-radius-master": "99px",
   },
   siweConfig,
 });
