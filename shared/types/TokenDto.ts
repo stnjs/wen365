@@ -14,4 +14,6 @@ export interface TokenDto {
   tokenPrice: number;
   /** Total Value of token balance in USD */
   tokenValue: number;
+  /** Percentage of total portfolio value (0-100) */
+  percentage: number;
 }

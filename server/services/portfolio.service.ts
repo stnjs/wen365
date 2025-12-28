@@ -136,6 +136,23 @@ function deduplicateTokens(tokens: TokenDto[]): TokenDto[] {
   return Array.from(tokenMap.values());
 }
 
+/**
+ * Adds percentage to each token based on total portfolio value
+ * @param tokens - Array of TokenDto
+ * @param totalValue - Total portfolio value in USD
+ * @returns Tokens with percentage field populated
+ */
+function addPercentageToTokens(tokens: TokenDto[], totalValue: number): TokenDto[] {
+  if (totalValue === 0) {
+    return tokens.map(token => ({ ...token, percentage: 0 }));
+  }
+
+  return tokens.map(token => ({
+    ...token,
+    percentage: roundToTwoDecimals((token.tokenValue / totalValue) * 100),
+  }));
+}
+
 export async function getPortfolio(
   walletAddress: string,
   alchemyApiKey: string,
@@ -156,5 +173,7 @@ export async function getPortfolio(
     activeTokens.reduce((sum, token) => sum + token.tokenValue, 0),
   );
 
-  return mapToPortfolioDto(totalValue, activeTokens);
+  const tokensWithPercentage = addPercentageToTokens(activeTokens, totalValue);
+
+  return mapToPortfolioDto(totalValue, tokensWithPercentage);
 }
