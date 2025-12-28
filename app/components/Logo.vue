@@ -4,8 +4,6 @@
   </NuxtLink>
 </template>
 <script setup lang="ts">
-// Import assets statically so Nuxt can process them at build time
-
 // Original SVG dimensions: 202x64 (for logo), 64x64 (for icon)
 const ORIGINAL_WIDTH = 202;
 const ORIGINAL_HEIGHT = 64;

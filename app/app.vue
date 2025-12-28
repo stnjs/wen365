@@ -26,10 +26,10 @@ createAppKit({
   },
   themeMode: "dark",
   themeVariables: {
-    "--apkt-font-family": "Inter, system-ui, sans-serif",
-    "--apkt-accent": "#9f9fa9", // primary accent color
-    "--apkt-color-mix": "#9f9fa9", // blend color
-    "--apkt-border-radius-master": "9999px",
+    // "--apkt-font-family": "Inter, system-ui, sans-serif",
+    // "--apkt-accent": "#9f9fa9 !important", // primary accent color
+    // "--apkt-color-mix": "#9f9fa9 !important", // blend color
+    // "--apkt-border-radius-master": "9999px",
   },
   siweConfig,
 });
