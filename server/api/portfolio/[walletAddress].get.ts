@@ -1,6 +1,7 @@
-import { isAddress } from "viem";
 import { getPortfolio } from "@server/services/portfolio.service";
 import { handleServiceError } from "@server/utils/errorHandler";
+import { validateParams } from "@server/utils/validation";
+import { WalletAddressParamsSchema } from "@server/schemas/common";
 
 export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   const config = useRuntimeConfig(event);
@@ -13,13 +14,8 @@ export default defineEventHandler(async (event): Promise<PortfolioDto> => {
     });
   }
 
-  const walletAddress = getRouterParam(event, "walletAddress");
-  if (!walletAddress || !isAddress(walletAddress)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid wallet address format",
-    });
-  }
+  // Validate route params with Zod (also normalizes address to checksum format)
+  const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
 
   try {
     return await getPortfolio(walletAddress, alchemyApiKey);

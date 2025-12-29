@@ -1,8 +1,10 @@
 import type { Address } from "viem";
 import { createPublicClient, http, getAddress } from "viem";
 import { handleServiceError } from "@server/utils/errorHandler";
-import { isValidSignatureFormat, validateSiweMessage } from "@server/utils/authUtils";
+import { validateSiweMessage } from "@server/utils/authUtils";
 import { logError } from "@server/utils/logger";
+import { validateBody } from "@server/utils/validation";
+import { VerifyBodySchema } from "@server/schemas/auth";
 
 const REQUEST_TIMEOUT_MS = 60000; // 60 seconds
 
@@ -23,30 +25,8 @@ export default defineEventHandler(async event => {
   const protocol = getHeader(event, "x-forwarded-proto") || "http";
   const origin = `${protocol}://${host}`;
 
-  const body = await readBody(event);
-  const { message, signature } = body;
-
-  // Input validation
-  if (!message || typeof message !== "string" || message.trim().length === 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Message is required and must be a non-empty string",
-    });
-  }
-
-  if (!signature || typeof signature !== "string") {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Signature is required and must be a string",
-    });
-  }
-
-  if (!isValidSignatureFormat(signature)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid signature format",
-    });
-  }
+  // Validate request body with Zod
+  const { message, signature } = await validateBody(event, VerifyBodySchema);
 
   const session = await getUserSession(event);
   const storedNonce = session.nonce;
