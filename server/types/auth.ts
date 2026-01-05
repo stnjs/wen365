@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-/**
- * Hex signature format regex (0x followed by hex characters)
- */
-const HEX_SIGNATURE_REGEX = /^0x[a-fA-F0-9]+$/;
+const HEX_SIGNATURE_REGEX = /^0x[a-fA-F0-9]{130}$/;
 
 /**
  * Schema for SIWE signature verification request body
