@@ -1,18 +1,9 @@
+import { NETWORK_IDS } from "#shared/types/NetworkId";
+
 /**
  * Valid NetworkId values for validation
  */
-const VALID_NETWORK_IDS: NetworkId[] = [
-  "eth-mainnet",
-  "matic-mainnet",
-  "base-mainnet",
-  "arb-mainnet",
-  "opt-mainnet",
-  "zksync-mainnet",
-  "avax-mainnet",
-  "linea-mainnet",
-  "scroll-mainnet",
-  "bnb-mainnet",
-];
+const VALID_NETWORK_IDS: readonly NetworkId[] = NETWORK_IDS;
 
 /**
  * Default networks for development (fallback if env var not set)

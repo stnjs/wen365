@@ -3,29 +3,12 @@
  * Validates external API data and transforms to internal DTOs
  */
 import { z } from "zod";
+import { NetworkIdSchema } from "#shared/types/NetworkId";
 import {
   convertTokenBalanceToNumber,
   extractUsdPrice,
   calculateTokenValue,
 } from "@server/utils/blockchainUtils";
-
-/**
- * Valid network identifiers
- */
-const NETWORK_IDS = [
-  "eth-mainnet",
-  "matic-mainnet",
-  "base-mainnet",
-  "arb-mainnet",
-  "opt-mainnet",
-  "zksync-mainnet",
-  "avax-mainnet",
-  "linea-mainnet",
-  "scroll-mainnet",
-  "bnb-mainnet",
-] as const;
-
-const NetworkIdSchema = z.enum(NETWORK_IDS);
 
 /**
  * Token price information schema

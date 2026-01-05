@@ -1,4 +1,4 @@
-import type { AlchemyToken } from "@server/schemas/alchemy";
+import type { AlchemyToken } from "@server/types/alchemy";
 import { formatUnits } from "viem";
 import { roundToTwoDecimals } from "./formatterUtils";
 

@@ -1,7 +1,7 @@
 import { getPortfolio } from "@server/services/portfolio.service";
 import { handleServiceError } from "@server/utils/errorHandler";
 import { validateParams } from "@server/utils/validation";
-import { WalletAddressParamsSchema } from "@server/schemas/common";
+import { WalletAddressParamsSchema } from "@server/types/common";
 
 export default defineEventHandler(async (event): Promise<PortfolioDto> => {
   const config = useRuntimeConfig(event);
