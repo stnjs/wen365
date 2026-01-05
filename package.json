@@ -33,7 +33,6 @@
     "@wagmi/vue": "^0.3.2",
     "date-fns": "^4.1.0",
     "lodash-es": "4.17.21",
-    "lucide-vue-next": "^0.536.0",
     "nuxt-auth-utils": "0.5.25",
     "siwe": "3.0.0",
     "viem": "^2.38.6",

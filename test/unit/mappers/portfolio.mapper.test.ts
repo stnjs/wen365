@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import type { AlchemyToken } from "@server/schemas/alchemy";
-import { TokenDtoFromAlchemySchema } from "@server/schemas/alchemy";
+import type { AlchemyToken } from "@server/types/alchemy";
+import { TokenDtoFromAlchemySchema } from "@server/types/alchemy";
 import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 
 describe("portfolio.mapper", () => {
