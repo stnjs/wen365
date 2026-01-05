@@ -1,34 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { AlchemyToken } from "@server/types";
-import { mapToTokenDto, mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
-
-// Mock blockchainUtils - use alias to match source imports
-const mockConvertTokenBalanceToNumber = vi.fn();
-const mockCalculateTokenUsdValue = vi.fn();
-
-vi.mock("@server/utils/blockchainUtils", () => ({
-  convertTokenBalanceToNumber: (token: AlchemyToken) => mockConvertTokenBalanceToNumber(token),
-  calculateTokenUsdValue: (token: AlchemyToken) => mockCalculateTokenUsdValue(token),
-}));
+import { describe, it, expect } from "vitest";
+import type { AlchemyToken } from "@server/schemas/alchemy";
+import { TokenDtoFromAlchemySchema } from "@server/schemas/alchemy";
+import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 
 describe("portfolio.mapper", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // Default mock implementations
-    mockConvertTokenBalanceToNumber.mockReturnValue(1);
-    mockCalculateTokenUsdValue.mockImplementation((token: AlchemyToken) => {
-      const price = parseFloat(token.tokenPrices[0]?.value || "0");
-      return price * 1;
-    });
-  });
-
-  describe("mapToTokenDto", () => {
-    it("should map token with USD price correctly", () => {
+  describe("TokenDtoFromAlchemySchema (Zod transform)", () => {
+    it("should transform token with USD price correctly", () => {
       const alchemyToken: AlchemyToken = {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0x5f5e100", // 100000000 (100 USDC with 6 decimals)
         tokenMetadata: {
           symbol: "USDC",
           decimals: 6,
@@ -44,7 +26,7 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.network).toBe("eth-mainnet");
       expect(result.tokenAddress).toBe("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
@@ -53,9 +35,8 @@ describe("portfolio.mapper", () => {
       expect(result.tokenMetadata.name).toBe("USD Coin");
       expect(result.tokenMetadata.logo).toBe("https://example.com/logo.png");
       expect(result.tokenPrice).toBe(1.0);
-      expect(result.tokenValue).toBe(1.0);
-      expect(mockConvertTokenBalanceToNumber).toHaveBeenCalledWith(alchemyToken);
-      expect(mockCalculateTokenUsdValue).toHaveBeenCalledWith(alchemyToken);
+      expect(result.tokenBalance).toBe(100); // 100000000 / 10^6 = 100
+      expect(result.tokenValue).toBe(100); // 100 * 1.0 = 100
     });
 
     it("should fall back to first price when USD not found", () => {
@@ -63,7 +44,7 @@ describe("portfolio.mapper", () => {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: "0xtoken",
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0xde0b6b3a7640000", // 1 ETH (18 decimals)
         tokenMetadata: {
           symbol: "TOKEN",
           decimals: 18,
@@ -79,7 +60,7 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.tokenPrice).toBe(0.9);
     });
@@ -89,7 +70,7 @@ describe("portfolio.mapper", () => {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: "0xtoken",
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0xde0b6b3a7640000",
         tokenMetadata: {
           symbol: "TOKEN",
           decimals: 18,
@@ -99,18 +80,18 @@ describe("portfolio.mapper", () => {
         tokenPrices: [],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.tokenPrice).toBe(0);
       expect(result.tokenValue).toBe(0);
     });
 
-    it("should map native token (null tokenAddress)", () => {
+    it("should transform native token (null tokenAddress)", () => {
       const alchemyToken: AlchemyToken = {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: null,
-        tokenBalance: "0x2386f26fc10000",
+        tokenBalance: "0x2386f26fc10000", // 0.01 ETH
         tokenMetadata: {
           symbol: "ETH",
           decimals: 18,
@@ -126,19 +107,19 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.tokenAddress).toBeNull();
       expect(result.network).toBe("eth-mainnet");
       expect(result.tokenMetadata.symbol).toBe("ETH");
     });
 
-    it("should map ERC-20 token correctly", () => {
+    it("should transform ERC-20 token correctly", () => {
       const alchemyToken: AlchemyToken = {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: "0x4d224452801aced8b2f0aebe155379bb5d594381",
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0xde0b6b3a7640000", // 1 token
         tokenMetadata: {
           symbol: "APE",
           decimals: 18,
@@ -154,7 +135,7 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.tokenAddress).toBe("0x4d224452801aced8b2f0aebe155379bb5d594381");
       expect(result.tokenMetadata.symbol).toBe("APE");
@@ -162,12 +143,12 @@ describe("portfolio.mapper", () => {
       expect(result.tokenPrice).toBe(2.5);
     });
 
-    it("should map all metadata fields correctly", () => {
+    it("should transform all metadata fields correctly", () => {
       const alchemyToken: AlchemyToken = {
         address: "0x123",
         network: "matic-mainnet",
         tokenAddress: "0xtoken",
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0xde0b6b3a7640000",
         tokenMetadata: {
           symbol: "MATIC",
           decimals: 18,
@@ -183,7 +164,7 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.network).toBe("matic-mainnet");
       expect(result.tokenMetadata.symbol).toBe("MATIC");
@@ -197,7 +178,7 @@ describe("portfolio.mapper", () => {
         address: "0x123",
         network: "eth-mainnet",
         tokenAddress: null,
-        tokenBalance: "0x5f5e100",
+        tokenBalance: "0xde0b6b3a7640000",
         tokenMetadata: {
           symbol: null,
           decimals: null,
@@ -213,12 +194,30 @@ describe("portfolio.mapper", () => {
         ],
       };
 
-      const result = mapToTokenDto(alchemyToken);
+      const result = TokenDtoFromAlchemySchema.parse(alchemyToken);
 
       expect(result.tokenMetadata.symbol).toBeNull();
       expect(result.tokenMetadata.decimals).toBeNull();
       expect(result.tokenMetadata.name).toBeNull();
       expect(result.tokenMetadata.logo).toBeNull();
+    });
+
+    it("should throw on invalid input", () => {
+      const invalidToken = {
+        address: "0x123",
+        network: "invalid-network", // Invalid network
+        tokenAddress: null,
+        tokenBalance: "0xde0b6b3a7640000",
+        tokenMetadata: {
+          symbol: "ETH",
+          decimals: 18,
+          name: "Ethereum",
+          logo: null,
+        },
+        tokenPrices: [],
+      };
+
+      expect(() => TokenDtoFromAlchemySchema.parse(invalidToken)).toThrow();
     });
   });
 

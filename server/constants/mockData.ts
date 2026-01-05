@@ -1,4 +1,4 @@
-import type { AlchemyTokensByAddressResponse } from "@server/types";
+import type { AlchemyTokensByAddressResponse } from "@server/schemas/alchemy";
 
 export const alchemyTokensByAddressMock: AlchemyTokensByAddressResponse = {
   data: {

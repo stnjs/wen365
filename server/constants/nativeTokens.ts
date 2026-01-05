@@ -1,5 +1,5 @@
 import type { NetworkId } from "~~/shared/types/NetworkId";
-import type { AlchemyTokenMetadata } from "@server/types";
+import type { AlchemyTokenMetadata } from "@server/schemas/alchemy";
 
 /**
  * Native token metadata by network

@@ -1,9 +1,12 @@
 import { describe, it, expect } from "vitest";
-import type { AlchemyToken } from "@server/types";
+import type { AlchemyToken } from "@server/schemas/alchemy";
 import {
-  convertTokenBalanceToNumber,
+  convertTokenBalanceToNumberFromToken,
   calculateTokenUsdValue,
   calculatePortfolioTotalValue,
+  convertTokenBalanceToNumber,
+  extractUsdPrice,
+  calculateTokenValue,
 } from "@server/utils/blockchainUtils";
 
 // Note: We're testing with real viem formatUnits implementation
@@ -26,7 +29,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(1);
     });
 
@@ -45,7 +48,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(100);
     });
 
@@ -64,7 +67,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(1);
     });
 
@@ -83,7 +86,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(1);
     });
 
@@ -102,7 +105,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(0);
     });
 
@@ -121,7 +124,7 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBe(1000000);
     });
 
@@ -140,8 +143,43 @@ describe("blockchainUtils", () => {
         tokenPrices: [],
       };
 
-      const result = convertTokenBalanceToNumber(token);
+      const result = convertTokenBalanceToNumberFromToken(token);
       expect(result).toBeCloseTo(0.001, 10);
+    });
+
+    it("should work with raw parameters (new API)", () => {
+      const result = convertTokenBalanceToNumber("0xde0b6b3a7640000", 18);
+      expect(result).toBe(1);
+    });
+
+    it("should extract USD price correctly", () => {
+      const tokenPrices = [
+        { currency: "eur", value: "0.9", lastUpdatedAt: "2025-01-01T00:00:00Z" },
+        { currency: "usd", value: "1.0", lastUpdatedAt: "2025-01-01T00:00:00Z" },
+      ];
+      const result = extractUsdPrice(tokenPrices);
+      expect(result).toBe(1.0);
+    });
+
+    it("should fallback to first price when USD not found", () => {
+      const tokenPrices = [
+        { currency: "eur", value: "0.9", lastUpdatedAt: "2025-01-01T00:00:00Z" },
+      ];
+      const result = extractUsdPrice(tokenPrices);
+      expect(result).toBe(0.9);
+    });
+
+    it("should return 0 when no prices available", () => {
+      const result = extractUsdPrice([]);
+      expect(result).toBe(0);
+    });
+
+    it("should calculate token value correctly", () => {
+      const tokenPrices = [
+        { currency: "usd", value: "3000", lastUpdatedAt: "2025-01-01T00:00:00Z" },
+      ];
+      const result = calculateTokenValue("0xde0b6b3a7640000", 18, tokenPrices);
+      expect(result).toBe(3000);
     });
   });
 
