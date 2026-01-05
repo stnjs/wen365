@@ -1,4 +1,4 @@
-import type { BlacklistedToken } from "@server/types/BlacklistedToken";
+import type { BlacklistedToken } from "@server/types/tokens";
 export const BLACKLISTED_TOKENS: BlacklistedToken[] = [
   {
     network: "matic-mainnet",

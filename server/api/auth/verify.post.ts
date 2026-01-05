@@ -4,7 +4,7 @@ import { handleServiceError } from "@server/utils/errorHandler";
 import { validateSiweMessage } from "@server/utils/authUtils";
 import { logError } from "@server/utils/logger";
 import { validateBody } from "@server/utils/validation";
-import { VerifyBodySchema } from "@server/schemas/auth";
+import { VerifyBodySchema } from "@server/types/auth";
 
 const REQUEST_TIMEOUT_MS = 60000; // 60 seconds
 

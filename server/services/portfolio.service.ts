@@ -3,7 +3,7 @@ import {
   type AlchemyTokensByAddressResponse,
   parseAlchemyResponse,
   TokenDtoFromAlchemySchema,
-} from "@server/schemas/alchemy";
+} from "@server/types/alchemy";
 import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 import { SUPPORTED_NETWORKS } from "@server/config/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
