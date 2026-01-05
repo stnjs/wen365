@@ -1,32 +1,3 @@
-import type { AlchemyToken } from "@server/types";
-import { calculateTokenUsdValue, convertTokenBalanceToNumber } from "@server/utils/blockchainUtils";
-
-export function mapToTokenDto(alchemyToken: AlchemyToken): TokenDto {
-  const usdPrice =
-    alchemyToken.tokenPrices.find(p => p.currency.toLowerCase() === "usd") ||
-    alchemyToken.tokenPrices[0];
-
-  const tokenPrice = usdPrice ? parseFloat(usdPrice.value) : 0;
-  const tokenValue = calculateTokenUsdValue(alchemyToken);
-
-  const tokenBalance = convertTokenBalanceToNumber(alchemyToken);
-
-  return {
-    network: alchemyToken.network,
-    tokenAddress: alchemyToken.tokenAddress,
-    tokenBalance,
-    tokenMetadata: {
-      symbol: alchemyToken.tokenMetadata.symbol,
-      decimals: alchemyToken.tokenMetadata.decimals,
-      name: alchemyToken.tokenMetadata.name,
-      logo: alchemyToken.tokenMetadata.logo,
-    },
-    tokenPrice,
-    tokenValue,
-    percentage: 0, // Placeholder - calculated by addPercentageToTokens in service
-  };
-}
-
 /**
  * Maps data to PortfolioDto
  * Pure transformation function - no business logic

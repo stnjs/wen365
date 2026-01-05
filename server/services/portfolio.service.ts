@@ -1,6 +1,10 @@
-import type { AlchemyTokensByAddressResponse, AlchemyToken } from "@server/types";
-//import { alchemyTokensByAddressMock } from "@server/constants/mockData";
-import { mapToPortfolioDto, mapToTokenDto } from "@server/mappers/portfolio.mapper";
+import {
+  type AlchemyToken,
+  type AlchemyTokensByAddressResponse,
+  parseAlchemyResponse,
+  TokenDtoFromAlchemySchema,
+} from "@server/schemas/alchemy";
+import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 import { SUPPORTED_NETWORKS } from "@server/config/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
 import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
@@ -37,7 +41,7 @@ export const getAlchemyTokensByAddress = async (
 
   const url = `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`;
 
-  return await fetchWithRetry<AlchemyTokensByAddressResponse>(
+  const response = await fetchWithRetry<unknown>(
     url,
     {
       method: "POST",
@@ -49,6 +53,9 @@ export const getAlchemyTokensByAddress = async (
       baseDelay: 1000,
     },
   );
+
+  // Validate external API response with Zod
+  return parseAlchemyResponse(response);
 };
 
 /**
@@ -161,7 +168,8 @@ export async function getPortfolio(
 
   const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
 
-  const allTokenDtos = enrichedTokens.map(token => mapToTokenDto(token));
+  // Transform to DTOs using Zod schema (validates + transforms)
+  const allTokenDtos = enrichedTokens.map(token => TokenDtoFromAlchemySchema.parse(token));
 
   const uniqueTokens = deduplicateTokens(allTokenDtos);
 
