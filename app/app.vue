@@ -10,6 +10,12 @@ import { projectId, wagmiAdapter, networks } from "./config/wagmi";
 import { siweConfig } from "./config/siwe";
 import { en } from "@nuxt/ui/locale";
 
+useHead({
+  bodyAttrs: {
+    class: "theme-dark",
+  },
+});
+
 const colorMode = useColorMode();
 colorMode.preference = "dark";
 

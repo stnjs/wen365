@@ -157,15 +157,7 @@
                 <template #header>
                   <span class="text-xs font-medium text-muted">Asset Allocation</span>
                 </template>
-                <div class="p-6 flex flex-col justify-center items-center relative">
-                  <div
-                    class="w-24 h-24 rounded-full border-[6px] border-zinc-800 border-t-emerald-500 border-r-blue-500 border-b-purple-500 border-l-orange-500 rotate-45"
-                  />
-                  <div class="absolute inset-0 flex items-center justify-center flex-col">
-                    <span class="text-default text-sm font-medium">{{ tokens.length }}</span>
-                    <span class="text-[10px] text-dimmed uppercase">Assets</span>
-                  </div>
-                </div>
+                <AssetAllocationChart :data="tokens.slice(0, 5)" />
               </UCard>
             </div>
 
@@ -183,11 +175,12 @@ import { computed, onMounted } from "vue";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
+import AssetAllocationChart from "~/components/AssetAllocationChart.vue";
 
 // Protect this route with auth middleware
-definePageMeta({
-  middleware: "auth",
-});
+// definePageMeta({
+//   middleware: "auth",
+// });
 
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
