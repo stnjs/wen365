@@ -7,6 +7,11 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* Unovis Theme Variables */
+:root {
+  --vis-font-family: var(--font-sans);
+}
+
 @layer base {
   body {
     @apply antialiased font-sans;
@@ -14,37 +19,37 @@
 }
 
 @utility bg-app {
-  background-color: #000000; /* black */
+  background-color: var(--color-black);
 }
 
 @utility bg-app-card {
-  background-color: rgba(24, 24, 27, 0.5); /* zinc-900/50 */
+  background-color: theme("colors.zinc.900 / 50%");
 }
 
 @utility bg-app-card-light {
-  background-color: rgba(24, 24, 27, 0.2); /* zinc-900/20 */
+  background-color: theme("colors.zinc.900 / 20%");
 }
 
 @utility bg-app-overlay {
-  background-color: rgba(0, 0, 0, 0.5); /* black/50 */
+  background-color: theme("colors.black / 50%");
 }
 
 @utility bg-app-overlay-light {
-  background-color: rgba(0, 0, 0, 0.4); /* black/40 */
+  background-color: theme("colors.black / 40%");
 }
 
 @utility bg-grid {
   background-size: 60px 60px;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, theme("colors.white / 5%") 1px, transparent 1px),
+    linear-gradient(to bottom, theme("colors.white / 5%") 1px, transparent 1px);
 }
 
 @utility bg-radial-glow {
   background: radial-gradient(
     ellipse 80% 50% at 50% 0%,
-    rgba(113, 113, 122, 0.4),
-    rgba(39, 39, 42, 0.2) 50%,
+    theme("colors.zinc.500 / 40%"),
+    theme("colors.zinc.800 / 20%") 50%,
     transparent 70%
   );
 }
@@ -85,14 +90,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--color-zinc-950);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--color-zinc-800);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--color-zinc-700);
 }
