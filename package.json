@@ -30,6 +30,8 @@
     "@reown/appkit-siwe": "1.8.14",
     "@tanstack/vue-query": "^5.90.7",
     "@tanstack/vue-table": "8.21.3",
+    "@unovis/ts": "1.6.2",
+    "@unovis/vue": "1.6.2",
     "@wagmi/vue": "^0.3.2",
     "date-fns": "^4.1.0",
     "lodash-es": "4.17.21",
