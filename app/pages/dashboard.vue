@@ -157,7 +157,7 @@
                 <template #header>
                   <span class="text-xs font-medium text-muted">Asset Allocation</span>
                 </template>
-                <AssetAllocationChart :data="tokens.slice(0, 5)" />
+                <AssetAllocationChart :data="tokens" :total-value="portfolio?.totalValue" />
               </UCard>
             </div>
 
@@ -191,12 +191,9 @@ const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
 
 const netWorthDollars = computed<string>(() => {
   const value = portfolio.value?.totalValue || 0;
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
+  return formatCurrency(Math.floor(value), {
     maximumFractionDigits: 0,
-  }).format(Math.floor(value));
+  });
 });
 
 const netWorthCents = computed<string>(() => {

@@ -103,21 +103,6 @@ const filteredTokens = computed<TokenDto[]>(() => {
   });
 });
 
-const formatBalance = (balance: number): string => {
-  if (balance === 0) return "0";
-  if (balance < 0.0001) return balance.toExponential(2);
-  if (balance < 1) return balance.toFixed(6);
-  if (balance < 1000) return balance.toFixed(4);
-  return balance.toFixed(2);
-};
-
-const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
-};
-
 const updateDebouncedSearch = debounce((value: string) => {
   debouncedSearchQuery.value = value;
 }, 300);
