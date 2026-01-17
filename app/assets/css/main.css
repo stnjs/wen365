@@ -7,11 +7,6 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-/* Unovis Theme Variables */
-:root {
-  --vis-font-family: var(--font-sans);
-}
-
 @layer base {
   body {
     @apply antialiased font-sans;
