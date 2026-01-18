@@ -66,9 +66,7 @@
                     </div>
                   </div>
                   <!-- Subtle grid in stats bg -->
-                  <div
-                    class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"
-                  />
+                  <div class="absolute inset-0 bg-grid-sm pointer-events-none" />
                 </div>
               </UCard>
 
@@ -157,7 +155,11 @@
                 <template #header>
                   <span class="text-xs font-medium text-muted">Asset Allocation</span>
                 </template>
-                <AssetAllocationChart :data="tokens" :total-value="portfolio?.totalValue" />
+                <AssetAllocationChart
+                  :data="tokens"
+                  :total-value="portfolio?.totalValue"
+                  :is-loading="isLoading"
+                />
               </UCard>
             </div>
 
