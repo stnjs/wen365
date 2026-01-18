@@ -1,28 +1,55 @@
 <template>
-  <div class="h-58 w-full relative donut-chart-container" :class="{ 'has-selection': selectedItem }">
+  <div
+    class="h-58 w-full relative donut-chart-container"
+    :class="{ 'has-selection': selectedItem }"
+  >
     <VisSingleContainer :data="chartData" class="h-full" :events="containerEvents">
-      <VisDonut :value="value" :color="color" :arc-width="20" :padding="{ top: 10, bottom: 10, left: 10, right: 10 }"
-        :pad-angle="0.03" :corner-radius="6" :events="events" />
+      <VisDonut
+        :value="value"
+        :color="color"
+        :arc-width="20"
+        :padding="{ top: 10, bottom: 10, left: 10, right: 10 }"
+        :pad-angle="0.03"
+        :corner-radius="6"
+        :events="events"
+      />
       <VisTooltip :triggers="triggers" />
     </VisSingleContainer>
 
     <!-- Central text for the donut -->
-    <div class="pointer-events-none absolute inset-0 flex items-center justify-center flex-col gap-1">
-      <template v-if="selectedItem">
+    <div
+      class="pointer-events-none absolute inset-0 flex items-center justify-center flex-col gap-1"
+    >
+      <UIcon v-if="props.isLoading" name="i-lucide-loader-circle" class="size-10 animate-spin" />
+      <template v-else-if="selectedItem">
         <template v-if="selectedItem.type === 'token'">
-          <span class="text-xs text-dimmed font-light">{{ selectedItem.data.tokenMetadata.symbol }}</span>
-          <span class="text-default text-xl font-medium">{{ formatCurrency(selectedItem.data.tokenValue) }}</span>
-          <UBadge color="success" variant="subtle" size="md">{{ formatPercent(selectedItem.data.percentage) }}</UBadge>
+          <span class="text-xs text-dimmed font-light">{{
+            selectedItem.data.tokenMetadata.symbol
+          }}</span>
+          <span class="text-default text-xl font-medium">{{
+            formatCurrency(selectedItem.data.tokenValue)
+          }}</span>
+          <UBadge color="success" variant="subtle" size="md">{{
+            formatPercent(selectedItem.data.percentage)
+          }}</UBadge>
         </template>
         <template v-else>
-          <span class="text-xs text-dimmed font-light">Other ({{ selectedItem.tokens.length }} assets)</span>
-          <span class="text-default text-xl font-medium">{{ formatCurrency(selectedItem.totalValue) }}</span>
-          <UBadge color="success" variant="subtle" size="md">{{ formatPercent(selectedItem.percentage) }}</UBadge>
+          <span class="text-xs text-dimmed font-light"
+            >Other ({{ selectedItem.tokens.length }} assets)</span
+          >
+          <span class="text-default text-xl font-medium">{{
+            formatCurrency(selectedItem.totalValue)
+          }}</span>
+          <UBadge color="success" variant="subtle" size="md">{{
+            formatPercent(selectedItem.percentage)
+          }}</UBadge>
         </template>
       </template>
       <template v-else>
         <span class="text-xs text-dimmed font-light">Total Portfolio Value:</span>
-        <span class="text-default text-xl font-medium">{{ formatCurrency(props.totalValue || 0) }}</span>
+        <span class="text-default text-xl font-medium">{{
+          formatCurrency(props.totalValue || 0)
+        }}</span>
         <UBadge color="success" variant="subtle" size="md">{{ formatPercent(100) }}</UBadge>
       </template>
     </div>
@@ -45,7 +72,7 @@ type ChartDataItem =
   | { type: "token"; data: TokenDto }
   | { type: "other"; tokens: TokenDto[]; totalValue: number; percentage: number };
 
-const props = defineProps<{ data: TokenDto[]; totalValue?: number }>();
+const props = defineProps<{ data: TokenDto[]; totalValue?: number; isLoading?: boolean }>();
 
 const selectedItem = ref<ChartDataItem | undefined>();
 
@@ -54,10 +81,10 @@ const chartData = computed<ChartDataItem[]>(() => {
   const sorted = [...props.data].sort((a, b) => b.percentage - a.percentage);
 
   if (sorted.length <= 5) {
-    return sorted.map((token) => ({ type: "token" as const, data: token }));
+    return sorted.map(token => ({ type: "token" as const, data: token }));
   }
 
-  const top4 = sorted.slice(0, 4).map((token) => ({ type: "token" as const, data: token }));
+  const top4 = sorted.slice(0, 4).map(token => ({ type: "token" as const, data: token }));
   const others = sorted.slice(4);
   const otherItem: ChartDataItem = {
     type: "other" as const,
@@ -87,7 +114,7 @@ const getItemIdentifier = (item: ChartDataItem | undefined): string => {
  */
 const clearAllSelections = () => {
   const segments = document.querySelectorAll(".donut-chart-container path");
-  segments.forEach((segment) => {
+  segments.forEach(segment => {
     segment.classList.remove("is-selected");
   });
 };
@@ -98,7 +125,7 @@ const events = {
       d: { data: ChartDataItem },
       event: MouseEvent,
       _index: number,
-      elements: SVGPathElement[]
+      elements: SVGPathElement[],
     ) => {
       event.stopPropagation();
       const clickedElement = elements[_index];
@@ -155,7 +182,10 @@ const triggers = {
 
 :deep(path) {
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    filter 0.2s ease;
   transform-origin: center;
   transform-box: fill-box;
 }
