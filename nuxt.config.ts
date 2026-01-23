@@ -48,6 +48,7 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@nuxt/test-utils/module",
     "nuxt-auth-utils",
+    "@nuxtjs/supabase",
   ],
 
   // Runtime config for environment variables
@@ -56,6 +57,8 @@ export default defineNuxtConfig({
     reownProjectId: process.env.REOWN_PROJECT_ID,
     alchemyApiKey: process.env.ALCHEMY_API_KEY,
     supportedNetworks: process.env.SUPPORTED_NETWORKS,
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
 
     // Public keys (exposed to client-side)
     public: {
