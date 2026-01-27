@@ -5,6 +5,7 @@ import { validateSiweMessage } from "@server/utils/authUtils";
 import { logError } from "@server/utils/logger";
 import { validateBody } from "@server/utils/validation";
 import { VerifyBodySchema } from "@server/types/auth";
+import { getOrCreateWallet } from "@server/services/wallet.service";
 
 const REQUEST_TIMEOUT_MS = 60000; // 60 seconds
 
@@ -101,6 +102,15 @@ export default defineEventHandler(async event => {
         address: normalizedAddress,
         chainId: chainIdNumber,
       },
+    });
+
+    // Register wallet in Supabase (non-blocking)
+    getOrCreateWallet(event, normalizedAddress).catch(err => {
+      logError("Failed to register wallet in Supabase", {
+        requestId,
+        address: normalizedAddress,
+        error: err instanceof Error ? err.message : "Unknown error",
+      });
     });
 
     return { success: true };
