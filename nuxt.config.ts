@@ -57,13 +57,19 @@ export default defineNuxtConfig({
     reownProjectId: process.env.REOWN_PROJECT_ID,
     alchemyApiKey: process.env.ALCHEMY_API_KEY,
     supportedNetworks: process.env.SUPPORTED_NETWORKS,
-    supabaseUrl: process.env.SUPABASE_URL,
-    supabaseSecretKey: process.env.SUPABASE_SECRET_KEY,
+    cronSecret: process.env.CRON_SECRET,
 
     // Public keys (exposed to client-side)
     public: {
       reownProjectId: process.env.REOWN_PROJECT_ID,
     },
+  },
+
+  // Supabase configuration
+  // By default uses SUPABASE_URL, SUPABASE_KEY (anon), and SUPABASE_SECRET_KEY (service role) from env
+  supabase: {
+    types: "@server/types/database.ts",
+    redirect: false,
   },
 
   // App configuration
