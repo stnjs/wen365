@@ -108,9 +108,4 @@ export default defineNuxtConfig({
   alias: {
     "@server": resolve(__dirname, "server"),
   },
-
-  // Nitro server configuration
-  nitro: {
-    preset: "node-server",
-  },
 });
