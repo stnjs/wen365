@@ -255,7 +255,7 @@ Once you've completed this setup:
 
 1. The project uses `@nuxtjs/supabase` for integration.
 2. Database types are configured in `nuxt.config.ts` to point to `server/types/database.ts`.
-3. The CRON job is configured in `vercel.json` to run every hour.
+3. The CRON job is configured in `vercel.json` to run once daily (at midnight UTC).
 4. The snapshot feature is ready to use!
 
 ---

@@ -2,8 +2,9 @@ import { getWalletsForSnapshot } from "@server/services/wallet.service";
 import { createSnapshot, cleanupOldSnapshots } from "@server/services/snapshot.service";
 import { logError, logInfo, logWarn } from "@server/utils/logger";
 
-// Minimum hours between snapshots for the same wallet
-const MIN_HOURS_BETWEEN_SNAPSHOTS = 1;
+// 22h buffer: Vercel Hobby has ±59min execution variance. Using 24h would exclude
+// wallets snapshotted 23h59m ago when the job runs. 22h ensures we don't miss any.
+const MIN_HOURS_BETWEEN_SNAPSHOTS = 22;
 
 // Delay between processing wallets to avoid rate limiting (ms)
 const DELAY_BETWEEN_WALLETS_MS = 1000;
