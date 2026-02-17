@@ -38,21 +38,26 @@ const items = [
       label: "Assets",
       icon: "i-lucide-wallet",
       to: "/assets",
+      disabled: true,
     },
 
     {
       label: "Settings",
       icon: "i-lucide-settings",
       defaultOpen: true,
+      disabled: true,
       children: [
         {
           label: "General",
+          disabled: true,
         },
         {
           label: "Wallets",
+          disabled: true,
         },
         {
           label: "Notifications",
+          disabled: true,
         },
       ],
     },
@@ -73,17 +78,3 @@ const items = [
   ],
 ] satisfies NavigationMenuItem[][];
 </script>
-<style scoped>
-.logo-v10 {
-  font-size: 50px;
-  font-weight: 400;
-  color: white;
-  letter-spacing: 2px;
-}
-
-.logo-v10 .accent {
-  color: #666;
-  font-weight: 300;
-  font-size: 0.6em;
-}
-</style>
