@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
 
   // Development tools
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== "production" },
 
   // SSR disabled for client-side only app
   ssr: false,
