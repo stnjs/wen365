@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { createAppKit } from "@reown/appkit/vue";
-import { projectId, wagmiAdapter, networks } from "./config/wagmi";
+import { networks } from "./config/wagmi";
 import { siweConfig } from "./config/siwe";
 import { en } from "@nuxt/ui/locale";
 
@@ -16,13 +16,15 @@ useHead({
   },
 });
 
+const { $wagmiAdapter, $reownProjectId } = useNuxtApp();
+
 const colorMode = useColorMode();
 colorMode.preference = "dark";
 
 createAppKit({
-  adapters: [wagmiAdapter],
+  adapters: [$wagmiAdapter],
   networks,
-  projectId,
+  projectId: $reownProjectId,
   metadata: {
     name: "wen365",
     description:
