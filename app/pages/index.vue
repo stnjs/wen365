@@ -294,7 +294,6 @@ const email = ref("");
 const isConnected = computed<boolean>(() => accountData.value?.isConnected || false);
 
 const handleViewDemo = () => {
-  // Navigate to dashboard or show demo
   router.push("/dashboard");
 };
 

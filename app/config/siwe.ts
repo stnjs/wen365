@@ -5,7 +5,7 @@ import {
   createSIWEConfig,
   formatMessage,
 } from "@reown/appkit-siwe";
-import { mainnet, base } from "@reown/appkit/networks";
+import { networks } from "./wagmi";
 
 /**
  * Function that returns the user's session - uses nuxt-auth-utils
@@ -84,7 +84,7 @@ export const siweConfig = createSIWEConfig({
   getMessageParams: async () => ({
     domain: typeof window !== "undefined" ? window.location.host : "",
     uri: typeof window !== "undefined" ? window.location.origin : "",
-    chains: [mainnet.id, base.id], // Use chain IDs from networks
+    chains: networks.map(network => network.id as number),
     statement: "Please sign in with your Ethereum account to access your portfolio.",
   }),
   createMessage: ({ address, ...args }: SIWECreateMessageArgs) => formatMessage(args, address),
