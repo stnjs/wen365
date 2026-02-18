@@ -8,8 +8,15 @@ const DEFAULT_DAYS = 30;
 const MAX_DAYS = 90;
 
 export default defineEventHandler(async (event): Promise<PortfolioHistoryDto> => {
+  const session = await requireUserSession(event);
+
   // Validate route params with Zod (also normalizes address to checksum format)
   const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
+
+  // Validate that the user is the owner of the wallet
+  if (session.user.address.toLowerCase() !== walletAddress.toLowerCase()) {
+    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
+  }
 
   // Get optional query params
   const query = getQuery(event);

@@ -4,6 +4,7 @@ import { validateParams } from "@server/utils/validation";
 import { WalletAddressParamsSchema } from "@server/types/common";
 
 export default defineEventHandler(async (event): Promise<PortfolioDto> => {
+  const session = await requireUserSession(event);
   const config = useRuntimeConfig(event);
   const alchemyApiKey = config.alchemyApiKey;
 
@@ -16,6 +17,11 @@ export default defineEventHandler(async (event): Promise<PortfolioDto> => {
 
   // Validate route params with Zod (also normalizes address to checksum format)
   const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
+
+  // Validate that the user is the owner of the wallet
+  if (session.user.address.toLowerCase() !== walletAddress.toLowerCase()) {
+    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
+  }
 
   try {
     return await getPortfolio(walletAddress, alchemyApiKey);
