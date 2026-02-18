@@ -28,16 +28,22 @@ createAppKit({
   metadata: {
     name: "wen365",
     description:
-      "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool.",
-    url: "http://localhost:3000",
-    icons: ["https://avatars.githubusercontent.com/u/179229932"],
+      "Portfolio tracker and tax status tracker for crypto assets across multiple chains.",
+    url: window.location.origin,
+    icons: [`${window.location.origin}/favicon.svg`],
   },
   themeMode: "dark",
   themeVariables: {
     "--apkt-font-family": "Inter, system-ui, sans-serif",
-    // "--apkt-accent": "#9f9fa9 !important", // primary accent color
-    // "--apkt-color-mix": "#9f9fa9 !important", // blend color
-    "--apkt-border-radius-master": "99px",
+    "--apkt-color-mix": "#a1a1aa",
+    "--apkt-color-mix-strength": 5,
+    "--apkt-border-radius-master": "4px",
+  },
+  features: {
+    analytics: true,
+    swaps: false,
+    onramp: false,
+    connectMethodsOrder: ["wallet"],
   },
   siweConfig,
 });
