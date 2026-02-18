@@ -1,7 +1,20 @@
 import { WagmiPlugin } from "@wagmi/vue";
-import { defineNuxtPlugin } from "nuxt/app";
-import { wagmiAdapter } from "../config/wagmi";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { networks } from "../config/wagmi";
 
 export default defineNuxtPlugin(nuxtApp => {
+  const {
+    public: { reownProjectId },
+  } = useRuntimeConfig();
+
+  const wagmiAdapter = new WagmiAdapter({ networks, projectId: reownProjectId });
+
   nuxtApp.vueApp.use(WagmiPlugin, { config: wagmiAdapter.wagmiConfig });
+
+  return {
+    provide: {
+      wagmiAdapter,
+      reownProjectId,
+    },
+  };
 });
