@@ -72,39 +72,7 @@
 
               <!-- Portfolio Graph Card -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
-                <div class="p-6 relative h-[200px] flex items-end overflow-hidden">
-                  <div class="absolute top-6 right-6 flex gap-2 z-10">
-                    <div class="text-[10px] text-default bg-white/10 px-2 py-0.5 rounded">1D</div>
-                    <div class="text-[10px] text-dimmed px-2 py-0.5 rounded">1W</div>
-                    <div class="text-[10px] text-dimmed px-2 py-0.5 rounded">1M</div>
-                  </div>
-                  <!-- SVG Line Graph -->
-                  <svg
-                    class="w-full h-[80%] absolute bottom-0 left-0"
-                    preserveAspectRatio="none"
-                    viewBox="0 0 600 200"
-                  >
-                    <defs>
-                      <linearGradient id="graphGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="rgba(16, 185, 129, 0.1)" />
-                        <stop offset="100%" stop-color="rgba(16, 185, 129, 0)" />
-                      </linearGradient>
-                    </defs>
-                    <!-- Fill Area -->
-                    <path
-                      d="M0,150 C100,140 200,180 300,120 C400,60 500,80 600,40 V200 H0 Z"
-                      fill="url(#graphGradient)"
-                    />
-                    <!-- Line -->
-                    <path
-                      d="M0,150 C100,140 200,180 300,120 C400,60 500,80 600,40"
-                      fill="none"
-                      stroke="#10b981"
-                      stroke-width="2"
-                      class="animate-draw"
-                    />
-                  </svg>
-                </div>
+                <PortfolioChart :address="address" />
               </UCard>
             </div>
 
@@ -178,6 +146,7 @@ import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
 import AssetAllocationChart from "~/components/AssetAllocationChart.vue";
+import PortfolioChart from "~/components/portfolio/PortfolioChart.vue";
 
 // Protect this route with auth middleware
 // definePageMeta({
