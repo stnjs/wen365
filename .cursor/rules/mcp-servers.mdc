@@ -1,0 +1,29 @@
+---
+description: Available MCP servers and when to use them over CLI/shell commands
+alwaysApply: true
+---
+
+# MCP Servers
+
+The following MCP servers are available. Always prefer them over shell commands or CLI tools when applicable.
+
+## Server Names (use exact names with `user-` prefix)
+
+| Config Name     | Agent Server Name      | Use For                                      |
+| --------------- | ---------------------- | -------------------------------------------- |
+| Vercel          | `user-Vercel`          | Deployments, projects, logs, domains         |
+| Supabase        | `user-Supabase`        | Database queries, migrations, edge functions |
+| Chrome DevTools | `user-Chrome DevTools` | Browser inspection, performance profiling    |
+| Context7        | `user-Context7`        | Up-to-date library/framework documentation   |
+| _(built-in)_    | `cursor-ide-browser`   | Browser testing and web automation           |
+
+## Usage Rules
+
+- Use `user-Vercel` instead of running `vercel` CLI commands
+- Use `user-Supabase` instead of running raw `psql` or `supabase` CLI commands
+- Use `user-Context7` when you need current docs for any library before writing code
+- Always read the tool schema from the mcps folder before calling a tool
+
+## Tool Discovery
+
+Before calling an unknown tool, list the available tools for that server from the mcps folder in the Cursor projects directory. Read the relevant JSON schema file before making any `call_mcp_tool` call.
