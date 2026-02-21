@@ -5,7 +5,7 @@ import { WalletAddressParamsSchema } from "@server/types/common";
 import type { PortfolioHistoryDto } from "#shared/types/PortfolioHistoryDto";
 
 const DEFAULT_DAYS = 30;
-const MAX_DAYS = 90;
+const MAX_DAYS = 365;
 
 export default defineEventHandler(async (event): Promise<PortfolioHistoryDto> => {
   const session = await requireUserSession(event);
