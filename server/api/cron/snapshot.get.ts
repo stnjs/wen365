@@ -12,6 +12,8 @@ const DELAY_BETWEEN_WALLETS_MS = 1000;
 // Maximum wallets to process per CRON run
 const MAX_WALLETS_PER_RUN = 50;
 
+const DAYS_TO_KEEP_SNAPSHOTS = 365;
+
 /**
  * CRON endpoint for creating portfolio snapshots.
  * Protected by CRON_SECRET in Authorization header.
@@ -105,7 +107,7 @@ export default defineEventHandler(async event => {
     let cleanedUp = 0;
     if (results.successful > 0) {
       try {
-        cleanedUp = await cleanupOldSnapshots(event, 90);
+        cleanedUp = await cleanupOldSnapshots(event, DAYS_TO_KEEP_SNAPSHOTS);
       } catch (error) {
         logError("Failed to cleanup old snapshots", {
           error: error instanceof Error ? error.message : "Unknown error",
