@@ -7,7 +7,7 @@
       class="fixed inset-0 z-0 pointer-events-none bg-grid [mask-image:linear-gradient(to_bottom,white,transparent)]"
     />
     <div
-      class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[600px] pointer-events-none z-0 blur-3xl bg-radial-glow"
+      class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-150 pointer-events-none z-0 blur-3xl bg-radial-glow"
     />
 
     <UHeader class="fixed w-full bg-app-overlay backdrop-blur-xl">
@@ -39,7 +39,7 @@
             <div class="w-3 h-3 bg-white rounded-full" />
             <span class="text-default font-medium tracking-tighter">wen365</span>
           </div>
-          <p class="text-dimmed text-xs max-w-[200px] mb-4">
+          <p class="text-dimmed text-xs max-w-50 mb-4">
             © 2025 wen365<br />
             Mastering time and value on-chain.
           </p>
