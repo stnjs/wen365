@@ -45,9 +45,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <!-- Net Worth Card -->
               <UCard class="bg-app-card border-muted">
-                <div
-                  class="p-8 flex flex-col justify-between relative overflow-hidden min-h-50"
-                >
+                <div class="p-8 flex flex-col justify-between relative overflow-hidden min-h-50">
                   <div class="relative z-10">
                     <div class="flex items-center gap-2 mb-1">
                       <span class="text-xs font-medium text-dimmed uppercase tracking-wider"
@@ -72,7 +70,7 @@
 
               <!-- Portfolio Graph Card -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
-                <PortfolioChart :address="address" :current-value="portfolio?.totalValue" use-mock />
+                <PortfolioChart :address="address" :current-value="portfolio?.totalValue" />
               </UCard>
             </div>
 
