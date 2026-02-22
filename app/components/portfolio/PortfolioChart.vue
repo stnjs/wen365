@@ -29,72 +29,62 @@
       <div v-else />
 
       <div class="flex gap-1">
-        <button
+        <UButton
           v-for="range in timeRanges"
           :key="range.label"
-          class="text-[10px] px-2 py-0.5 rounded transition-colors"
-          :class="
-            selectedDays === range.days
-              ? 'text-default bg-white/10'
-              : 'text-dimmed hover:text-muted'
-          "
+          size="xs"
+          variant="ghost"
+          active-variant="soft"
+          color="neutral"
+          :label="range.label"
+          :active="selectedDays === range.days"
           @click="selectedDays = range.days"
-        >
-          {{ range.label }}
-        </button>
+        />
       </div>
     </div>
 
     <!-- Loading state -->
-    <div v-if="isLoading" class="h-[160px] flex items-center justify-center">
+    <div v-if="isLoading" class="h-50 flex items-center justify-center">
       <UIcon name="i-lucide-loader-circle" class="size-8 animate-spin text-dimmed" />
     </div>
 
     <!-- Empty state -->
     <div
       v-else-if="!chartData.length"
-      class="h-[160px] flex items-center justify-center text-dimmed text-sm"
+      class="h-50 flex items-center justify-center text-dimmed text-sm"
     >
       No snapshot data available yet
     </div>
 
     <!-- Chart -->
-    <div v-else class="h-[160px]">
-      <VisXYContainer :data="chartData" :padding="{ top: 4, right: 0, bottom: 0, left: 0 }" :svg-defs="svgDefs">
-        <VisArea
-          :x="x"
-          :y="y"
-          color="url(#portfolioGradient)"
-          curve-type="linear"
-        />
-        <VisLine
-          :x="x"
-          :y="y"
-          :color="lineColor"
-          :line-width="2"
-          curve-type="linear"
-        />
+    <div v-else class="">
+      <VisXYContainer
+        :data="chartData"
+        :padding="{ top: 4, right: 0, bottom: 0, left: 0 }"
+        :svg-defs="svgDefs"
+        class="h-50"
+      >
+        <VisArea :x="x" :y="y" color="url(#portfolioGradient)" curve-type="linear" />
+        <VisLine :x="x" :y="y" :color="lineColor" :line-width="2" curve-type="linear" />
         <VisAxis
           type="x"
           :tick-format="tickFormat"
-          :num-ticks="numTicks"
+          :tick-values="tickValues"
           :grid-line="false"
-          :tick-line="false"
+          :tick-line="true"
           :domain-line="false"
           tick-text-color="var(--color-zinc-500)"
           tick-text-font-size="10px"
         />
-        <VisCrosshair
-          :template="crosshairTemplate"
-          color="var(--color-emerald-500)"
-        />
+        <VisCrosshair color="var(--color-emerald-500)" :template="template" />
+        <VisTooltip />
       </VisXYContainer>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { VisXYContainer, VisArea, VisLine, VisAxis, VisCrosshair } from "@unovis/vue";
+import { VisXYContainer, VisArea, VisLine, VisAxis, VisCrosshair, VisTooltip } from "@unovis/vue";
 import { useQuery } from "@tanstack/vue-query";
 import { usePortfolioHistory } from "~/composables/queries/usePortfolioHistory";
 import type { PortfolioHistoryDto } from "#shared/types/PortfolioHistoryDto";
@@ -132,7 +122,9 @@ const realQuery = usePortfolioHistory(
 );
 
 const history = computed(() => (props.useMock ? mockQuery.data.value : realQuery.data.value));
-const isLoading = computed(() => (props.useMock ? mockQuery.isLoading.value : realQuery.isLoading.value));
+const isLoading = computed(() =>
+  props.useMock ? mockQuery.isLoading.value : realQuery.isLoading.value,
+);
 
 const chartData = computed<ChartDatum[]>(() => {
   if (!history.value?.snapshots.length) return [];
@@ -161,7 +153,19 @@ const svgDefs = computed(() => {
   `;
 });
 
-const numTicks = computed(() => (selectedDays.value <= 7 ? 7 : 5));
+const tickCount = computed(() => (selectedDays.value <= 7 ? 7 : 5));
+
+const tickValues = computed<number[]>(() => {
+  const data = chartData.value;
+  if (data.length <= tickCount.value) return data.map(d => d.timestamp);
+
+  const count = tickCount.value;
+  const step = (data.length - 1) / (count - 1);
+  return Array.from({ length: count }, (_, i) => {
+    const point = data[Math.round(i * step)];
+    return point ? point.timestamp : 0;
+  });
+});
 
 const tickFormat = (tick: number | Date): string => {
   const date = tick instanceof Date ? tick : new Date(tick);
@@ -174,22 +178,23 @@ const tickFormat = (tick: number | Date): string => {
   return date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
 };
 
-const crosshairTemplate = (d: ChartDatum): string => {
+const template = (d: ChartDatum) => {
   const date = new Date(d.timestamp).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
-  return `<div class="text-xs">
-    <div class="text-zinc-400">${date}</div>
-    <div class="text-white font-medium">${formatCurrency(d.value)}</div>
-  </div>`;
+  return `<div">
+      <div class="text-xs text-zinc-400">${date}</div>
+      <div class="text-smtext-white font-medium">${formatCurrency(d.value)}</div>
+    </div>`;
 };
 </script>
 
 <style lang="css" scoped>
 .unovis-xy-container {
   --vis-font-family: var(--font-sans);
+  --vis-dark-tooltip-background-color: var(--color-zinc-900);
   --vis-crosshair-line-stroke-color: var(--color-emerald-500);
   --vis-crosshair-circle-stroke-color: var(--color-emerald-500);
   --vis-dark-crosshair-line-stroke-color: var(--color-emerald-500);
