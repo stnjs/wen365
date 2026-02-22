@@ -96,6 +96,8 @@ interface ChartDatum {
 
 const props = defineProps<{
   address?: string;
+  /** Current live portfolio value to append as the latest data point */
+  currentValue?: number;
   /** Use mock endpoint instead of real data (dev only) */
   useMock?: boolean;
 }>();
@@ -128,10 +130,21 @@ const isLoading = computed(() =>
 
 const chartData = computed<ChartDatum[]>(() => {
   if (!history.value?.snapshots.length) return [];
-  return history.value.snapshots.map(s => ({
+
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+  let points = history.value.snapshots.map(s => ({
     timestamp: new Date(s.timestamp).getTime(),
     value: s.totalValue,
   }));
+
+  if (props.currentValue != null) {
+    points = points.filter(p => p.timestamp < todayStart);
+    points.push({ timestamp: Date.now(), value: props.currentValue });
+  }
+
+  return points;
 });
 
 const x = (d: ChartDatum) => d.timestamp;
