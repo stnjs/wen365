@@ -72,7 +72,7 @@
 
               <!-- Portfolio Graph Card -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
-                <PortfolioChart :address="address" use-mock />
+                <PortfolioChart :address="address" :current-value="portfolio?.totalValue" use-mock />
               </UCard>
             </div>
 
