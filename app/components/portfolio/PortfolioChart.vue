@@ -199,7 +199,7 @@ const template = (d: ChartDatum) => {
   });
   return `<div">
       <div class="text-xs text-zinc-400">${date}</div>
-      <div class="text-smtext-white font-medium">${formatCurrency(d.value)}</div>
+      <div class="text-sm text-white font-medium">${formatCurrency(d.value)}</div>
     </div>`;
 };
 </script>
