@@ -32,7 +32,7 @@
       </div>
 
       <!-- App Container - Non-interactive internal content -->
-      <div class="flex min-h-[600px] pointer-events-none select-none">
+      <div class="flex min-h-150 pointer-events-none select-none">
         <!-- Sidebar - Clean with Blurred Bars -->
         <div class="w-64 border-r border-muted bg-zinc-900/30 hidden md:flex flex-col p-6">
           <div class="flex items-center gap-2 mb-10">

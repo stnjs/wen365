@@ -245,7 +245,7 @@
     <!-- CTA Section -->
     <section class="py-32 px-6 text-center relative overflow-hidden">
       <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 blur-[120px] rounded-full pointer-events-none"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-150 bg-white/5 blur-[120px] rounded-full pointer-events-none"
       />
 
       <div class="relative z-10 max-w-2xl mx-auto">

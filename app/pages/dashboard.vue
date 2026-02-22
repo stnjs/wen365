@@ -46,7 +46,7 @@
               <!-- Net Worth Card -->
               <UCard class="bg-app-card border-muted">
                 <div
-                  class="p-8 flex flex-col justify-between relative overflow-hidden min-h-[200px]"
+                  class="p-8 flex flex-col justify-between relative overflow-hidden min-h-50"
                 >
                   <div class="relative z-10">
                     <div class="flex items-center gap-2 mb-1">
