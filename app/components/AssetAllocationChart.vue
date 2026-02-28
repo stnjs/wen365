@@ -24,7 +24,7 @@
       <template v-else-if="selectedItem">
         <template v-if="selectedItem.type === 'token'">
           <span class="text-xs text-dimmed font-light">{{
-            selectedItem.data.tokenMetadata.symbol
+            `${selectedItem.data.tokenMetadata.symbol} (${networkToNameMap[selectedItem.data.network]})`
           }}</span>
           <span class="text-default text-xl font-medium">{{
             formatCurrency(selectedItem.data.tokenValue)
@@ -59,6 +59,7 @@
 <script setup lang="ts">
 import { VisSingleContainer, VisDonut, VisTooltip } from "@unovis/vue";
 import { Donut } from "@unovis/ts";
+import { networkToNameMap } from "./portfolio/AssetsTable/config";
 
 const colorPalette = [
   "var(--color-emerald-400)",
