@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 relative">
+  <div class="p-2 relative">
     <!-- Header: value change + time range selector -->
     <div class="flex items-center justify-between mb-4">
       <div v-if="history && history.snapshots.length >= 2" class="flex items-center gap-2">
@@ -128,20 +128,24 @@ const isLoading = computed(() =>
   props.useMock ? mockQuery.isLoading.value : realQuery.isLoading.value,
 );
 
+const startOfDay = (ms: number) => {
+  const d = new Date(ms);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+};
+
 const chartData = computed<ChartDatum[]>(() => {
   if (!history.value?.snapshots.length) return [];
 
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const todayStart = startOfDay(Date.now());
 
   let points = history.value.snapshots.map(s => ({
-    timestamp: new Date(s.timestamp).getTime(),
+    timestamp: startOfDay(new Date(s.timestamp).getTime()),
     value: s.totalValue,
   }));
 
   if (props.currentValue != null) {
     points = points.filter(p => p.timestamp < todayStart);
-    points.push({ timestamp: Date.now(), value: props.currentValue });
+    points.push({ timestamp: todayStart, value: props.currentValue });
   }
 
   return points;
@@ -166,26 +170,35 @@ const svgDefs = computed(() => {
   `;
 });
 
-const tickCount = computed(() => (selectedDays.value <= 7 ? 7 : 5));
-
 const tickValues = computed<number[]>(() => {
   const data = chartData.value;
-  if (data.length <= tickCount.value) return data.map(d => d.timestamp);
+  if (data.length === 0) return [];
 
-  const count = tickCount.value;
-  const step = (data.length - 1) / (count - 1);
-  return Array.from({ length: count }, (_, i) => {
+  const maxTicks = selectedDays.value <= 7 ? data.length : 5;
+  if (data.length <= maxTicks) return data.map(d => d.timestamp);
+
+  const step = (data.length - 1) / (maxTicks - 1);
+  return Array.from({ length: maxTicks }, (_, i) => {
     const point = data[Math.round(i * step)];
     return point ? point.timestamp : 0;
   });
 });
 
+const dataSpanDays = computed(() => {
+  const data = chartData.value;
+  const first = data.at(0);
+  const last = data.at(-1);
+  if (!first || !last) return 0;
+  return (last.timestamp - first.timestamp) / (24 * 60 * 60 * 1000);
+});
+
 const tickFormat = (tick: number | Date): string => {
   const date = tick instanceof Date ? tick : new Date(tick);
-  if (selectedDays.value <= 7) {
+  const span = dataSpanDays.value;
+  if (span <= 7) {
     return date.toLocaleDateString("en-US", { weekday: "short" });
   }
-  if (selectedDays.value <= 30) {
+  if (span <= 90) {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }
   return date.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
