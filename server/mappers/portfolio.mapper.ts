@@ -7,7 +7,7 @@
 export function mapToPortfolioDto(totalValue: number, tokens: TokenDto[]): PortfolioDto {
   return {
     totalValue,
-    totalValueChange24h: 0, // TODO: Implement 24h change calculation
+    totalValueChange24h: 0,
     totalValueChangePercent24h: 0,
     tokens,
   };

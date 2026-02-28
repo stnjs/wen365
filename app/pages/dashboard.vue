@@ -43,30 +43,11 @@
           <div v-else class="space-y-6">
             <!-- Top Section: Net Worth & Graph -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <!-- Net Worth Card -->
-              <UCard class="bg-app-card border-muted">
-                <div class="p-8 flex flex-col justify-between relative overflow-hidden min-h-50">
-                  <div class="relative z-10">
-                    <div class="flex items-center gap-2 mb-1">
-                      <span class="text-xs font-medium text-dimmed uppercase tracking-wider"
-                        >Total Net Worth</span
-                      >
-                    </div>
-                    <div class="text-4xl text-default font-semibold tracking-tight mb-2">
-                      <span>{{ netWorthDollars }}</span
-                      ><span class="text-2xl">.{{ netWorthCents }}</span>
-                    </div>
-                    <div
-                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium"
-                    >
-                      <UIcon name="i-lucide-trending-up" class="w-3 h-3" />
-                      <span>Portfolio Active</span>
-                    </div>
-                  </div>
-                  <!-- Subtle grid in stats bg -->
-                  <div class="absolute inset-0 bg-grid-sm pointer-events-none" />
-                </div>
-              </UCard>
+              <NetWorthCard
+                :total-value="portfolio?.totalValue"
+                :value-change-24h="portfolio?.totalValueChange24h"
+                :value-change-percent-24h="portfolio?.totalValueChangePercent24h"
+              />
 
               <!-- Portfolio Graph Card -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
@@ -145,6 +126,7 @@ import { useAppKitAccount } from "@reown/appkit/vue";
 import AssetsTable from "~/components/portfolio/AssetsTable/AssetsTable.vue";
 import AssetAllocationChart from "~/components/AssetAllocationChart.vue";
 import PortfolioChart from "~/components/portfolio/PortfolioChart.vue";
+import NetWorthCard from "~/components/portfolio/NetWorthCard.vue";
 
 // Protect this route with auth middleware
 // definePageMeta({
@@ -157,19 +139,6 @@ const address = computed<string | undefined>(() => accountData.value?.address);
 const { data: portfolio, isLoading, refetch: refetchPortfolio } = usePortfolio(address);
 
 const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
-
-const netWorthDollars = computed<string>(() => {
-  const value = portfolio.value?.totalValue || 0;
-  return formatCurrency(Math.floor(value), {
-    maximumFractionDigits: 0,
-  });
-});
-
-const netWorthCents = computed<string>(() => {
-  const value = portfolio.value?.totalValue || 0;
-  const cents = Math.floor((value % 1) * 100);
-  return cents.toString().padStart(2, "0");
-});
 
 const getTokenIcon = (symbol: string): string => {
   const iconMap: Record<string, string> = {
