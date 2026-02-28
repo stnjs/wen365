@@ -13,15 +13,20 @@
         </UDashboardNavbar>
         <UDashboardToolbar>
           <template #right>
-            <UTooltip text="Refresh Portfolio">
-              <UButton
-                icon="i-lucide-refresh-cw"
-                color="neutral"
-                variant="ghost"
-                :disabled="isLoading"
-                @click="refetchPortfolio()"
-              />
-            </UTooltip>
+            <div class="flex items-center gap-2">
+              <span v-if="lastUpdated" class="text-xs text-dimmed">
+                Last updated: {{ lastUpdated }}
+              </span>
+              <UTooltip text="Refresh Portfolio">
+                <UButton
+                  icon="i-lucide-refresh-cw"
+                  color="neutral"
+                  variant="ghost"
+                  :disabled="isLoading"
+                  @click="refetchPortfolio()"
+                />
+              </UTooltip>
+            </div>
           </template>
         </UDashboardToolbar>
       </template>
@@ -136,7 +141,20 @@ import NetWorthCard from "~/components/portfolio/NetWorthCard.vue";
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
 
-const { data: portfolio, isLoading, refetch: refetchPortfolio } = usePortfolio(address);
+const {
+  data: portfolio,
+  isLoading,
+  refetch: refetchPortfolio,
+  dataUpdatedAt,
+} = usePortfolio(address);
+
+const lastUpdated = computed<string>(() => {
+  if (!dataUpdatedAt.value) return "";
+  return new Date(dataUpdatedAt.value).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+});
 
 const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
 
