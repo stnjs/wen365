@@ -141,6 +141,38 @@ Always structure Vue components following this order in `<script setup>`:
 7. **Configuration** - Component configuration (e.g., table columns)
 8. **Lifecycle Hooks** - All hooks at the end
 
+### 9. Props: Use a Named Interface
+
+Always define props via a named interface, then pass it to `defineProps`:
+
+```typescript
+// ✅ Good
+interface NetWorthCardProps {
+  totalValue?: number;
+  valueChange24h?: number;
+}
+
+const props = defineProps<NetWorthCardProps>();
+
+// ❌ Bad: inline shape
+const props = defineProps<{ totalValue?: number }>();
+```
+
+### 10. Always Type `ref` and `computed`
+
+Explicitly pass a type parameter to `ref()` and `computed()`:
+
+```typescript
+// ✅ Good
+const searchQuery = ref<string>("");
+const isOpen = ref<boolean>(false);
+const filteredTokens = computed<TokenDto[]>(() => { /* ... */ });
+
+// ❌ Bad: relies on inference
+const searchQuery = ref("");
+const filteredTokens = computed(() => { /* ... */ });
+```
+
 <!-- ✅ Good: Well-structured component -->
 <script setup lang="ts">
 import { h, resolveComponent, computed, onBeforeUnmount } from "vue";
@@ -148,9 +180,11 @@ import { debounce } from "lodash-es";
 import type { TableColumn } from "@nuxt/ui";
 import Token from "./Token.vue";
 
-const props = defineProps<{
+interface AssetsTableProps {
   tokens: TokenDto[];
-}>();
+}
+
+const props = defineProps<AssetsTableProps>();
 
 const table = useTemplateRef("table");
 
