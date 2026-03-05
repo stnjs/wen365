@@ -7,14 +7,9 @@
           class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-default bg-white/5 backdrop-blur-sm mb-8 animate-fade-up"
           :style="{ animationDelay: '0ms' }"
         >
-          <span class="relative flex h-2 w-2">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"
-            />
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-white" />
-          </span>
+          <UIcon name="i-lucide-code-2" class="w-3.5 h-3.5 text-default" />
           <span class="text-xs text-default font-medium tracking-wide uppercase"
-            >v2.0 Now Live</span
+            >Open-Source Demo</span
           >
         </div>
 
@@ -23,15 +18,15 @@
           :style="{ animationDelay: '100ms' }"
         >
           Portfolio clarity.<br />
-          <span class="text-dimmed">Tax optimized.</span>
+          <span class="text-dimmed">Multi-chain tracking.</span>
         </h1>
 
         <p
           class="text-lg md:text-xl text-muted max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up"
           :style="{ animationDelay: '200ms' }"
         >
-          Visualize asset flows across chains and optimize your tax burden with intelligent holding
-          time tracking. The operating system for your web3 wealth.
+          A full-stack crypto portfolio tracker with SIWE authentication, multi-chain aggregation,
+          and historical snapshots. Built with Nuxt 4.
         </p>
 
         <div
@@ -75,8 +70,8 @@
           Everything in one timeline.
         </h2>
         <p class="text-muted text-lg max-w-2xl">
-          wen365 unifies your fragmented crypto existence into a singular, coherent stream of value
-          and time.
+          Track token balances across EVM chains, visualize portfolio performance over time, and
+          authenticate securely with your wallet.
         </p>
       </div>
 
@@ -211,32 +206,30 @@
       </div>
     </section>
 
-    <!-- Integration Ticker (Subtle) -->
-    <section class="py-12 border-y border-default bg-app-overlay">
+    <!-- Tech Stack -->
+    <section id="tech" class="py-12 border-y border-default bg-app-overlay">
       <div class="max-w-6xl mx-auto px-6 text-center">
-        <p class="text-xs font-medium text-dimmed uppercase tracking-widest mb-8">
-          Seamlessly Integrated With
-        </p>
-        <div class="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-50 grayscale">
+        <p class="text-xs font-medium text-dimmed uppercase tracking-widest mb-8">Built With</p>
+        <div class="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-50">
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-circle-dollar-sign" class="w-5 h-5" />
-            <span class="font-semibold">Coinbase</span>
+            <UIcon name="i-lucide-layers" class="w-5 h-5" />
+            <span class="font-semibold">Nuxt 4</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-code-2" class="w-5 h-5" />
+            <span class="font-semibold">TypeScript</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-database" class="w-5 h-5" />
+            <span class="font-semibold">Supabase</span>
           </div>
           <div class="flex items-center gap-2">
             <UIcon name="i-lucide-wallet" class="w-5 h-5" />
-            <span class="font-semibold">Metamask</span>
+            <span class="font-semibold">SIWE Auth</span>
           </div>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-shield" class="w-5 h-5" />
-            <span class="font-semibold">Ledger</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-key" class="w-5 h-5" />
-            <span class="font-semibold">Trezor</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-zap" class="w-5 h-5" />
-            <span class="font-semibold">Zapper</span>
+            <UIcon name="i-lucide-link" class="w-5 h-5" />
+            <span class="font-semibold">Alchemy API</span>
           </div>
         </div>
       </div>
@@ -250,57 +243,58 @@
 
       <div class="relative z-10 max-w-2xl mx-auto">
         <h2 class="text-4xl md:text-5xl font-medium text-default tracking-tighter mb-6">
-          Ready to clarify your crypto?
+          Explore the source code.
         </h2>
         <p class="text-muted text-lg mb-10">
-          Join the waitlist for wen365 and take control of your financial timeline. Built for the
-          modern web3 native.
+          This project is open-source. Dive into the codebase to see how SIWE authentication,
+          multi-chain portfolio aggregation, and historical snapshots are implemented.
         </p>
 
-        <form
-          class="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto"
-          @submit.prevent="handleWaitlistSubmit"
-        >
-          <input
-            v-model="email"
-            type="email"
-            placeholder="alice@example.com"
-            class="flex-1 bg-app-card border border-default rounded-full px-5 py-3 text-sm text-default focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all placeholder:text-toned"
-            required
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <UButton
+            to="https://github.com/stnjs/wen365"
+            target="_blank"
+            class="rounded-full transition-all"
+            color="neutral"
+            size="lg"
+            leading-icon="i-lucide-github"
+          >
+            View on GitHub
+          </UButton>
+          <ConnectWalletButton
+            v-if="!isConnected"
+            class="transition-all sm:w-auto"
+            label="Try the Demo"
+            trailing-icon="i-lucide-arrow-right"
+            size="lg"
           />
           <UButton
-            type="submit"
-            class="bg-white text-black font-medium text-sm px-6 py-3 rounded-full hover:bg-zinc-200 transition-colors whitespace-nowrap"
+            v-else
+            to="/dashboard"
+            class="rounded-full transition-all"
+            color="primary"
+            trailing-icon="i-lucide-arrow-right"
+            size="lg"
           >
-            Request Access
+            Go to Dashboard
           </UButton>
-        </form>
-        <p class="text-xs text-toned mt-6">No spam. Unsubscribe anytime.</p>
+        </div>
       </div>
     </section>
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAppKitAccount } from "@reown/appkit/vue";
 import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
 
 const router = useRouter();
 const accountData = useAppKitAccount();
-const email = ref("");
 
 const isConnected = computed<boolean>(() => accountData.value?.isConnected || false);
 
 const handleViewDemo = () => {
   router.push("/dashboard");
-};
-
-const handleWaitlistSubmit = () => {
-  // Handle waitlist submission
-  console.log("Waitlist submission:", email.value);
-  // TODO: Implement actual waitlist API call
-  email.value = "";
 };
 </script>
