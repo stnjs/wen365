@@ -1,7 +1,7 @@
 <template>
   <UDashboardSidebar id="default" collapsible resizeable>
     <template #header="{ collapsed }">
-      <NuxtLink to="/dashboard">
+      <NuxtLink to="/">
         <img
           v-if="collapsed"
           src="~/assets/images/wen365-icon.svg"

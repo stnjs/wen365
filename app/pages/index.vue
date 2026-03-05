@@ -149,7 +149,12 @@
             <!-- Mini auth flow visual -->
             <div class="mt-auto space-y-2">
               <div
-                v-for="(step, i) in ['Nonce generated', 'Message signed', 'Signature verified', 'Session created']"
+                v-for="(step, i) in [
+                  'Nonce generated',
+                  'Message signed',
+                  'Signature verified',
+                  'Session created',
+                ]"
                 :key="i"
                 class="flex items-center gap-2 text-[11px]"
               >
@@ -204,8 +209,8 @@
             </div>
             <h3 class="text-xl font-medium text-default mb-2">Portfolio Analytics</h3>
             <p class="text-muted text-sm leading-relaxed max-w-sm">
-              Interactive area charts with crosshair tooltips (Unovis), asset allocation donut, and a
-              searchable, sortable token table with chain indicators and pagination.
+              Interactive area charts with crosshair tooltips (Unovis), asset allocation donut, and
+              a searchable, sortable token table with chain indicators and pagination.
             </p>
           </div>
           <div class="w-full md:w-1/2">
@@ -274,11 +279,37 @@
           How it's built.
         </h2>
         <p class="text-muted text-lg max-w-2xl">
-          A look at the two core data flows that power the application.
+          Frontend architecture, authentication, and the data pipeline behind the app.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <!-- Frontend Architecture -->
+        <div class="p-6 rounded-2xl border border-default bg-app-card-light">
+          <div class="flex items-center gap-2 mb-6">
+            <UIcon name="i-lucide-layout-template" class="w-4 h-4 text-violet-400" />
+            <h3 class="text-sm font-medium text-default uppercase tracking-wider">
+              Frontend Architecture
+            </h3>
+          </div>
+          <div class="space-y-4">
+            <div v-for="(step, i) in frontendSteps" :key="i" class="flex items-start gap-3">
+              <div class="flex flex-col items-center">
+                <div
+                  class="w-7 h-7 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 flex-shrink-0"
+                >
+                  <UIcon :name="step.icon" class="w-3.5 h-3.5" />
+                </div>
+                <div v-if="i < frontendSteps.length - 1" class="w-px h-6 bg-zinc-700 mt-1" />
+              </div>
+              <div class="pt-1">
+                <p class="text-sm text-default font-medium">{{ step.title }}</p>
+                <p class="text-xs text-dimmed mt-0.5">{{ step.detail }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Authentication Flow -->
         <div class="p-6 rounded-2xl border border-default bg-app-card-light">
           <div class="flex items-center gap-2 mb-6">
@@ -288,21 +319,14 @@
             </h3>
           </div>
           <div class="space-y-4">
-            <div
-              v-for="(step, i) in authSteps"
-              :key="i"
-              class="flex items-start gap-3"
-            >
+            <div v-for="(step, i) in authSteps" :key="i" class="flex items-start gap-3">
               <div class="flex flex-col items-center">
                 <div
                   class="w-7 h-7 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs font-medium flex-shrink-0"
                 >
                   {{ i + 1 }}
                 </div>
-                <div
-                  v-if="i < authSteps.length - 1"
-                  class="w-px h-6 bg-zinc-700 mt-1"
-                />
+                <div v-if="i < authSteps.length - 1" class="w-px h-6 bg-zinc-700 mt-1" />
               </div>
               <div class="pt-1">
                 <p class="text-sm text-default font-medium">{{ step.title }}</p>
@@ -316,26 +340,17 @@
         <div class="p-6 rounded-2xl border border-default bg-app-card-light">
           <div class="flex items-center gap-2 mb-6">
             <UIcon name="i-lucide-database" class="w-4 h-4 text-blue-400" />
-            <h3 class="text-sm font-medium text-default uppercase tracking-wider">
-              Data Pipeline
-            </h3>
+            <h3 class="text-sm font-medium text-default uppercase tracking-wider">Data Pipeline</h3>
           </div>
           <div class="space-y-4">
-            <div
-              v-for="(step, i) in pipelineSteps"
-              :key="i"
-              class="flex items-start gap-3"
-            >
+            <div v-for="(step, i) in pipelineSteps" :key="i" class="flex items-start gap-3">
               <div class="flex flex-col items-center">
                 <div
                   class="w-7 h-7 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-medium flex-shrink-0"
                 >
                   {{ i + 1 }}
                 </div>
-                <div
-                  v-if="i < pipelineSteps.length - 1"
-                  class="w-px h-6 bg-zinc-700 mt-1"
-                />
+                <div v-if="i < pipelineSteps.length - 1" class="w-px h-6 bg-zinc-700 mt-1" />
               </div>
               <div class="pt-1">
                 <p class="text-sm text-default font-medium">{{ step.title }}</p>
@@ -365,19 +380,12 @@
           Tech Stack
         </p>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-          <div
-            v-for="group in stackGroups"
-            :key="group.label"
-          >
+          <div v-for="group in stackGroups" :key="group.label">
             <p class="text-[10px] uppercase tracking-widest text-dimmed font-medium mb-3">
               {{ group.label }}
             </p>
             <div class="space-y-2">
-              <div
-                v-for="item in group.items"
-                :key="item.name"
-                class="flex items-center gap-2"
-              >
+              <div v-for="item in group.items" :key="item.name" class="flex items-center gap-2">
                 <UIcon :name="item.icon" class="w-4 h-4 text-muted" />
                 <span class="text-sm text-default">{{ item.name }}</span>
               </div>
@@ -477,18 +485,50 @@ const roadmapItems = [
   },
 ];
 
+const frontendSteps = [
+  {
+    icon: "i-lucide-component",
+    title: "Component architecture",
+    detail: "Nuxt UI 4 primitives composed into domain components (charts, tables, wallet)",
+  },
+  {
+    icon: "i-lucide-refresh-cw",
+    title: "TanStack Query",
+    detail: "Declarative data fetching with cache keys, stale-time, and automatic refetching",
+  },
+  {
+    icon: "i-lucide-bar-chart-3",
+    title: "Unovis charts",
+    detail: "Area charts with crosshair tooltips, donut allocation, and responsive layouts",
+  },
+  {
+    icon: "i-lucide-share-2",
+    title: "Shared composables",
+    detail: "Reusable hooks for demo mode, portfolio queries, and wallet state",
+  },
+];
+
 const authSteps = [
   { title: "Nonce requested", detail: "Client fetches a one-time nonce from /api/auth/nonce" },
   { title: "SIWE message signed", detail: "User signs an EIP-4361 message via Reown AppKit" },
-  { title: "Signature verified", detail: "Server validates signature with viem against a public RPC" },
+  {
+    title: "Signature verified",
+    detail: "Server validates signature with viem against a public RPC",
+  },
   { title: "Session created", detail: "Encrypted session stored with wallet address and chain ID" },
 ];
 
 const pipelineSteps = [
   { title: "Alchemy API", detail: "Paginated token fetches across 10 EVM networks with retry" },
-  { title: "Portfolio endpoint", detail: "Zod-validated response with dedup, filtering, and enrichment" },
+  {
+    title: "Portfolio endpoint",
+    detail: "Zod-validated response with dedup, filtering, and enrichment",
+  },
   { title: "CRON snapshot", detail: "Daily Vercel CRON persists portfolio state to Supabase" },
-  { title: "History & charts", detail: "TanStack Query fetches snapshots, Unovis renders the chart" },
+  {
+    title: "History & charts",
+    detail: "TanStack Query fetches snapshots, Unovis renders the chart",
+  },
 ];
 
 const stackGroups = [
@@ -541,7 +581,6 @@ const techBadges = [
   "TanStack Query with stale-time caching",
   "Layered service architecture",
   "Vitest test suites (unit + integration)",
-  "TypeScript strict mode end-to-end",
 ];
 
 const handleViewDemo = () => {
