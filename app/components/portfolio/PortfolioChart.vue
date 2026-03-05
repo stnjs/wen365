@@ -85,9 +85,7 @@
 
 <script setup lang="ts">
 import { VisXYContainer, VisArea, VisLine, VisAxis, VisCrosshair, VisTooltip } from "@unovis/vue";
-import { useQuery } from "@tanstack/vue-query";
 import { usePortfolioHistory } from "~/composables/queries/usePortfolioHistory";
-import type { PortfolioHistoryDto } from "#shared/types/PortfolioHistoryDto";
 
 interface ChartDatum {
   timestamp: number;
@@ -98,8 +96,8 @@ const props = defineProps<{
   address?: string;
   /** Current live portfolio value to append as the latest data point */
   currentValue?: number;
-  /** Use mock endpoint instead of real data (dev only) */
-  useMock?: boolean;
+  /** Use demo endpoint instead of real data */
+  demo?: boolean;
 }>();
 
 const timeRanges = [
@@ -111,21 +109,9 @@ const timeRanges = [
 
 const selectedDays = ref<number>(30);
 
-const mockQuery = useQuery<PortfolioHistoryDto>({
-  queryKey: ["portfolioHistory", "mock", selectedDays],
-  queryFn: () => $fetch("/api/portfolio/mock-history", { query: { days: selectedDays.value } }),
-  enabled: computed(() => !!props.useMock),
-  staleTime: 0,
-});
-
-const realQuery = usePortfolioHistory(
+const { data: history, isLoading } = usePortfolioHistory(
   computed(() => props.address ?? null),
-  { days: selectedDays },
-);
-
-const history = computed(() => (props.useMock ? mockQuery.data.value : realQuery.data.value));
-const isLoading = computed(() =>
-  props.useMock ? mockQuery.isLoading.value : realQuery.isLoading.value,
+  { days: selectedDays, demo: computed(() => !!props.demo) },
 );
 
 const startOfDay = (ms: number) => {
