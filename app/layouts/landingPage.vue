@@ -17,6 +17,7 @@
 
       <div class="hidden md:flex items-center gap-8 text-sm text-muted font-medium">
         <a href="#features" class="hover:text-default transition-colors">Features</a>
+        <a href="#architecture" class="hover:text-default transition-colors">Architecture</a>
         <a href="#tech" class="hover:text-default transition-colors">Tech Stack</a>
       </div>
       <template #right>
@@ -51,6 +52,15 @@
             >
               <UIcon name="i-lucide-github" class="w-5 h-5" />
             </a>
+            <a
+              href=""
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-dimmed hover:text-default transition-colors"
+              aria-label="LinkedIn profile"
+            >
+              <UIcon name="i-lucide-linkedin" class="w-5 h-5" />
+            </a>
           </div>
         </div>
       </template>
@@ -63,6 +73,11 @@
             >
             <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors"
               >Features</a
+            >
+            <a
+              href="#architecture"
+              class="text-dimmed text-xs hover:text-default transition-colors"
+              >Architecture</a
             >
             <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors"
               >Tech Stack</a

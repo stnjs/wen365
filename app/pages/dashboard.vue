@@ -12,6 +12,20 @@
           </template>
         </UDashboardNavbar>
         <UDashboardToolbar>
+          <template #left>
+            <div
+              v-if="isDemoMode && !address"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20"
+            >
+              <UIcon name="i-lucide-flask-conical" class="size-3.5 text-amber-400" />
+              <span class="text-xs text-amber-400 font-medium">
+                Viewing demo data.
+                <span class="text-amber-400/70"
+                  >Connect your wallet to see your real portfolio.</span
+                >
+              </span>
+            </div>
+          </template>
           <template #right>
             <div class="flex items-center gap-2">
               <span v-if="lastUpdated" class="text-xs text-dimmed">
@@ -32,8 +46,8 @@
       </template>
       <template #body>
         <div>
-          <!-- Empty State - No Wallet Connected -->
-          <div v-if="!address" class="text-center py-12">
+          <!-- Empty State - No Wallet Connected and not in demo mode -->
+          <div v-if="!address && !isDemoMode" class="text-center py-12">
             <UEmpty
               icon="i-lucide-wallet"
               description="Connect your wallet to view your portfolio"
@@ -56,7 +70,11 @@
 
               <!-- Portfolio Graph Card -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
-                <PortfolioChart :address="address" :current-value="portfolio?.totalValue" />
+                <PortfolioChart
+                  :address="address"
+                  :current-value="portfolio?.totalValue"
+                  :demo="showDemo"
+                />
               </UCard>
             </div>
 
@@ -71,7 +89,6 @@
                   </div>
                 </template>
                 <div class="p-6 space-y-5">
-                  <!-- Placeholder maturity bars - will be replaced with real data -->
                   <div v-if="tokens.length > 0">
                     <div
                       v-for="(token, index) in tokens.slice(0, 3)"
@@ -133,20 +150,18 @@ import AssetAllocationChart from "~/components/AssetAllocationChart.vue";
 import PortfolioChart from "~/components/portfolio/PortfolioChart.vue";
 import NetWorthCard from "~/components/portfolio/NetWorthCard.vue";
 
-// Protect this route with auth middleware
-// definePageMeta({
-//   middleware: "auth",
-// });
-
 const accountData = useAppKitAccount();
 const address = computed<string | undefined>(() => accountData.value?.address);
+
+const { isDemoMode } = useDemoMode();
+const showDemo = computed<boolean>(() => isDemoMode.value && !address.value);
 
 const {
   data: portfolio,
   isLoading,
   refetch: refetchPortfolio,
   dataUpdatedAt,
-} = usePortfolio(address);
+} = usePortfolio(address, { demo: showDemo });
 
 const lastUpdated = computed<string>(() => {
   if (!dataUpdatedAt.value) return "";
