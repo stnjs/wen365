@@ -23,7 +23,7 @@ const props = withDefaults(
   }>(),
   {
     size: "md",
-    to: "/dashboard",
+    to: "/",
   },
 );
 const style = computed(() => {
