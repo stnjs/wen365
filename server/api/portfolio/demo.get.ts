@@ -1,5 +1,5 @@
 /**
- * Returns static demo portfolio data so recruiters can explore
+ * Returns static demo portfolio data so users can explore
  * the dashboard without connecting a wallet.
  */
 export default defineEventHandler((): PortfolioDto => {
@@ -16,7 +16,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "ETH",
           decimals: 18,
           name: "Ethereum",
-          logo: "https://token-icons.s3.amazonaws.com/eth.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
         },
         tokenPrice: 3245.12,
         tokenValue: 27328.98,
@@ -30,7 +30,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "WETH",
           decimals: 18,
           name: "Wrapped Ether",
-          logo: "https://token-icons.s3.amazonaws.com/eth.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
         },
         tokenPrice: 3245.12,
         tokenValue: 6830.98,
@@ -44,7 +44,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "USDC",
           decimals: 6,
           name: "USD Coin",
-          logo: "https://token-icons.s3.amazonaws.com/usdc.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png",
         },
         tokenPrice: 1.0,
         tokenValue: 5200.0,
@@ -58,7 +58,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "ETH",
           decimals: 18,
           name: "Ethereum",
-          logo: "https://token-icons.s3.amazonaws.com/eth.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
         },
         tokenPrice: 3245.12,
         tokenValue: 4056.4,
@@ -72,7 +72,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "LINK",
           decimals: 18,
           name: "Chainlink",
-          logo: "https://token-icons.s3.amazonaws.com/link.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png",
         },
         tokenPrice: 14.82,
         tokenValue: 2749.11,
@@ -86,7 +86,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "OP",
           decimals: 18,
           name: "Optimism",
-          logo: "https://token-icons.s3.amazonaws.com/op.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png",
         },
         tokenPrice: 2.35,
         tokenValue: 752.0,
@@ -100,7 +100,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "ARB",
           decimals: 18,
           name: "Arbitrum",
-          logo: "https://token-icons.s3.amazonaws.com/arb.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png",
         },
         tokenPrice: 1.18,
         tokenValue: 483.8,
@@ -114,7 +114,7 @@ export default defineEventHandler((): PortfolioDto => {
           symbol: "POL",
           decimals: 18,
           name: "POL (ex-MATIC)",
-          logo: "https://token-icons.s3.amazonaws.com/matic.png",
+          logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
         },
         tokenPrice: 0.83,
         tokenValue: 431.34,

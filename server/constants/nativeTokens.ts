@@ -11,19 +11,19 @@ export const NATIVE_TOKENS: Partial<Record<NetworkId, AlchemyTokenMetadata>> = {
     symbol: "MATIC",
     decimals: 18,
     name: "Polygon",
-    logo: "https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png",
   },
   "avax-mainnet": {
     symbol: "AVAX",
     decimals: 18,
     name: "Avalanche",
-    logo: "https://assets.coingecko.com/coins/images/12559/large/avalanche-avax-logo.png",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png",
   },
   "bnb-mainnet": {
     symbol: "BNB",
     decimals: 18,
     name: "BNB",
-    logo: "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png",
+    logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png",
   },
 };
 
@@ -34,5 +34,5 @@ export const DEFAULT_ETH_METADATA: AlchemyTokenMetadata = {
   symbol: "ETH",
   decimals: 18,
   name: "Ethereum",
-  logo: "https://assets.coingecko.com/coins/images/279/large/ethereum.png",
+  logo: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
 };

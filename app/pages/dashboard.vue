@@ -20,7 +20,7 @@
               <UIcon name="i-lucide-flask-conical" class="size-3.5 text-amber-400" />
               <span class="text-xs text-amber-400 font-medium">
                 Viewing demo data.
-                <span class="text-amber-400/70"
+                <span class="hidden sm:inline text-amber-400/70"
                   >Connect your wallet to see your real portfolio.</span
                 >
               </span>
