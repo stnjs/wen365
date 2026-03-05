@@ -1,7 +1,7 @@
 {
   "name": "wen365",
   "version": "1.0.0",
-  "description": "Crypto-native web app for tracking crypto asset holding periods with FIFO logic for tax exemptions",
+  "description": "Full-stack crypto portfolio tracker demo built with Nuxt 4",
   "private": true,
   "type": "module",
   "scripts": {

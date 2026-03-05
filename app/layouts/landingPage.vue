@@ -17,9 +17,7 @@
 
       <div class="hidden md:flex items-center gap-8 text-sm text-muted font-medium">
         <a href="#features" class="hover:text-default transition-colors">Features</a>
-        <a href="#" class="hover:text-default transition-colors">Tax Engine</a>
-        <a href="#" class="hover:text-default transition-colors">Chains</a>
-        <a href="#" class="hover:text-default transition-colors">Pricing</a>
+        <a href="#tech" class="hover:text-default transition-colors">Tech Stack</a>
       </div>
       <template #right>
         <ConnectWalletButton />
@@ -40,27 +38,18 @@
             <span class="text-default font-medium tracking-tighter">wen365</span>
           </div>
           <p class="text-dimmed text-xs max-w-50 mb-4">
-            © 2025 wen365<br />
-            Mastering time and value on-chain.
+            A full-stack crypto portfolio tracker.<br />
+            Built as an open-source technical demo.
           </p>
           <div class="flex items-center gap-4">
             <a
-              href=""
+              href="https://github.com/mtp721/wen365"
               target="_blank"
               rel="noopener noreferrer"
               class="text-dimmed hover:text-default transition-colors"
-              aria-label="Follow us on X"
+              aria-label="View source on GitHub"
             >
-              <UIcon name="i-lucide-twitter" class="w-5 h-5" />
-            </a>
-            <a
-              href=""
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-dimmed hover:text-default transition-colors"
-              aria-label="Follow us on LinkedIn"
-            >
-              <UIcon name="i-lucide-linkedin" class="w-5 h-5" />
+              <UIcon name="i-lucide-github" class="w-5 h-5" />
             </a>
           </div>
         </div>
@@ -70,33 +59,20 @@
         <div class="flex gap-16">
           <div class="flex flex-col gap-3">
             <span class="text-xs font-medium text-default uppercase tracking-widest mb-1"
-              >Product</span
+              >Explore</span
             >
             <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors"
               >Features</a
             >
-            <a href="#" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Integrations</a
+            <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors"
+              >Tech Stack</a
             >
-            <a href="#" class="text-dimmed text-xs hover:text-default transition-colors">Pricing</a>
-          </div>
-          <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-default uppercase tracking-widest mb-1"
-              >Legal</span
-            >
-            <NuxtLink to="/privacy" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Privacy</NuxtLink
-            >
-            <NuxtLink to="/terms" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Terms</NuxtLink
-            >
-            <NuxtLink
-              to="/disclaimer"
+            <a
+              href="https://github.com/mtp721/wen365"
+              target="_blank"
+              rel="noopener noreferrer"
               class="text-dimmed text-xs hover:text-default transition-colors"
-              >Disclaimer</NuxtLink
-            >
-            <NuxtLink to="/cookies" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Cookie Policy</NuxtLink
+              >Source Code</a
             >
           </div>
         </div>

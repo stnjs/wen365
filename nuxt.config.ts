@@ -75,14 +75,13 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: "Wen365 - Portfolio & Tax Tracking",
+      title: "Wen365 - Crypto Portfolio Tracker",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
-          content:
-            "A comprehensive portfolio tracker, tax status tracker for held assets, and asset visualization tool. Track your crypto assets across multiple blockchains.",
+          content: "A full-stack crypto portfolio tracker demo built with Nuxt 4",
         },
         { name: "theme-color", content: "#000000" }, // Black theme
       ],
