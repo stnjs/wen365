@@ -146,7 +146,7 @@ const { page, limit } = validateQuery(event, QuerySchema);
 // ❌ Bad: hand-rolled validation that bypasses the taxonomy
 const walletAddress = getRouterParam(event, "walletAddress");
 if (!walletAddress || !isAddress(walletAddress)) {
-  throw createError({ statusCode: 400, statusMessage: "Invalid wallet address format" });
+  throw validation("Invalid wallet address format");
 }
 ```
 

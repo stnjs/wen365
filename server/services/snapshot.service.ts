@@ -1,7 +1,8 @@
+import { isAddress } from "viem";
 import type { PortfolioSnapshot, SnapshotRepo, SnapshotToken, WalletRepo } from "@server/repos";
 import { getPortfolio } from "@server/services/portfolio.service";
 import { logError, logInfo, logWarn } from "@server/utils/logger";
-import { DomainError } from "@server/errors";
+import { DomainError, validation } from "@server/errors";
 
 /**
  * Create a Portfolio Snapshot for the given Wallet Address.
@@ -15,6 +16,12 @@ export async function createSnapshot(
   wallets: WalletRepo,
   snapshots: SnapshotRepo,
 ): Promise<PortfolioSnapshot> {
+  if (!isAddress(walletAddress)) {
+    throw validation("Invalid wallet address format", {
+      details: { walletAddress },
+    });
+  }
+
   const wallet = await wallets.getOrCreate(walletAddress);
   const portfolio = await getPortfolio(walletAddress, alchemyApiKey);
 
@@ -112,8 +119,7 @@ export async function compute24hDelta(
 
     const previousValue = previous.total_value;
     const change = currentTotal - previousValue;
-    const changePercent =
-      previousValue > 0 ? (change / previousValue) * 100 : 0;
+    const changePercent = previousValue > 0 ? (change / previousValue) * 100 : 0;
 
     return {
       change: roundToCents(change),

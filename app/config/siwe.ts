@@ -78,6 +78,19 @@ const signOut = async (): Promise<boolean> => {
 };
 
 /**
+ * Refresh the nuxt-auth-utils client session cache so `loggedIn` updates
+ * reactively across the app (landing-page redirect, route middleware, etc.)
+ * after the server has set or cleared the session cookie.
+ */
+const refreshUserSession = async (): Promise<void> => {
+  try {
+    await useUserSession().fetch();
+  } catch (_error) {
+    // Best-effort — the next page load will pick up the correct session.
+  }
+};
+
+/**
  * Create a SIWE configuration object
  */
 export const siweConfig = createSIWEConfig({
@@ -92,4 +105,10 @@ export const siweConfig = createSIWEConfig({
   getSession,
   verifyMessage,
   signOut,
+  onSignIn: () => {
+    void refreshUserSession();
+  },
+  onSignOut: () => {
+    void refreshUserSession();
+  },
 });
