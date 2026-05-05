@@ -1,14 +1,18 @@
 /**
- * Maps data to PortfolioDto
- * Pure transformation function - no business logic
- * @param totalValue - Pre-calculated total portfolio value
- * @param tokens - Pre-processed and filtered tokens
+ * Maps data to PortfolioDto.
+ *
+ * Pure transformation — no business logic. The 24h delta fields default to
+ * `null` ("no data"); handlers populate them via compute24hDelta when history
+ * is available.
  */
-export function mapToPortfolioDto(totalValue: number, tokens: TokenDto[]): PortfolioDto {
+export function mapToPortfolioDto(
+  totalValue: number,
+  tokens: TokenDto[],
+): PortfolioDto {
   return {
     totalValue,
-    totalValueChange24h: 0,
-    totalValueChangePercent24h: 0,
+    totalValueChange24h: null,
+    totalValueChangePercent24h: null,
     tokens,
   };
 }

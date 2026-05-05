@@ -14,6 +14,72 @@ This project uses **Nuxt 4** with **Nitro** for server-side and API implementati
 - **Nitro**: Nuxt's server engine
 - **TypeScript**: Type-safe server code with strict mode
 
+## Domain Errors and Repositories (authoritative)
+
+Two architectural decisions govern how server code is shaped. Read them before writing new server code:
+
+- `@docs/adr/0004-domain-error-taxonomy.md` — every throw below the HTTP edge uses a `DomainError` factory from `@server/errors`. Handlers catch once and call `toHttp(err, event)`. The old `createError` + `statusCode` discipline is **retired**.
+- `@docs/adr/0005-repository-pattern-for-persistence.md` — services take `WalletRepo` / `SnapshotRepo` parameters, never `H3Event` or `SupabaseClient`. Handlers build repos via `reposFromEvent(event)`.
+
+### Canonical handler shape
+
+```typescript
+import { reposFromEvent } from "@server/repos";
+import { forbidden, toHttp } from "@server/errors";
+import { validateParams } from "@server/utils/validation";
+
+export default defineEventHandler(async event => {
+  try {
+    const session = await requireUserSession(event);
+    const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
+
+    if (session.user.address.toLowerCase() !== walletAddress.toLowerCase()) {
+      throw forbidden("Session wallet does not match requested address");
+    }
+
+    const { wallets, snapshots } = reposFromEvent(event);
+    return await doTheWork(walletAddress, wallets, snapshots);
+  } catch (err) {
+    toHttp(err, event);
+  }
+});
+```
+
+### Throw sites (below the HTTP edge)
+
+Always pick the most specific `DomainError` factory — never `new Error(...)`:
+
+```typescript
+import {
+  notFound,
+  forbidden,
+  validation,
+  preconditionFailed,
+  upstreamFailed,
+  internal,
+} from "@server/errors";
+
+if (!wallet) throw notFound("Wallet", { details: { address } });
+if (!config.alchemyApiKey) throw internal("Missing ALCHEMY_API_KEY");
+
+// Wrap upstream calls at the adapter boundary:
+import { wrapUpstream } from "@server/errors";
+const data = await wrapUpstream("alchemy", () => fetchWithRetry(url, ...));
+```
+
+### What NOT to do
+
+```typescript
+// ❌ Bad: raw Error below the edge
+throw new Error(`Failed to register wallet: ${err.message}`);
+
+// ❌ Bad: createError inside a service
+throw createError({ statusCode: 404, statusMessage: "Wallet not found" });
+
+// ❌ Bad: manually mapping upstream status codes in a handler
+if (err.statusCode === 429) throw createError({ statusCode: 503, ... });
+```
+
 ## Type Imports
 
 Nuxt 4 automatically imports all types from `shared/types/`. **Do not** explicitly import types from `shared/types/` - they are available globally.
@@ -59,31 +125,29 @@ Before deploying server code to production, ensure:
 
 ### Input Validation and Sanitization
 
-Always validate and sanitize ALL inputs (route parameters, query parameters, request body).
+Always validate and sanitize ALL inputs. Use the Zod-backed helpers in `@server/utils/validation` — they convert `ZodError` into `DomainError("validation")` so the outer `toHttp` turns it into a clean 400 with structured `data.errors`.
 
 ```typescript
-// ✅ Good: Validate all inputs
-import { isAddress } from "viem"; // For blockchain addresses
-import { z } from "zod"; // For general validation
+// ✅ Good: Zod + the validation helpers
+import { z } from "zod";
+import { validateParams, validateQuery, validateBody } from "@server/utils/validation";
+import { WalletAddressParamsSchema } from "@server/types/common";
 
+const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
+
+const QuerySchema = z.object({
+  page: z.string().optional().transform(v => (v ? parseInt(v, 10) : 1))
+    .pipe(z.number().int().positive()),
+  limit: z.string().optional().transform(v => (v ? parseInt(v, 10) : 20))
+    .pipe(z.number().int().min(1).max(100)),
+});
+const { page, limit } = validateQuery(event, QuerySchema);
+
+// ❌ Bad: hand-rolled validation that bypasses the taxonomy
 const walletAddress = getRouterParam(event, "walletAddress");
 if (!walletAddress || !isAddress(walletAddress)) {
-  throw createError({
-    statusCode: 400,
-    statusMessage: "Invalid wallet address format",
-  });
+  throw createError({ statusCode: 400, statusMessage: "Invalid wallet address format" });
 }
-
-const query = getQuery(event);
-const schema = z.object({
-  page: z.number().int().positive().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-});
-const validatedQuery = schema.parse(query);
-
-// ❌ Bad: No validation, trust user input
-const walletAddress = getRouterParam(event, "walletAddress");
-const page = getQuery(event).page; // Could be anything
 ```
 
 ### API Key and Configuration Validation
@@ -108,23 +172,21 @@ const apiKey = config.alchemyApiKey; // Could be undefined
 
 ### Error Message Sanitization
 
-Never expose sensitive information in error messages. Log detailed errors server-side, but return generic messages to clients.
+Never expose sensitive information in error messages. Sanitization is built into `toHttp(err, event)` — it emits only the sanitized status message per `DomainError.kind` and attaches `details` as `data`. The raw `message` and `cause` are logged but never sent to the client.
 
 ```typescript
-// ✅ Good: Sanitized error messages
-catch (error: any) {
-  logger.error({ error: error.message, requestId }, "Request failed");
-  throw createError({
-    statusCode: 500,
-    statusMessage: "Internal server error",
-  });
+// ✅ Good: one catch, one toHttp. Sanitization is automatic.
+try {
+  ...
+} catch (err) {
+  toHttp(err, event);
 }
 
-// ❌ Bad: Leaks error details
-catch (error: any) {
+// ❌ Bad: manual sanitization on every handler
+catch (err: any) {
   throw createError({
-    statusCode: error.statusCode || 500,
-    statusMessage: error.message, // May contain sensitive info
+    statusCode: err.statusCode || 500,
+    statusMessage: err.message, // Leaks internal detail.
   });
 }
 ```
@@ -141,32 +203,20 @@ Follow RESTful conventions: Use appropriate HTTP methods (GET, POST, PUT, DELETE
 
 ### HTTP Status Codes
 
-Use appropriate HTTP status codes: `200 OK` (successful GET/PUT/PATCH), `201 Created` (POST success), `400 Bad Request` (invalid input), `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `429 Too Many Requests`, `500 Internal Server Error`, `503 Service Unavailable`.
+HTTP status codes are derived mechanically from the `DomainError.kind` in `server/errors/toHttp.ts`. Don't pick status codes directly — pick a `kind` that describes the failure, and the mapping takes care of the HTTP layer.
 
-```typescript
-// ✅ Good: Appropriate status codes
-if (!walletAddress) {
-  throw createError({
-    statusCode: 400,
-    statusMessage: "Wallet address is required",
-  });
-}
+| Kind | HTTP |
+|---|---|
+| `notFound` | 404 |
+| `unauthorized` | 401 |
+| `forbidden` | 403 |
+| `validation` | 400 |
+| `preconditionFailed` | 400 |
+| `rateLimited` | 503 |
+| `upstreamFailed` | 502 |
+| `internal` | 500 |
 
-if (error.statusCode === 429) {
-  throw createError({
-    statusCode: 503,
-    statusMessage: "Service temporarily unavailable",
-  });
-}
-
-// ❌ Bad: Wrong status codes
-if (!walletAddress) {
-  throw createError({
-    statusCode: 500, // Should be 400
-    statusMessage: "Wallet address is required",
-  });
-}
-```
+If a new HTTP case genuinely can't be described by these, add a new kind (and its mapping) together in the same change. Never bypass the taxonomy with a direct `createError({ statusCode: ... })` at a throw site.
 
 ### Request/Response Structure
 
@@ -200,10 +250,12 @@ throw createError({
 
 Follow the layered architecture pattern:
 
-1. **API Handlers** (`server/api/`): Handle HTTP requests/responses
-2. **Services** (`server/services/`): Business logic and orchestration
-3. **Mappers** (`server/mappers/`): Pure transformation functions
-4. **Utils** (`server/utils/`): Reusable utility functions
+1. **API Handlers** (`server/api/`): HTTP edge. Build repos via `reposFromEvent`, call services, translate errors via `toHttp`.
+2. **Services** (`server/services/`): Business logic and orchestration. Accept `WalletRepo` / `SnapshotRepo`; never see `H3Event`.
+3. **Repos** (`server/repos/`): Persistence. Supabase adapters + in-memory adapters for tests. See ADR-0005.
+4. **Errors** (`server/errors/`): `DomainError` taxonomy, HTTP translation, upstream wrapper. See ADR-0004.
+5. **Mappers** (`server/mappers/`): Pure transformation functions.
+6. **Utils** (`server/utils/`): Reusable utility functions.
 
 ```typescript
 // ✅ Good: Clear separation
@@ -218,7 +270,7 @@ export default defineEventHandler(async event => {
 
 ### Service Layer Pattern
 
-Services handle business logic and orchestration: call external APIs, coordinate between data sources, apply business rules. Services should be testable (can be mocked).
+Services handle business logic and orchestration: call external APIs, coordinate between data sources, apply business rules. Services take repo interfaces (not `H3Event`, not a concrete client), so they're exercised under test with `createInMemoryWalletRepo()` / `createInMemorySnapshotRepo()`.
 
 ### Pure Functions
 
@@ -230,50 +282,24 @@ Use clear, descriptive function names: Services (`getPortfolio`, `createUser`), 
 
 ## Error Handling
 
-### Standardized Error Responses
+See the "Domain Errors and Repositories" section at the top of this file for the canonical pattern. In short:
 
-Always use `createError` from Nuxt for error responses. Never throw generic `Error` objects.
+- **Throw sites** (services, repos, utils): construct a `DomainError` via a factory (`notFound`, `validation`, `upstreamFailed`, ...).
+- **Upstream calls** (Alchemy, Supabase, anything over the network): wrap with `wrapUpstream("<source>", () => ...)` so 429 becomes `rateLimited` and everything else becomes `upstreamFailed("<source>")`.
+- **Handlers**: `try { ...work... } catch (err) { toHttp(err, event) }`. That's the entire error-handling surface at the HTTP edge.
 
-### Error Categorization
+### Error Categorization (by kind, not status)
 
-Categorize errors appropriately:
-
-- **Client Errors (4xx)**: Invalid input, missing parameters, unauthorized
-- **Server Errors (5xx)**: Internal errors, external API failures, configuration issues
-
-```typescript
-// ✅ Good: Categorized errors
-catch (error: any) {
-  if (error.statusCode === 429) {
-    // Rate limit - treat as service unavailable
-    throw createError({
-      statusCode: 503,
-      statusMessage: "Service temporarily unavailable",
-    });
-  }
-  if (error.statusCode >= 400 && error.statusCode < 500) {
-    // Client error - pass through with sanitization
-    throw createError({
-      statusCode: error.statusCode,
-      statusMessage: "Invalid request",
-    });
-  }
-  // Server error - log and return generic message
-  logger.error({ error: error.message }, "Request failed");
-  throw createError({
-    statusCode: 500,
-    statusMessage: "Internal server error",
-  });
-}
-
-// ❌ Bad: All errors treated the same
-catch (error: any) {
-  throw createError({
-    statusCode: error.statusCode || 500,
-    statusMessage: error.message,
-  });
-}
-```
+| Scenario | Kind |
+|---|---|
+| Resource doesn't exist | `notFound("Wallet")` |
+| Caller not authenticated | `unauthorized()` |
+| Caller authenticated but not allowed | `forbidden()` |
+| Input shape invalid | `validation(message, { details })` |
+| State not suitable (expired nonce, stale etag) | `preconditionFailed(message)` |
+| Hit a rate limit on an upstream | `rateLimited()` (usually via `wrapUpstream`) |
+| Upstream failed for any other reason | `upstreamFailed("<source>", { cause })` |
+| Programmer-level / configuration | `internal(message)` |
 
 ### Error Logging
 
@@ -509,9 +535,11 @@ while (condition) {
 
 Reference existing code for patterns:
 
-- `@server/api/portfolio/[walletAddress].get.ts` - API handler example
-- `@server/services/portfolio.service.ts` - Service layer example
-- `@server/mappers/portfolio.mapper.ts` - Mapper pattern example
+- `@server/api/portfolio/[walletAddress].get.ts` - Handler pattern (repos-from-event + toHttp).
+- `@server/services/snapshot.service.ts` - Service taking repo parameters + `compute24hDelta` degradation.
+- `@server/errors/` - `DomainError`, `toHttp`, `wrapUpstream`.
+- `@server/repos/` - Repository interfaces + Supabase and in-memory adapters.
+- `@server/mappers/portfolio.mapper.ts` - Mapper pattern.
 
 ## Additional Resources
 
