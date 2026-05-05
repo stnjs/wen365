@@ -75,8 +75,8 @@ describe("portfolio.service", () => {
       expect(result).toHaveProperty("totalValueChangePercent24h");
       expect(result).toHaveProperty("tokens");
       expect(Array.isArray(result.tokens)).toBe(true);
-      expect(result.totalValueChange24h).toBe(0);
-      expect(result.totalValueChangePercent24h).toBe(0);
+      expect(result.totalValueChange24h).toBeNull();
+      expect(result.totalValueChangePercent24h).toBeNull();
     });
 
     it("should handle empty portfolio gracefully", async () => {

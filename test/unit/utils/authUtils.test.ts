@@ -99,19 +99,19 @@ Issued At: 2024-01-01T00:00:00.000Z`;
     it("should throw error for empty message", () => {
       expect(() => {
         validateSiweMessage("", expectedDomain, expectedUri);
-      }).toThrow("Message is required and must be a string");
+      }).toThrow("SIWE message is required and must be a string");
     });
 
     it("should throw error for null message", () => {
       expect(() => {
         validateSiweMessage(null as unknown as string, expectedDomain, expectedUri);
-      }).toThrow("Message is required and must be a string");
+      }).toThrow("SIWE message is required and must be a string");
     });
 
     it("should throw error for non-string message", () => {
       expect(() => {
         validateSiweMessage(123 as unknown as string, expectedDomain, expectedUri);
-      }).toThrow("Message is required and must be a string");
+      }).toThrow("SIWE message is required and must be a string");
     });
 
     it("should throw error for invalid SIWE message format", () => {

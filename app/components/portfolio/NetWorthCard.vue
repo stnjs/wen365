@@ -35,8 +35,8 @@
 <script setup lang="ts">
 interface NetWorthCardProps {
   totalValue?: number;
-  valueChange24h?: number;
-  valueChangePercent24h?: number;
+  valueChange24h?: number | null;
+  valueChangePercent24h?: number | null;
 }
 
 const props = defineProps<NetWorthCardProps>();

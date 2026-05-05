@@ -258,8 +258,8 @@ describe("portfolio.mapper", () => {
       const result = mapToPortfolioDto(totalValue, tokens);
 
       expect(result.totalValue).toBe(5000.5);
-      expect(result.totalValueChange24h).toBe(0);
-      expect(result.totalValueChangePercent24h).toBe(0);
+      expect(result.totalValueChange24h).toBeNull();
+      expect(result.totalValueChangePercent24h).toBeNull();
       expect(result.tokens).toEqual(tokens);
       expect(result.tokens).toHaveLength(2);
     });
@@ -281,11 +281,11 @@ describe("portfolio.mapper", () => {
       expect(result.totalValue).toBe(12345.67);
     });
 
-    it("should set 24h change fields to 0", () => {
+    it("should default 24h change fields to null (no history)", () => {
       const result = mapToPortfolioDto(1000, []);
 
-      expect(result.totalValueChange24h).toBe(0);
-      expect(result.totalValueChangePercent24h).toBe(0);
+      expect(result.totalValueChange24h).toBeNull();
+      expect(result.totalValueChangePercent24h).toBeNull();
     });
   });
 });

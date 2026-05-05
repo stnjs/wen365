@@ -1,64 +1,59 @@
+import { z } from "zod";
 import { getSnapshotHistory } from "@server/services/snapshot.service";
-import { handleServiceError } from "@server/utils/errorHandler";
-import { validateParams } from "@server/utils/validation";
+import { reposFromEvent } from "@server/repos";
+import { forbidden, toHttp } from "@server/errors";
+import { validateParams, validateQuery } from "@server/utils/validation";
 import { WalletAddressParamsSchema } from "@server/types/common";
 import type { PortfolioHistoryDto } from "#shared/types/PortfolioHistoryDto";
 
-const DEFAULT_DAYS = 30;
-const MAX_DAYS = 365;
+const HistoryQuerySchema = z.object({
+  days: z
+    .string()
+    .optional()
+    .transform(val => (val ? parseInt(val, 10) : 30))
+    .pipe(z.number().int().positive().max(365)),
+});
 
 export default defineEventHandler(async (event): Promise<PortfolioHistoryDto> => {
-  const session = await requireUserSession(event);
-
-  // Validate route params with Zod (also normalizes address to checksum format)
-  const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
-
-  // Validate that the user is the owner of the wallet
-  if (session.user.address.toLowerCase() !== walletAddress.toLowerCase()) {
-    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
-  }
-
-  // Get optional query params
-  const query = getQuery(event);
-  let days = DEFAULT_DAYS;
-
-  if (query.days) {
-    const parsedDays = parseInt(query.days as string, 10);
-    if (!isNaN(parsedDays) && parsedDays > 0 && parsedDays <= MAX_DAYS) {
-      days = parsedDays;
-    }
-  }
-
   try {
-    const snapshots = await getSnapshotHistory(event, walletAddress, days);
+    const session = await requireUserSession(event);
+    const { walletAddress } = validateParams(event, WalletAddressParamsSchema);
 
-    // Calculate value change from first to last snapshot
+    if (session.user.address.toLowerCase() !== walletAddress.toLowerCase()) {
+      throw forbidden("Session wallet does not match requested address");
+    }
+
+    const { days } = validateQuery(event, HistoryQuerySchema);
+
+    const { wallets, snapshots } = reposFromEvent(event);
+    const rows = await getSnapshotHistory(walletAddress, days, wallets, snapshots);
+
+    const snapshotPoints = rows.map(row => ({
+      timestamp: row.timestamp,
+      totalValue: row.total_value,
+    }));
+
     let valueChange = 0;
     let valueChangePercent = 0;
 
-    const firstSnapshot = snapshots.at(0);
-    const lastSnapshot = snapshots.at(-1);
+    const firstSnapshot = rows.at(0);
+    const lastSnapshot = rows.at(-1);
 
-    if (firstSnapshot && lastSnapshot && snapshots.length >= 2) {
+    if (firstSnapshot && lastSnapshot && rows.length >= 2) {
       const firstValue = firstSnapshot.total_value;
       const lastValue = lastSnapshot.total_value;
-
       valueChange = lastValue - firstValue;
-
       if (firstValue > 0) {
         valueChangePercent = ((lastValue - firstValue) / firstValue) * 100;
       }
     }
 
     return {
-      snapshots: snapshots.map(snapshot => ({
-        timestamp: snapshot.timestamp,
-        totalValue: snapshot.total_value,
-      })),
+      snapshots: snapshotPoints,
       valueChange: Math.round(valueChange * 100) / 100,
       valueChangePercent: Math.round(valueChangePercent * 100) / 100,
     };
-  } catch (error: unknown) {
-    handleServiceError(error);
+  } catch (err) {
+    toHttp(err, event);
   }
 });

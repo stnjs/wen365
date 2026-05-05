@@ -10,16 +10,10 @@ import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
 import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 import { fetchWithRetry } from "@server/utils/retryUtils";
+import { upstreamFailed, wrapUpstream } from "@server/errors";
 
 const MIN_TOKEN_VALUE_USD = 0.03;
-
-// Unused mock function - kept for potential future use
-// const _getAlchemyTokensByAddressMock = async () => {
-//   const response = await new Promise(resolve => setTimeout(resolve, 1000)).then(() => {
-//     return alchemyTokensByAddressMock;
-//   });
-//   return response as AlchemyTokensByAddressResponse;
-// };
+const MAX_PAGES = 100;
 
 export const getAlchemyTokensByAddress = async (
   walletAddress: string,
@@ -41,21 +35,30 @@ export const getAlchemyTokensByAddress = async (
 
   const url = `https://api.g.alchemy.com/data/v1/${alchemyApiKey}/assets/tokens/by-address`;
 
-  const response = await fetchWithRetry<unknown>(
-    url,
-    {
-      method: "POST",
-      body: responseBody,
-      timeout: 30000,
-    },
-    {
-      maxRetries: 3,
-      baseDelay: 1000,
-    },
+  const response = await wrapUpstream("alchemy", () =>
+    fetchWithRetry<unknown>(
+      url,
+      {
+        method: "POST",
+        body: responseBody,
+        timeout: 30000,
+      },
+      {
+        maxRetries: 3,
+        baseDelay: 1000,
+      },
+    ),
   );
 
-  // Validate external API response with Zod
-  return parseAlchemyResponse(response);
+  // Upstream contract violation is an upstream failure, not a client validation error.
+  try {
+    return parseAlchemyResponse(response);
+  } catch (err) {
+    throw upstreamFailed("alchemy", {
+      details: { reason: "contract_violation" },
+      cause: err,
+    });
+  }
 };
 
 /**
@@ -68,15 +71,20 @@ async function fetchAllAlchemyPages(
 ): Promise<AlchemyToken[]> {
   const allTokens: AlchemyToken[] = [];
   let pageKey: string | undefined = undefined;
-  const MAX_PAGES = 100;
   let pageCount = 0;
 
   do {
     if (pageCount >= MAX_PAGES) {
-      throw new Error("Maximum page limit reached");
+      throw upstreamFailed("alchemy", {
+        details: { reason: "max_pages_reached", maxPages: MAX_PAGES },
+      });
     }
 
-    const response = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey, pageKey);
+    const response = await getAlchemyTokensByAddress(
+      walletAddress,
+      alchemyApiKey,
+      pageKey,
+    );
     allTokens.push(...response.data.tokens);
     pageKey = response.data.pageKey || undefined;
     pageCount++;
@@ -88,7 +96,8 @@ async function fetchAllAlchemyPages(
 function isTokenBlacklisted(token: TokenDto): boolean {
   return BLACKLISTED_TOKENS.some(
     blacklistedToken =>
-      blacklistedToken.address === token.tokenAddress && blacklistedToken.network === token.network,
+      blacklistedToken.address === token.tokenAddress &&
+      blacklistedToken.network === token.network,
   );
 }
 
@@ -118,9 +127,6 @@ function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
   };
 }
 
-/**
- * Creates a unique key for a token based on network and address
- */
 function getTokenKey(token: TokenDto): string {
   return `${token.network}:${token.tokenAddress || "native"}`;
 }
@@ -143,13 +149,10 @@ function deduplicateTokens(tokens: TokenDto[]): TokenDto[] {
   return Array.from(tokenMap.values());
 }
 
-/**
- * Adds percentage to each token based on total portfolio value
- * @param tokens - Array of TokenDto
- * @param totalValue - Total portfolio value in USD
- * @returns Tokens with percentage field populated
- */
-function addPercentageToTokens(tokens: TokenDto[], totalValue: number): TokenDto[] {
+function addPercentageToTokens(
+  tokens: TokenDto[],
+  totalValue: number,
+): TokenDto[] {
   if (totalValue === 0) {
     return tokens.map(token => ({ ...token, percentage: 0 }));
   }
@@ -166,15 +169,31 @@ export async function getPortfolio(
 ): Promise<PortfolioDto> {
   const allAlchemyTokens = await fetchAllAlchemyPages(walletAddress, alchemyApiKey);
 
-  const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
+  const enrichedTokens = allAlchemyTokens.map(token =>
+    enrichNativeTokenMetadata(token),
+  );
 
-  // Transform to DTOs using Zod schema (validates + transforms)
-  const allTokenDtos = enrichedTokens.map(token => TokenDtoFromAlchemySchema.parse(token));
+  // Transform to DTOs using Zod schema (validates + transforms).
+  // Any ZodError here is an Alchemy contract violation — re-raise as upstream.
+  let allTokenDtos: TokenDto[];
+  try {
+    allTokenDtos = enrichedTokens.map(token =>
+      TokenDtoFromAlchemySchema.parse(token),
+    );
+  } catch (err) {
+    throw upstreamFailed("alchemy", {
+      details: { reason: "token_contract_violation" },
+      cause: err,
+    });
+  }
 
   const uniqueTokens = deduplicateTokens(allTokenDtos);
 
   const activeTokens = uniqueTokens
-    .filter(token => token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token))
+    .filter(
+      token =>
+        token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token),
+    )
     .sort((a, b) => b.tokenValue - a.tokenValue);
 
   const totalValue = roundToTwoDecimals(
