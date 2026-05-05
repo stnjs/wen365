@@ -459,6 +459,7 @@ import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
 const router = useRouter();
 const accountData = useAppKitAccount();
 const { enableDemo } = useDemoMode();
+const { loggedIn } = useUserSession();
 
 const isConnected = computed<boolean>(() => accountData.value?.isConnected || false);
 
@@ -587,4 +588,14 @@ const handleViewDemo = () => {
   enableDemo();
   router.push("/dashboard");
 };
+
+onMounted(() => {
+  if (loggedIn.value) return;
+
+  const stop = watch(loggedIn, async next => {
+    if (!next) return;
+    stop();
+    await navigateTo("/dashboard");
+  });
+});
 </script>
