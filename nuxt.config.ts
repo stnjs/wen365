@@ -22,9 +22,6 @@ export default defineNuxtConfig({
     typeCheck: true,
     tsConfig: {
       include: [
-        "../tests/**/*.ts",
-        "../tests/**/*.spec.ts",
-        "../tests/**/*.test.ts",
         "../test/**/*.ts",
         "../test/**/*.spec.ts",
         "../test/**/*.test.ts",
