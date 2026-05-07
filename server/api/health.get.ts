@@ -1,8 +1,8 @@
-export default defineEventHandler(async () => {
-  return {
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    version: "1.0.0",
-    environment: process.env.NODE_ENV || "development",
-  };
-});
+import pkg from "../../package.json";
+
+export default defineEventHandler(() => ({
+  status: "healthy",
+  timestamp: new Date().toISOString(),
+  version: pkg.version,
+  environment: process.env.NODE_ENV || "development",
+}));
