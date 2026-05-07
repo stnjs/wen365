@@ -1,23 +1,13 @@
 import { z } from "zod";
+import { NETWORKS, type NetworkId } from "#shared/config/networks";
 
-/**
- * Valid network identifiers
- */
-export const NETWORK_IDS = [
-  "eth-mainnet",
-  "matic-mainnet",
-  "base-mainnet",
-  "arb-mainnet",
-  "opt-mainnet",
-  "zksync-mainnet",
-  "avax-mainnet",
-  "linea-mainnet",
-  "scroll-mainnet",
-  "bnb-mainnet",
-] as const;
+// Re-exported here so Nuxt 4 auto-imports `NetworkId` everywhere.
+export type { NetworkId };
 
-/**
- * Zod schema for NetworkId
- */
+// Tuple-typed so z.enum accepts it.
+export const NETWORK_IDS = NETWORKS.map(n => n.alchemySlug) as [
+  NetworkId,
+  ...NetworkId[],
+];
+
 export const NetworkIdSchema = z.enum(NETWORK_IDS);
-export type NetworkId = (typeof NETWORK_IDS)[number];
