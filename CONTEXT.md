@@ -29,7 +29,7 @@ A persisted row in `portfolio_snapshots` recording a Wallet's total Portfolio va
 _Avoid_: history entry, record, checkpoint (the table name is the noun).
 
 **Network**:
-A supported EVM chain, identified by an Alchemy network slug (e.g. `eth-mainnet`, `base-mainnet`). The single source of truth is the server network registry.
+A supported EVM chain, identified by an Alchemy network slug (e.g. `eth-mainnet`, `base-mainnet`). The single source of truth is the shared `Network` registry at [`shared/config/networks.ts`](./shared/config/networks.ts) — every other consumer (server `SUPPORTED_NETWORKS`, wagmi `networks`, `NetworkId` type, landing page count) derives from it.
 _Avoid_: chain, blockchain (`chainId` is fine when referring specifically to the EIP-155 integer).
 
 ## Relationships
@@ -47,8 +47,8 @@ _Avoid_: chain, blockchain (`chainId` is fine when referring specifically to the
 > **Dev:** "What if the **Wallet** has no **Snapshots** yet?"
 > **Maintainer:** "Return the live **Portfolio** without 24h deltas. Missing **Snapshot** history is normal for a new **Wallet**, not an error."
 
-## Flagged ambiguities
+## Resolved ambiguities
 
-- **"wallet" vs "address"** — previously used interchangeably. Resolved: **Wallet** is the persisted record (has a UUID, `last_snapshot_at`, etc.); **Address** is the on-chain string. `getOrCreateWallet(address)` takes an Address and returns a Wallet.
-- **"supported networks"** — the server env list (`SUPPORTED_NETWORKS`), the client wagmi chain list, and the `NetworkId` type currently disagree. Resolution pending — will become a single registry (see forthcoming ADR).
-- **"portfolio"** — ambiguously used for "live Alchemy view" and "live view + 24h deltas from Snapshots". Resolved: **Portfolio** means the live view; 24h delta fields are present but may be `null` / `0` when Snapshot history is absent.
+- **"wallet" vs "address"** — previously used interchangeably. **Wallet** is the persisted record (has a UUID, `last_snapshot_at`, etc.); **Address** is the on-chain string. `getOrCreateWallet(address)` takes an Address and returns a Wallet.
+- **"supported networks"** — server, client, and type list previously disagreed. The shared registry at [`shared/config/networks.ts`](./shared/config/networks.ts) is now the only source; `SUPPORTED_NETWORKS`, the wagmi chain list, and the `NetworkId` type all derive from it. See [ADR-0006](./docs/adr/0006-shared-network-registry.md).
+- **"portfolio"** — previously ambiguous between "live Alchemy view" and "live view + 24h deltas from Snapshots". **Portfolio** is the live view; 24h delta fields are present but may be `null` / `0` when Snapshot history is absent.
