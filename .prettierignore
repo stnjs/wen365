@@ -49,6 +49,11 @@ pnpm-lock.yaml
 coverage/
 *.lcov
 
+# Test artifacts
+.playwright-mcp/
+playwright-report/
+test-results/
+
 # Temporary files
 *.tmp
 *.temp
