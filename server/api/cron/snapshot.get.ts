@@ -1,8 +1,5 @@
 import { reposFromEvent } from "@server/repos";
-import {
-  createSnapshot,
-  cleanupOldSnapshots,
-} from "@server/services/snapshot.service";
+import { createSnapshot, cleanupOldSnapshots } from "@server/services/snapshot.service";
 import { internal, unauthorized, toHttp } from "@server/errors";
 import { logError, logInfo, logWarn } from "@server/utils/logger";
 
@@ -70,18 +67,11 @@ export default defineEventHandler(async event => {
       results.processed++;
 
       try {
-        await createSnapshot(
-          wallet.address,
-          config.alchemyApiKey,
-          wallets,
-          snapshots,
-        );
+        await createSnapshot(wallet.address, config.alchemyApiKey, wallets, snapshots);
         results.successful++;
 
         if (results.processed < walletsToProcess.length) {
-          await new Promise(resolve =>
-            setTimeout(resolve, DELAY_BETWEEN_WALLETS_MS),
-          );
+          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_WALLETS_MS));
         }
       } catch (err) {
         results.failed++;

@@ -5,10 +5,7 @@
  * @param options - Intl.NumberFormatOptions
  * @returns A formatted currency string
  */
-export const formatCurrency = (
-  value: number,
-  options: Intl.NumberFormatOptions = {}
-) => {
+export const formatCurrency = (value: number, options: Intl.NumberFormatOptions = {}) => {
   const defaultOptions: Intl.NumberFormatOptions = {
     style: "currency",
     currency: "USD",
@@ -27,10 +24,7 @@ export const formatCurrency = (
  * @param options - Intl.NumberFormatOptions
  * @returns A formatted number string
  */
-export const formatNumber = (
-  value: number,
-  options: Intl.NumberFormatOptions = {}
-) => {
+export const formatNumber = (value: number, options: Intl.NumberFormatOptions = {}) => {
   return new Intl.NumberFormat("en-US", options).format(value);
 };
 

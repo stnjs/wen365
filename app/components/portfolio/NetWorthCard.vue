@@ -43,9 +43,7 @@ const props = defineProps<NetWorthCardProps>();
 
 // Round to integer cents once, then split — sidesteps the floating-point
 // drift that makes `(100.05 % 1) * 100` evaluate to 4.999999…
-const totalCents = computed<number>(() =>
-  Math.round((props.totalValue || 0) * 100),
-);
+const totalCents = computed<number>(() => Math.round((props.totalValue || 0) * 100));
 const dollars = computed<string>(() =>
   formatCurrency(Math.trunc(totalCents.value / 100), { maximumFractionDigits: 0 }),
 );

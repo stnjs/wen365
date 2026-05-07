@@ -18,9 +18,7 @@ describe("InMemorySnapshotRepo (contract)", () => {
     const snap = await snapshots.create({
       walletId: wallet.id,
       totalValue: 100,
-      tokens: [
-        { symbol: "ETH", address: null, network: "eth-mainnet", balance: 1, value: 100 },
-      ],
+      tokens: [{ symbol: "ETH", address: null, network: "eth-mainnet", balance: 1, value: 100 }],
     });
     expect(snap.wallet_id).toBe(wallet.id);
     expect(snap.total_value).toBe(100);
@@ -103,9 +101,7 @@ describe("InMemorySnapshotRepo (contract)", () => {
       },
     ];
     snapshots = createInMemorySnapshotRepo(seed);
-    const deleted = await snapshots.deleteOlderThan(
-      new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    );
+    const deleted = await snapshots.deleteOlderThan(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
     expect(deleted).toBe(1);
     const history = await snapshots.historyForWallet(wallet.id, 365);
     expect(history.map(h => h.id)).toEqual(["new"]);

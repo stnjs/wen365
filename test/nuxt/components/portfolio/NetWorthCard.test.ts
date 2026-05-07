@@ -6,17 +6,16 @@ import NetWorthCard from "~/components/portfolio/NetWorthCard.vue";
 // HTML so we can assert text and class semantics without booting the full UI
 // runtime.
 const uiStubs = {
-  UCard: { template: "<div><slot name=\"header\" /><slot /></div>" },
+  UCard: { template: '<div><slot name="header" /><slot /></div>' },
   UBadge: {
     inheritAttrs: false,
     props: ["color", "variant", "size"],
-    template:
-      "<span data-testid=\"badge\" :data-color=\"color\"><slot /></span>",
+    template: '<span data-testid="badge" :data-color="color"><slot /></span>',
   },
   UIcon: {
     inheritAttrs: false,
     props: ["name"],
-    template: "<i :data-icon=\"name\" />",
+    template: '<i :data-icon="name" />',
   },
 };
 
@@ -82,8 +81,6 @@ describe("NetWorthCard", () => {
       valueChange24h: 0,
       valueChangePercent24h: 0,
     });
-    expect(wrapper.find("[data-testid='badge']").attributes("data-color")).toBe(
-      "success",
-    );
+    expect(wrapper.find("[data-testid='badge']").attributes("data-color")).toBe("success");
   });
 });

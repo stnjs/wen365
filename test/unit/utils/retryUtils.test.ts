@@ -100,10 +100,11 @@ describe("retryUtils", () => {
     it("should pass timeout and options through to $fetch", async () => {
       mockFetch.mockResolvedValue({ data: "response" });
 
-      const promise = fetchWithRetry(
-        "https://api.example.com/data",
-        { method: "POST", body: { key: "value" }, timeout: 5000 },
-      );
+      const promise = fetchWithRetry("https://api.example.com/data", {
+        method: "POST",
+        body: { key: "value" },
+        timeout: 5000,
+      });
       await vi.runAllTimersAsync();
       await promise;
 

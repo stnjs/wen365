@@ -150,9 +150,7 @@ export function buildDemoPortfolioHistory(days: number = 30): PortfolioHistoryDt
   const lastValue = snapshots[snapshots.length - 1]?.totalValue ?? 0;
   const valueChange = Math.round((lastValue - firstValue) * 100) / 100;
   const valueChangePercent =
-    firstValue > 0
-      ? Math.round(((lastValue - firstValue) / firstValue) * 10000) / 100
-      : 0;
+    firstValue > 0 ? Math.round(((lastValue - firstValue) / firstValue) * 10000) / 100 : 0;
 
   return { snapshots, valueChange, valueChangePercent };
 }

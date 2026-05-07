@@ -35,10 +35,7 @@ const SAFE_MESSAGE_BY_KIND: Record<DomainErrorKind, string> = {
  * Kinds logged at ERROR level (unexpected / high-severity).
  * Everything else logs at WARN.
  */
-const ERROR_LEVEL_KINDS: ReadonlySet<DomainErrorKind> = new Set([
-  "internal",
-  "upstreamFailed",
-]);
+const ERROR_LEVEL_KINDS: ReadonlySet<DomainErrorKind> = new Set(["internal", "upstreamFailed"]);
 
 function causeSummary(cause: unknown): unknown {
   if (cause instanceof Error) return { name: cause.name, message: cause.message };

@@ -9,7 +9,7 @@ const UUserStub = {
   inheritAttrs: false,
   props: ["name", "avatar", "description"],
   template:
-    "<div data-testid=\"user\" :data-name=\"name\" :data-description=\"description\" :data-avatar-src=\"avatar?.src\" :data-avatar-icon=\"avatar?.icon\" />",
+    '<div data-testid="user" :data-name="name" :data-description="description" :data-avatar-src="avatar?.src" :data-avatar-icon="avatar?.icon" />',
 };
 
 async function mountToken(metadata: TokenMetadataDto) {
