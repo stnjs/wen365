@@ -38,15 +38,21 @@ withDefaults(defineProps<ConnectWalletButtonProps>(), {
 
 const accountData = useAppKitAccount();
 const { open } = useAppKit();
+const toast = useToast();
 
-const isConnected = computed(() => accountData.value?.isConnected);
-const isConnecting = computed(() => accountData.value?.status === "connecting");
+const isConnected = computed<boolean>(() => accountData.value?.isConnected ?? false);
+const isConnecting = computed<boolean>(() => accountData.value?.status === "connecting");
 
 const handleConnect = async () => {
   try {
     await open({ view: "Connect", namespace: "eip155" });
-  } catch (error) {
-    console.error("Failed to connect wallet:", error);
+  } catch {
+    toast.add({
+      title: "Couldn't open the wallet picker",
+      description: "Please try again.",
+      color: "error",
+      icon: "i-lucide-triangle-alert",
+    });
   }
 };
 </script>
