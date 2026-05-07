@@ -52,15 +52,6 @@
             >
               <UIcon name="i-lucide-github" class="w-5 h-5" />
             </a>
-            <a
-              href=""
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-dimmed hover:text-default transition-colors"
-              aria-label="LinkedIn profile"
-            >
-              <UIcon name="i-lucide-linkedin" class="w-5 h-5" />
-            </a>
           </div>
         </div>
       </template>
