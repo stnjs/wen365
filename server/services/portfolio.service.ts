@@ -81,11 +81,7 @@ async function fetchAllAlchemyPages(
       });
     }
 
-    const response = await getAlchemyTokensByAddress(
-      walletAddress,
-      alchemyApiKey,
-      pageKey,
-    );
+    const response = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey, pageKey);
     allTokens.push(...response.data.tokens);
     pageKey = response.data.pageKey || undefined;
     pageCount++;
@@ -97,8 +93,7 @@ async function fetchAllAlchemyPages(
 function isTokenBlacklisted(token: TokenDto): boolean {
   return BLACKLISTED_TOKENS.some(
     blacklistedToken =>
-      blacklistedToken.address === token.tokenAddress &&
-      blacklistedToken.network === token.network,
+      blacklistedToken.address === token.tokenAddress && blacklistedToken.network === token.network,
   );
 }
 
@@ -147,10 +142,7 @@ function deduplicateTokens(tokens: TokenDto[]): TokenDto[] {
   return Array.from(tokenMap.values());
 }
 
-function addPercentageToTokens(
-  tokens: TokenDto[],
-  totalValue: number,
-): TokenDto[] {
+function addPercentageToTokens(tokens: TokenDto[], totalValue: number): TokenDto[] {
   if (totalValue === 0) {
     return tokens.map(token => ({ ...token, percentage: 0 }));
   }
@@ -167,17 +159,13 @@ export async function getPortfolio(
 ): Promise<PortfolioDto> {
   const allAlchemyTokens = await fetchAllAlchemyPages(walletAddress, alchemyApiKey);
 
-  const enrichedTokens = allAlchemyTokens.map(token =>
-    enrichNativeTokenMetadata(token),
-  );
+  const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
 
   // Transform to DTOs using Zod schema (validates + transforms).
   // Any ZodError here is an Alchemy contract violation — re-raise as upstream.
   let allTokenDtos: TokenDto[];
   try {
-    allTokenDtos = enrichedTokens.map(token =>
-      TokenDtoFromAlchemySchema.parse(token),
-    );
+    allTokenDtos = enrichedTokens.map(token => TokenDtoFromAlchemySchema.parse(token));
   } catch (err) {
     throw upstreamFailed("alchemy", {
       details: { reason: "token_contract_violation" },
@@ -188,10 +176,7 @@ export async function getPortfolio(
   const uniqueTokens = deduplicateTokens(allTokenDtos);
 
   const activeTokens = uniqueTokens
-    .filter(
-      token =>
-        token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token),
-    )
+    .filter(token => token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token))
     .sort((a, b) => b.tokenValue - a.tokenValue);
 
   const totalValue = roundToTwoDecimals(

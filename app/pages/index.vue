@@ -95,9 +95,9 @@
             </div>
             <h3 class="text-xl font-medium text-default mb-2">Multi-Chain Portfolio</h3>
             <p class="text-muted text-sm leading-relaxed max-w-md">
-              Aggregates token balances and USD values across {{ NETWORKS.length }} EVM networks
-              via the Alchemy API. Paginated fetching, native token enrichment, and deduplication
-              built in.
+              Aggregates token balances and USD values across {{ NETWORKS.length }} EVM networks via
+              the Alchemy API. Paginated fetching, native token enrichment, and deduplication built
+              in.
             </p>
             <div class="mt-8 flex flex-wrap gap-2">
               <span

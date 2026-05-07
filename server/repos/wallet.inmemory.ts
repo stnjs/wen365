@@ -10,9 +10,7 @@ import type { Wallet, WalletRepo } from "./wallet.repo";
  * this is test-only code.
  */
 export function createInMemoryWalletRepo(seed: Wallet[] = []): WalletRepo {
-  const byAddress = new Map<string, Wallet>(
-    seed.map(w => [w.address.toLowerCase(), w]),
-  );
+  const byAddress = new Map<string, Wallet>(seed.map(w => [w.address.toLowerCase(), w]));
   const byId = new Map<string, Wallet>(seed.map(w => [w.id, w]));
 
   return {
@@ -42,9 +40,7 @@ export function createInMemoryWalletRepo(seed: Wallet[] = []): WalletRepo {
       wallet.last_snapshot_at = (when ?? new Date()).toISOString();
     },
 
-    async findDueForSnapshot(
-      minHoursSinceLastSnapshot?: number,
-    ): Promise<Wallet[]> {
+    async findDueForSnapshot(minHoursSinceLastSnapshot?: number): Promise<Wallet[]> {
       if (minHoursSinceLastSnapshot === undefined) {
         return [...byAddress.values()];
       }

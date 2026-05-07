@@ -34,10 +34,9 @@ export function createSupabaseWalletRepo(supabase: SupabaseAdmin): WalletRepo {
     async getOrCreate(address: string): Promise<Wallet> {
       const normalized = address.toLowerCase();
 
-      const { data: walletId, error: rpcError } = await supabase.rpc(
-        "get_or_create_wallet",
-        { wallet_address: normalized },
-      );
+      const { data: walletId, error: rpcError } = await supabase.rpc("get_or_create_wallet", {
+        wallet_address: normalized,
+      });
       if (rpcError) {
         throw upstreamFailed("supabase", {
           cause: rpcError,
@@ -72,18 +71,14 @@ export function createSupabaseWalletRepo(supabase: SupabaseAdmin): WalletRepo {
       }
     },
 
-    async findDueForSnapshot(
-      minHoursSinceLastSnapshot?: number,
-    ): Promise<Wallet[]> {
+    async findDueForSnapshot(minHoursSinceLastSnapshot?: number): Promise<Wallet[]> {
       let query = supabase.from("wallets").select("*");
 
       if (minHoursSinceLastSnapshot !== undefined) {
         const cutoffTime = new Date(
           Date.now() - minHoursSinceLastSnapshot * 60 * 60 * 1000,
         ).toISOString();
-        query = query.or(
-          `last_snapshot_at.is.null,last_snapshot_at.lt.${cutoffTime}`,
-        );
+        query = query.or(`last_snapshot_at.is.null,last_snapshot_at.lt.${cutoffTime}`);
       }
 
       const { data, error } = await query;

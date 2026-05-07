@@ -5,9 +5,7 @@ import type { SnapshotRepo, SnapshotToken } from "./snapshot.repo";
  * In-memory SnapshotRepo for tests. Snapshots live in insertion order; each
  * method filters / sorts to match the Supabase adapter's behaviour.
  */
-export function createInMemorySnapshotRepo(
-  seed: PortfolioSnapshot[] = [],
-): SnapshotRepo {
+export function createInMemorySnapshotRepo(seed: PortfolioSnapshot[] = []): SnapshotRepo {
   const rows = new Map<string, PortfolioSnapshot>(seed.map(s => [s.id, s]));
 
   return {
@@ -27,16 +25,10 @@ export function createInMemorySnapshotRepo(
       return snap;
     },
 
-    async historyForWallet(
-      walletId: string,
-      days: number,
-    ): Promise<PortfolioSnapshot[]> {
+    async historyForWallet(walletId: string, days: number): Promise<PortfolioSnapshot[]> {
       const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
       return [...rows.values()]
-        .filter(
-          s =>
-            s.wallet_id === walletId && new Date(s.timestamp).getTime() >= cutoff,
-        )
+        .filter(s => s.wallet_id === walletId && new Date(s.timestamp).getTime() >= cutoff)
         .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
     },
 

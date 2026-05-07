@@ -47,10 +47,7 @@ export async function validateBody<T extends z.ZodSchema>(
  * Validates query parameters against a Zod schema.
  * @throws DomainError("validation") when parsing fails.
  */
-export function validateQuery<T extends z.ZodSchema>(
-  event: H3Event,
-  schema: T,
-): z.infer<T> {
+export function validateQuery<T extends z.ZodSchema>(event: H3Event, schema: T): z.infer<T> {
   return parseOrThrow(schema, getQuery(event), "query");
 }
 
@@ -58,9 +55,6 @@ export function validateQuery<T extends z.ZodSchema>(
  * Validates route parameters against a Zod schema.
  * @throws DomainError("validation") when parsing fails.
  */
-export function validateParams<T extends z.ZodSchema>(
-  event: H3Event,
-  schema: T,
-): z.infer<T> {
+export function validateParams<T extends z.ZodSchema>(event: H3Event, schema: T): z.infer<T> {
   return parseOrThrow(schema, getRouterParams(event), "params");
 }

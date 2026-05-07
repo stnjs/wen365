@@ -1,9 +1,7 @@
 import { NETWORK_BY_ID, NETWORKS, type NetworkId } from "#shared/config/networks";
 import { logWarn } from "@server/utils/logger";
 
-const ALL_SUPPORTED_NETWORK_IDS: readonly NetworkId[] = NETWORKS.map(
-  n => n.alchemySlug,
-);
+const ALL_SUPPORTED_NETWORK_IDS: readonly NetworkId[] = NETWORKS.map(n => n.alchemySlug);
 
 /**
  * Defaults to the full registry. `SUPPORTED_NETWORKS=eth-mainnet,base-mainnet`

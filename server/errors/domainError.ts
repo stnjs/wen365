@@ -44,10 +44,7 @@ export class DomainError extends Error {
   }
 }
 
-export const notFound = (
-  resource: string,
-  options?: DomainErrorOptions,
-): DomainError =>
+export const notFound = (resource: string, options?: DomainErrorOptions): DomainError =>
   new DomainError("notFound", `${resource} not found`, options?.details, {
     cause: options?.cause,
   });
@@ -68,18 +65,12 @@ export const forbidden = (
     cause: options?.cause,
   });
 
-export const validation = (
-  message: string,
-  options?: DomainErrorOptions,
-): DomainError =>
+export const validation = (message: string, options?: DomainErrorOptions): DomainError =>
   new DomainError("validation", message, options?.details, {
     cause: options?.cause,
   });
 
-export const preconditionFailed = (
-  message: string,
-  options?: DomainErrorOptions,
-): DomainError =>
+export const preconditionFailed = (message: string, options?: DomainErrorOptions): DomainError =>
   new DomainError("preconditionFailed", message, options?.details, {
     cause: options?.cause,
   });
@@ -92,16 +83,10 @@ export const rateLimited = (
     cause: options?.cause,
   });
 
-export const upstreamFailed = (
-  upstream: string,
-  options?: DomainErrorOptions,
-): DomainError =>
-  new DomainError(
-    "upstreamFailed",
-    `${upstream} request failed`,
-    options?.details,
-    { cause: options?.cause },
-  );
+export const upstreamFailed = (upstream: string, options?: DomainErrorOptions): DomainError =>
+  new DomainError("upstreamFailed", `${upstream} request failed`, options?.details, {
+    cause: options?.cause,
+  });
 
 export const internal = (
   message: string = "Internal error",

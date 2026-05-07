@@ -74,9 +74,7 @@
             <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors"
               >Features</a
             >
-            <a
-              href="#architecture"
-              class="text-dimmed text-xs hover:text-default transition-colors"
+            <a href="#architecture" class="text-dimmed text-xs hover:text-default transition-colors"
               >Architecture</a
             >
             <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors"

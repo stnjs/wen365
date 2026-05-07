@@ -7,9 +7,7 @@ type SupabaseAdmin = ReturnType<typeof useSupabaseAdmin>;
 /**
  * Supabase-backed implementation of SnapshotRepo.
  */
-export function createSupabaseSnapshotRepo(
-  supabase: SupabaseAdmin,
-): SnapshotRepo {
+export function createSupabaseSnapshotRepo(supabase: SupabaseAdmin): SnapshotRepo {
   return {
     async create(input): Promise<PortfolioSnapshot> {
       const { data, error } = await supabase
@@ -30,13 +28,8 @@ export function createSupabaseSnapshotRepo(
       return data;
     },
 
-    async historyForWallet(
-      walletId: string,
-      days: number,
-    ): Promise<PortfolioSnapshot[]> {
-      const cutoffDate = new Date(
-        Date.now() - days * 24 * 60 * 60 * 1000,
-      ).toISOString();
+    async historyForWallet(walletId: string, days: number): Promise<PortfolioSnapshot[]> {
+      const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
       const { data, error } = await supabase
         .from("portfolio_snapshots")

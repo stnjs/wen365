@@ -39,9 +39,7 @@ describe("InMemoryWalletRepo (contract)", () => {
   });
 
   it("markSnapshotTaken silently ignores missing wallets", async () => {
-    await expect(
-      repo.markSnapshotTaken("missing-id"),
-    ).resolves.toBeUndefined();
+    await expect(repo.markSnapshotTaken("missing-id")).resolves.toBeUndefined();
   });
 
   describe("findDueForSnapshot", () => {
