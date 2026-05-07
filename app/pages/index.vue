@@ -95,34 +95,18 @@
             </div>
             <h3 class="text-xl font-medium text-default mb-2">Multi-Chain Portfolio</h3>
             <p class="text-muted text-sm leading-relaxed max-w-md">
-              Aggregates token balances and USD values across 10 EVM networks via the Alchemy API.
-              Paginated fetching, native token enrichment, and deduplication built in.
+              Aggregates token balances and USD values across {{ NETWORKS.length }} EVM networks
+              via the Alchemy API. Paginated fetching, native token enrichment, and deduplication
+              built in.
             </p>
             <div class="mt-8 flex flex-wrap gap-2">
               <span
+                v-for="network in NETWORKS"
+                :key="network.alchemySlug"
                 class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >ETH</span
               >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >MATIC</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >BASE</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >ARB</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >OPT</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >+5 more</span
-              >
+                {{ network.shortName }}
+              </span>
             </div>
           </div>
         </div>
@@ -454,6 +438,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useAppKitAccount } from "@reown/appkit/vue";
+import { NETWORKS } from "#shared/config/networks";
 import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
 
 const router = useRouter();
@@ -520,7 +505,10 @@ const authSteps = [
 ];
 
 const pipelineSteps = [
-  { title: "Alchemy API", detail: "Paginated token fetches across 10 EVM networks with retry" },
+  {
+    title: "Alchemy API",
+    detail: `Paginated token fetches across ${NETWORKS.length} EVM networks with retry`,
+  },
   {
     title: "Portfolio endpoint",
     detail: "Zod-validated response with dedup, filtering, and enrichment",

@@ -7,12 +7,13 @@ import {
 import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 import { SUPPORTED_NETWORKS } from "@server/config/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
-import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
+import { NETWORK_BY_ID } from "#shared/config/networks";
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 import { fetchWithRetry } from "@server/utils/retryUtils";
 import { upstreamFailed, wrapUpstream } from "@server/errors";
 
-const MIN_TOKEN_VALUE_USD = 0.03;
+// $0.50 floor: drops dust + most low-value spam airdrops. See ADR-0006.
+const MIN_TOKEN_VALUE_USD = 0.5;
 const MAX_PAGES = 100;
 
 export const getAlchemyTokensByAddress = async (
@@ -101,10 +102,8 @@ function isTokenBlacklisted(token: TokenDto): boolean {
   );
 }
 
-/**
- * Enriches native token metadata with predefined values
- * Uses network-specific metadata if available, otherwise falls back to ETH metadata
- */
+// Falls back to the registry's native-token metadata only when Alchemy
+// returns nothing of its own for a native token (`tokenAddress === null`).
 function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
   if (token.tokenAddress) {
     return token;
@@ -119,11 +118,10 @@ function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
   if (hasMetadata) {
     return token;
   }
-  const metadata = NATIVE_TOKENS[token.network] || DEFAULT_ETH_METADATA;
 
   return {
     ...token,
-    tokenMetadata: metadata,
+    tokenMetadata: NETWORK_BY_ID[token.network].nativeToken,
   };
 }
 
