@@ -27,7 +27,7 @@
 - **SIWE wallet auth.** Sign-In with Ethereum (EIP-4361) via Reown AppKit + Wagmi + Viem. Server-side nonce, signature verification, and an encrypted session cookie.
 - **Multi-chain portfolio.** Aggregates token balances and USD values across **Ethereum, Base, Arbitrum, Optimism, and Polygon** through the Alchemy API. Dust and known-spam tokens filtered out at the seam.
 - **Daily snapshots.** A Vercel Cron writes one `portfolio_snapshots` row per Wallet per day to Supabase, which powers the value-over-time chart and 24-hour delta.
-- **Holding-period tracking _(next)._** The original motivation: in Germany, crypto held more than a year is income-tax-free. The next milestone is a per-lot FIFO countdown that tells you exactly when each holding crosses the 1-year line.
+- **Holding-period tracking _(next)._** Many tax regimes treat crypto held longer than a year more favorably (long-term capital gains, or in some jurisdictions outright tax-free). The next milestone is a per-lot FIFO countdown that tells you exactly when each holding crosses the 1-year line.
 
 ## Why it exists
 
@@ -169,7 +169,7 @@ Deployed to [www.wen365.xyz](https://www.wen365.xyz/) on Vercel. The Vercel Cron
 
 Next things I'd build, in rough order:
 
-- **Holding-period tracker** — FIFO per Token, with a per-lot countdown to the tax-free threshold (e.g. Germany's 1-year rule). The feature that started this project.
+- **Holding-period tracker** — FIFO per Token, with a per-lot countdown to the 1-year long-term holding threshold. The feature that started this project.
 - **Multi-Wallet aggregation** — track several Addresses under one Session.
 - **NFT line in the Portfolio** — alongside fungible Tokens.
 - **Push notifications** — opt-in alerts when a Portfolio crosses a threshold.

@@ -97,8 +97,7 @@
                 </template>
                 <div class="p-6 flex flex-col items-start justify-center gap-3 h-full min-h-40">
                   <p class="text-sm text-muted leading-relaxed max-w-lg">
-                    Per-lot FIFO countdown to the 1-year tax-free threshold (Germany's 365-day
-                    rule). The feature that started this project.
+                    Per-lot FIFO countdown to the 1-year long-term holding threshold.
                   </p>
                   <p class="text-xs text-dimmed">
                     Track which holdings are about to mature and which are still inside the

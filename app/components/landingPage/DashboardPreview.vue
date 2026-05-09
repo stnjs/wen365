@@ -166,14 +166,14 @@
               </div>
 
               <div class="p-4 md:p-6 space-y-4">
-                <!-- ETH — past the 365-day threshold -->
+                <!-- ETH — past the 1-year threshold -->
                 <div>
                   <div class="flex justify-between text-xs mb-1.5">
                     <div class="flex items-center gap-2 text-default">
                       <UIcon name="i-token-branded-ethereum" class="w-3.5 h-3.5" />
                       ETH
                     </div>
-                    <span class="text-emerald-400 font-medium">Tax-free (420 days)</span>
+                    <span class="text-emerald-400 font-medium">Long-term (420 days)</span>
                   </div>
                   <div class="w-full bg-zinc-800/50 h-1.5 rounded-full overflow-hidden relative">
                     <div class="absolute left-[88%] top-0 h-full w-px bg-white/30 z-10" />
