@@ -159,10 +159,15 @@
               <div
                 class="px-4 md:px-6 py-3 flex items-center justify-between border-b border-muted gap-4"
               >
-                <div class="flex items-center gap-2">
-                  <UIcon name="i-lucide-hourglass" class="size-3.5 text-amber-400" />
-                  <span class="text-sm font-medium">Holding-period tracker</span>
+                <div class="flex items-center gap-2 min-w-0">
+                  <UIcon name="i-lucide-hourglass" class="size-3.5 text-amber-400 shrink-0" />
+                  <span class="text-sm font-medium truncate">Holding-period tracker</span>
                 </div>
+                <span
+                  class="shrink-0 px-1.5 py-1 rounded-sm text-[10px] font-medium uppercase tracking-wide leading-none bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                >
+                  Coming soon
+                </span>
               </div>
 
               <div class="p-4 md:p-6 space-y-4">

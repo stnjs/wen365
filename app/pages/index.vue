@@ -17,16 +17,16 @@
           class="text-5xl md:text-7xl font-medium text-default tracking-tighter mb-6 leading-[1.1] animate-fade-up"
           :style="{ animationDelay: '100ms' }"
         >
-          Portfolio clarity.<br />
-          <span class="text-dimmed">Counting down to year one.</span>
+          See what you own.<br />
+          <span class="text-dimmed">Track how long you’ve held it.</span>
         </h1>
 
         <p
           class="text-lg md:text-xl text-muted max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up"
           :style="{ animationDelay: '200ms' }"
         >
-          A multi-chain crypto portfolio tracker for EVM wallets — live balances and daily snapshots
-          today, with a per-lot countdown to the 1-year long-term holding threshold on the way.
+          A multi-chain crypto portfolio tracker for EVM wallets — live balances, daily snapshots
+          and a per-lot countdown to the 1-year holding threshold.
         </p>
 
         <div
