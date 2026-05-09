@@ -86,7 +86,7 @@
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                       <UIcon name="i-lucide-hourglass" class="size-3.5 text-amber-400" />
-                      <span class="text-xs font-medium">Holding-period tracker</span>
+                      <span class="font-medium">Holding-period tracker</span>
                     </div>
                     <span
                       class="px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20"
@@ -110,7 +110,10 @@
               <!-- Asset Allocation Card -->
               <UCard class="bg-app-card border-muted">
                 <template #header>
-                  <span class="text-xs font-medium text-muted">Asset Allocation</span>
+                  <div class="flex items-center gap-2">
+                    <UIcon name="i-lucide-chart-pie" class="size-3.5 text-emerald-400" />
+                    <span class="font-medium">Asset Allocation</span>
+                  </div>
                 </template>
                 <AssetAllocationChart
                   :data="tokens"
