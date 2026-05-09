@@ -2,7 +2,10 @@
   <UCard class="bg-app-card border-muted">
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <div class="text-lg font-medium text-default">Assets</div>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-coins" class="size-3.5 text-sky-400" />
+          <span class="font-medium">Assets</span>
+        </div>
         <UInput
           v-model="searchQuery"
           class="max-w-sm min-w-[12ch]"
