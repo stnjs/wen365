@@ -41,6 +41,7 @@ export default defineNuxtConfig({
     "@nuxt/test-utils/module",
     "nuxt-auth-utils",
     "@nuxtjs/supabase",
+    "@vueuse/nuxt",
   ],
 
   // Runtime config for environment variables
