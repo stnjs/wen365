@@ -21,14 +21,7 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true,
     tsConfig: {
-      include: [
-        "../tests/**/*.ts",
-        "../tests/**/*.spec.ts",
-        "../tests/**/*.test.ts",
-        "../test/**/*.ts",
-        "../test/**/*.spec.ts",
-        "../test/**/*.test.ts",
-      ],
+      include: ["../test/**/*.ts", "../test/**/*.spec.ts", "../test/**/*.test.ts"],
     },
   },
 
@@ -48,6 +41,7 @@ export default defineNuxtConfig({
     "@nuxt/test-utils/module",
     "nuxt-auth-utils",
     "@nuxtjs/supabase",
+    "@vueuse/nuxt",
   ],
 
   // Runtime config for environment variables

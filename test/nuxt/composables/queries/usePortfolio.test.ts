@@ -1,128 +1,102 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { defineComponent, h, ref } from "vue";
+import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { flushPromises } from "@vue/test-utils";
+import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
-import { ref } from "vue";
+import { DEMO_PORTFOLIO } from "~/utils/demoData";
 
-// Mock $fetch
+// $fetch is the process boundary — the only thing this composable talks to
+// outside of TanStack. Per testing.mdc §2 we mock $fetch and let the real
+// TanStack Query run.
 const mockFetch = vi.fn();
 global.$fetch = mockFetch as unknown as typeof global.$fetch;
 
-// Mock TanStack Query
-const mockUseQuery = vi.fn();
-vi.mock("@tanstack/vue-query", () => ({
-  useQuery: (options: {
-    queryKey: unknown[];
-    queryFn: () => Promise<unknown>;
-    enabled: { value: boolean };
-  }) => mockUseQuery(options),
-}));
+type Address = Parameters<typeof usePortfolio>[0];
+type DemoOpt = NonNullable<Parameters<typeof usePortfolio>[1]>["demo"];
+
+async function setupPortfolio(opts: { address: Address; demo?: DemoOpt }) {
+  let api!: ReturnType<typeof usePortfolio>;
+
+  const Harness = defineComponent({
+    setup() {
+      api = usePortfolio(opts.address, opts.demo !== undefined ? { demo: opts.demo } : {});
+      return () => h("div");
+    },
+  });
+
+  // Fresh, retry-disabled client per test so error cases don't trigger
+  // exponential backoff and so cached results don't leak between tests.
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+
+  await mountSuspended(Harness, {
+    global: { plugins: [[VueQueryPlugin, { queryClient }]] },
+  });
+
+  return { api: () => api };
+}
 
 describe("usePortfolio", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockResolvedValue({});
-    mockUseQuery.mockImplementation(options => {
-      const result = {
-        data: ref<unknown>(null),
-        isLoading: ref(false),
-        isError: ref(false),
-        error: ref<unknown>(null),
-        refetch: vi.fn(),
-      };
-
-      if (options.enabled?.value && options.queryFn) {
-        result.isLoading.value = true;
-        Promise.resolve(options.queryFn()).then(
-          (data: unknown) => {
-            result.data.value = data;
-            result.isLoading.value = false;
-          },
-          (error: unknown) => {
-            result.isError.value = true;
-            result.error.value = error;
-            result.isLoading.value = false;
-          },
-        );
-      }
-
-      return result;
-    });
   });
 
-  it("should call useQuery with correct parameters when address is provided", () => {
-    const address = ref("0x123");
-    usePortfolio(address);
+  it("does not fetch when address is null", async () => {
+    const { api } = await setupPortfolio({ address: ref<string | null>(null) });
+    await flushPromises();
 
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    expect(call).toBeDefined();
-    if (call) {
-      expect(Array.isArray(call.queryKey)).toBe(true);
-      expect(typeof call.queryFn).toBe("function");
-      expect(call.enabled).toBeDefined();
-    }
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(api().data.value).toBeUndefined();
   });
 
-  it("should disable query when address is null", () => {
-    const address = ref<string | null>(null);
-    usePortfolio(address);
+  it("does not fetch when address is an empty string", async () => {
+    const { api } = await setupPortfolio({ address: ref("") });
+    await flushPromises();
 
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    if (call) {
-      expect(call.enabled.value).toBe(false);
-    }
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(api().data.value).toBeUndefined();
   });
 
-  it("should disable query when address is empty string", () => {
-    const address = ref("");
-    usePortfolio(address);
-
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    if (call) {
-      expect(call.enabled.value).toBe(false);
-    }
-  });
-
-  it("should enable query when address is provided", () => {
-    const address = ref("0x123");
-    usePortfolio(address);
-
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    if (call) {
-      expect(call.enabled.value).toBe(true);
-    }
-  });
-
-  it("should call $fetch with correct endpoint in queryFn", async () => {
-    const mockPortfolio: PortfolioDto = {
+  it("fetches /api/portfolio/:address and exposes the response as data", async () => {
+    const portfolio: PortfolioDto = {
       totalValue: 5000,
       totalValueChange24h: 0,
       totalValueChangePercent24h: 0,
       tokens: [],
     };
+    mockFetch.mockResolvedValue(portfolio);
 
-    mockFetch.mockResolvedValue(mockPortfolio);
+    const { api } = await setupPortfolio({
+      address: ref("0x053cba8511f4ec58f175057162a31eb7bd0d812f"),
+    });
+    await flushPromises();
 
-    const address = ref("0x053cba8511f4ec58f175057162a31eb7bd0d812f");
-    usePortfolio(address);
-
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    if (call && call.queryFn) {
-      await call.queryFn();
-      expect(mockFetch).toHaveBeenCalledWith(
-        "/api/portfolio/0x053cba8511f4ec58f175057162a31eb7bd0d812f",
-      );
-    }
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/portfolio/0x053cba8511f4ec58f175057162a31eb7bd0d812f",
+    );
+    expect(api().data.value).toEqual(portfolio);
   });
 
-  it("should handle API errors gracefully", async () => {
-    const error = new Error("API Error");
-    mockFetch.mockRejectedValue(error);
+  it("returns the demo portfolio without hitting the network when demo=true", async () => {
+    const { api } = await setupPortfolio({
+      address: ref<string | null>(null),
+      demo: ref(true),
+    });
+    await flushPromises();
 
-    const address = ref("0x123");
-    usePortfolio(address);
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(api().data.value).toEqual(DEMO_PORTFOLIO);
+  });
 
-    const call = mockUseQuery.mock.calls[0]?.[0];
-    if (call && call.queryFn) {
-      await expect(call.queryFn()).rejects.toThrow("API Error");
-    }
+  it("surfaces fetch errors as a query error", async () => {
+    mockFetch.mockRejectedValue(new Error("API Error"));
+
+    const { api } = await setupPortfolio({ address: ref("0xabc") });
+    await flushPromises();
+
+    expect(api().isError.value).toBe(true);
+    expect(api().error.value).toMatchObject({ message: "API Error" });
   });
 });

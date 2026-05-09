@@ -38,5 +38,5 @@ Upstream failures are normalized at the adapter boundary via `wrapUpstream(sourc
 - **Positive**: Clients get consistent, sanitized error messages and structured `data` for validation errors; internal details and `cause` never leak.
 - **Positive**: Logs are structured and levelled by kind, so operational dashboards can reliably distinguish "user typed a bad address" from "Alchemy is down".
 - **Negative**: A new file (`server/errors/`) and a new discipline. Any future throw site that uses `new Error(...)` below the HTTP edge is now a bug.
-- **Negative**: `DomainError` encodes *our* taxonomy, not HTTP. If the HTTP-level mapping ever becomes inadequate, the translation table in `toHttp.ts` has to change in lockstep with any new kinds.
+- **Negative**: `DomainError` encodes _our_ taxonomy, not HTTP. If the HTTP-level mapping ever becomes inadequate, the translation table in `toHttp.ts` has to change in lockstep with any new kinds.
 - **Deliberate degradation**: `compute24hDelta` catches `DomainError` and returns `null` rather than propagating — Snapshot-infra failures must not break the live Portfolio view. See inline comment in `snapshot.service.ts`.

@@ -100,12 +100,7 @@ describe("snapshot.service", () => {
           throw upstreamFailed("supabase");
         },
       };
-      const delta = await compute24hDelta(
-        "0xabc",
-        1000,
-        throwingWallets,
-        snapshots,
-      );
+      const delta = await compute24hDelta("0xabc", 1000, throwingWallets, snapshots);
       expect(delta).toBeNull();
       expect(warnSpy).toHaveBeenCalled();
     });
@@ -118,12 +113,7 @@ describe("snapshot.service", () => {
           throw new Error("unexpected");
         },
       };
-      const delta = await compute24hDelta(
-        "0xabc",
-        1000,
-        throwingWallets,
-        snapshots,
-      );
+      const delta = await compute24hDelta("0xabc", 1000, throwingWallets, snapshots);
       expect(delta).toBeNull();
       expect(errorSpy).toHaveBeenCalled();
     });

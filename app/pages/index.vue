@@ -18,15 +18,15 @@
           :style="{ animationDelay: '100ms' }"
         >
           Portfolio clarity.<br />
-          <span class="text-dimmed">Multi-chain tracking.</span>
+          <span class="text-dimmed">Counting down to year one.</span>
         </h1>
 
         <p
           class="text-lg md:text-xl text-muted max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up"
           :style="{ animationDelay: '200ms' }"
         >
-          A full-stack crypto portfolio tracker with SIWE authentication, multi-chain aggregation,
-          and historical snapshots. Built with Nuxt 4.
+          A multi-chain crypto portfolio tracker for EVM wallets — live balances and daily snapshots
+          today, with a per-lot countdown to the 1-year long-term holding threshold on the way.
         </p>
 
         <div
@@ -95,34 +95,18 @@
             </div>
             <h3 class="text-xl font-medium text-default mb-2">Multi-Chain Portfolio</h3>
             <p class="text-muted text-sm leading-relaxed max-w-md">
-              Aggregates token balances and USD values across 10 EVM networks via the Alchemy API.
-              Paginated fetching, native token enrichment, and deduplication built in.
+              Aggregates token balances and USD values across {{ NETWORKS.length }} EVM networks via
+              the Alchemy API. Paginated fetching, native token enrichment, and deduplication built
+              in. Dust and known-spam tokens filtered out at the seam.
             </p>
             <div class="mt-8 flex flex-wrap gap-2">
               <span
+                v-for="network in NETWORKS"
+                :key="network.alchemySlug"
                 class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >ETH</span
               >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >MATIC</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >BASE</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >ARB</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >OPT</span
-              >
-              <span
-                class="px-2 py-1 text-[10px] uppercase tracking-wide border border-default rounded bg-app-overlay text-muted"
-                >+5 more</span
-              >
+                {{ network.shortName }}
+              </span>
             </div>
           </div>
         </div>
@@ -454,6 +438,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { useAppKitAccount } from "@reown/appkit/vue";
+import { NETWORKS } from "#shared/config/networks";
 import DashboardPreview from "~/components/landingPage/DashboardPreview.vue";
 
 const router = useRouter();
@@ -465,24 +450,26 @@ const isConnected = computed<boolean>(() => accountData.value?.isConnected || fa
 
 const roadmapItems = [
   {
+    icon: "i-lucide-hourglass",
+    title: "Holding-period tracker",
+    description:
+      "Per-lot FIFO countdown to the 1-year long-term holding threshold. The feature that started this project.",
+  },
+  {
     icon: "i-lucide-users",
     title: "Multi-Wallet Aggregation",
-    description: "Track multiple addresses and aggregate portfolio data across wallets.",
+    description: "Track several Addresses under one Session and aggregate their Portfolios.",
   },
   {
-    icon: "i-lucide-piggy-bank",
-    title: "Tax Optimization Engine",
-    description: "FIFO-based holding period tracking for long-term capital gains awareness.",
-  },
-  {
-    icon: "i-lucide-workflow",
-    title: "Asset Flow Visualization",
-    description: "Sankey diagrams tracing liquidity movement from on-ramps to DeFi protocols.",
+    icon: "i-lucide-gem",
+    title: "NFT line in the Portfolio",
+    description: "Surface ERC-721 / ERC-1155 holdings alongside fungible Tokens.",
   },
   {
     icon: "i-lucide-bell-ring",
-    title: "Maturity Notifications",
-    description: "Alerts when positions qualify for long-term tax rates.",
+    title: "Push notifications",
+    description:
+      "Opt-in alerts when a Portfolio crosses a threshold (price, allocation, or holding maturity).",
   },
 ];
 
@@ -516,11 +503,14 @@ const authSteps = [
     title: "Signature verified",
     detail: "Server validates signature with viem against a public RPC",
   },
-  { title: "Session created", detail: "Encrypted session stored with wallet address and chain ID" },
+  { title: "Session created", detail: "Encrypted session stored with Wallet Address and chain ID" },
 ];
 
 const pipelineSteps = [
-  { title: "Alchemy API", detail: "Paginated token fetches across 10 EVM networks with retry" },
+  {
+    title: "Alchemy API",
+    detail: `Paginated token fetches across ${NETWORKS.length} EVM networks with retry`,
+  },
   {
     title: "Portfolio endpoint",
     detail: "Zod-validated response with dedup, filtering, and enrichment",
@@ -581,7 +571,7 @@ const techBadges = [
   "Zod validation at all API boundaries",
   "TanStack Query with stale-time caching",
   "Layered service architecture",
-  "Vitest test suites (unit + integration)",
+  "Vitest test suites (unit + Nuxt env)",
 ];
 
 const handleViewDemo = () => {

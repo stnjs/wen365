@@ -24,12 +24,7 @@ export default defineEventHandler(async (event): Promise<PortfolioDto> => {
     const portfolio = await getPortfolio(walletAddress, alchemyApiKey);
 
     const { wallets, snapshots } = reposFromEvent(event);
-    const delta = await compute24hDelta(
-      walletAddress,
-      portfolio.totalValue,
-      wallets,
-      snapshots,
-    );
+    const delta = await compute24hDelta(walletAddress, portfolio.totalValue, wallets, snapshots);
 
     if (delta) {
       portfolio.totalValueChange24h = delta.change;

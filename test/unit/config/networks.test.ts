@@ -1,4 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { NETWORKS } from "#shared/config/networks";
+
+const ALL_REGISTRY_SLUGS = NETWORKS.map(n => n.alchemySlug);
 
 describe("networks config", () => {
   const originalEnv = process.env.SUPPORTED_NETWORKS;
@@ -21,38 +24,38 @@ describe("networks config", () => {
     return mod.SUPPORTED_NETWORKS;
   }
 
-  it("should return defaults when SUPPORTED_NETWORKS is not set", async () => {
+  it("falls back to the full registry when SUPPORTED_NETWORKS is unset", async () => {
     const networks = await importNetworks();
-    expect(networks).toEqual(["eth-mainnet", "base-mainnet"]);
+    expect(networks).toEqual(ALL_REGISTRY_SLUGS);
   });
 
-  it("should parse valid comma-separated networks", async () => {
+  it("parses a valid comma-separated list", async () => {
     process.env.SUPPORTED_NETWORKS = "eth-mainnet,matic-mainnet";
     const networks = await importNetworks();
     expect(networks).toEqual(["eth-mainnet", "matic-mainnet"]);
   });
 
-  it("should filter out invalid network IDs", async () => {
+  it("filters out unknown slugs and keeps the rest", async () => {
     process.env.SUPPORTED_NETWORKS = "eth-mainnet,fake-network";
     const networks = await importNetworks();
     expect(networks).toEqual(["eth-mainnet"]);
   });
 
-  it("should fall back to defaults when all networks are invalid", async () => {
+  it("falls back to the full registry when no valid slugs remain", async () => {
     process.env.SUPPORTED_NETWORKS = "fake1,fake2";
     const networks = await importNetworks();
-    expect(networks).toEqual(["eth-mainnet", "base-mainnet"]);
+    expect(networks).toEqual(ALL_REGISTRY_SLUGS);
   });
 
-  it("should handle whitespace in network values", async () => {
+  it("trims whitespace around slugs", async () => {
     process.env.SUPPORTED_NETWORKS = " eth-mainnet , base-mainnet ";
     const networks = await importNetworks();
     expect(networks).toEqual(["eth-mainnet", "base-mainnet"]);
   });
 
-  it("should return defaults for empty string", async () => {
+  it("falls back to the full registry on empty string", async () => {
     process.env.SUPPORTED_NETWORKS = "";
     const networks = await importNetworks();
-    expect(networks).toEqual(["eth-mainnet", "base-mainnet"]);
+    expect(networks).toEqual(ALL_REGISTRY_SLUGS);
   });
 });

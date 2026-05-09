@@ -78,51 +78,41 @@
               </UCard>
             </div>
 
-            <!-- Middle Section: Asset Maturity & Allocation -->
+            <!-- Middle Section: Holding-period tracker (placeholder) & Allocation -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <!-- Asset Maturity Card -->
+              <!-- Holding-period tracker — roadmap feature, see README -->
               <UCard class="bg-app-card border-muted lg:col-span-2">
                 <template #header>
                   <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium">Asset Maturity (Tax Status)</span>
-                    <span class="text-[10px] text-toned">Threshold: 365 Days</span>
+                    <div class="flex items-center gap-2">
+                      <UIcon name="i-lucide-hourglass" class="size-3.5 text-amber-400" />
+                      <span class="font-medium">Holding-period tracker</span>
+                    </div>
+                    <span
+                      class="px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                    >
+                      Coming soon
+                    </span>
                   </div>
                 </template>
-                <div class="p-6 space-y-5">
-                  <div v-if="tokens.length > 0">
-                    <div
-                      v-for="(token, index) in tokens.slice(0, 3)"
-                      :key="index"
-                      class="space-y-1.5"
-                    >
-                      <div class="flex justify-between text-xs mb-1.5">
-                        <div class="flex items-center gap-2 text-default">
-                          <UIcon
-                            :name="getTokenIcon(token.tokenMetadata?.symbol || '')"
-                            class="w-3.5 h-3.5"
-                            :class="getTokenIconColor(token.tokenMetadata?.symbol || '')"
-                          />
-                          {{ token.tokenMetadata?.symbol || "Token" }}
-                        </div>
-                        <span class="text-muted">Short Term</span>
-                      </div>
-                      <div
-                        class="w-full bg-zinc-800/50 h-1.5 rounded-full overflow-hidden relative"
-                      >
-                        <div class="h-full bg-zinc-500 w-[60%]" />
-                      </div>
-                    </div>
-                  </div>
-                  <div v-else class="text-dimmed text-sm text-center py-4">
-                    Connect wallet to see asset maturity
-                  </div>
+                <div class="p-6 flex flex-col items-start justify-center gap-3 h-full min-h-40">
+                  <p class="text-sm text-muted leading-relaxed max-w-lg">
+                    Per-lot FIFO countdown to the 1-year long-term holding threshold.
+                  </p>
+                  <p class="text-xs text-dimmed">
+                    Track which holdings are about to mature and which are still inside the
+                    speculative window.
+                  </p>
                 </div>
               </UCard>
 
               <!-- Asset Allocation Card -->
               <UCard class="bg-app-card border-muted">
                 <template #header>
-                  <span class="text-xs font-medium text-muted">Asset Allocation</span>
+                  <div class="flex items-center gap-2">
+                    <UIcon name="i-lucide-chart-pie" class="size-3.5 text-emerald-400" />
+                    <span class="font-medium">Asset Allocation</span>
+                  </div>
                 </template>
                 <AssetAllocationChart
                   :data="tokens"
@@ -172,26 +162,6 @@ const lastUpdated = computed<string>(() => {
 });
 
 const tokens = computed<TokenDto[]>(() => portfolio.value?.tokens || []);
-
-const getTokenIcon = (symbol: string): string => {
-  const iconMap: Record<string, string> = {
-    BTC: "i-lucide-bitcoin",
-    ETH: "i-lucide-layers",
-    USDC: "i-lucide-circle-dollar-sign",
-    USDT: "i-lucide-circle-dollar-sign",
-  };
-  return iconMap[symbol.toUpperCase()] || "i-lucide-coins";
-};
-
-const getTokenIconColor = (symbol: string): string => {
-  const colorMap: Record<string, string> = {
-    BTC: "text-orange-500",
-    ETH: "text-blue-500",
-    USDC: "text-blue-400",
-    USDT: "text-green-400",
-  };
-  return colorMap[symbol.toUpperCase()] || "text-muted";
-};
 
 onMounted(async () => {
   if (address.value) {

@@ -1,12 +1,6 @@
 import type { Address } from "viem";
 import { createPublicClient, http, getAddress } from "viem";
-import {
-  internal,
-  preconditionFailed,
-  unauthorized,
-  validation,
-  toHttp,
-} from "@server/errors";
+import { internal, preconditionFailed, unauthorized, validation, toHttp } from "@server/errors";
 import { validateSiweMessage } from "@server/utils/authUtils";
 import { logError } from "@server/utils/logger";
 import { validateBody } from "@server/utils/validation";

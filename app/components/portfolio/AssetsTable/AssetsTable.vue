@@ -2,7 +2,10 @@
   <UCard class="bg-app-card border-muted">
     <template #header>
       <div class="flex justify-between items-center gap-4">
-        <div class="text-lg font-medium text-default">Assets</div>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-lucide-coins" class="size-3.5 text-sky-400" />
+          <span class="font-medium">Assets</span>
+        </div>
         <UInput
           v-model="searchQuery"
           class="max-w-sm min-w-[12ch]"
@@ -18,38 +21,45 @@
       ref="table"
       v-model:expanded="expanded"
       v-model:pagination="pagination"
+      :column-visibility="columnVisibility"
       :pagination-options="{
         getPaginationRowModel: getPaginationRowModel(),
       }"
       :data="filteredTokens"
       :columns="columns"
       :loading="isLoading"
+      :on-select="onRowSelect"
       :ui="{ tr: 'data-[expanded=true]:bg-elevated/50' }"
     >
       <template #expanded="{ row }">
-        <div class="px-4 py-4 space-y-3">
-          <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="py-4 space-y-3 md:hidden">
+          <div class="grid grid-cols-2 gap-4 text-xs">
             <div>
-              <span class="text-muted">Network:</span>
-              <span class="ml-2 font-medium text-default">{{ row.original.network }}</span>
-            </div>
-            <div>
-              <span class="text-muted">Token Address:</span>
-              <span class="ml-2 font-mono text-xs text-default">
-                {{ row.original.tokenAddress || "Native Token" }}
-              </span>
-            </div>
-            <div>
-              <span class="text-muted">Balance:</span>
+              <span class="text-muted">Name:</span>
               <span class="ml-2 font-medium text-default">
-                {{ formatBalance(row.original.tokenBalance) }}
+                {{ row.original.tokenMetadata.name ?? "" }}
               </span>
             </div>
             <div>
-              <span class="text-muted">Price:</span>
+              <span class="text-muted">Chain:</span>
               <span class="ml-2 font-medium text-default">
-                {{ formatCurrency(row.original.tokenPrice) }}
+                {{ networkToNameMap[row.original.network] }}
               </span>
+            </div>
+            <div class="col-span-2">
+              <span class="text-muted">Contract:</span>
+              <span class="ml-2 font-mono text-xs text-default break-all">
+                {{
+                  row.original.tokenAddress
+                    ? truncateAddress(row.original.tokenAddress)
+                    : "Native token"
+                }}
+              </span>
+              <CopyToClipboardButton
+                v-if="row.original.tokenAddress"
+                :text="row.original.tokenAddress"
+                copy-label="Copy contract address"
+              />
             </div>
           </div>
         </div>
@@ -67,12 +77,15 @@
 </template>
 
 <script setup lang="ts">
-import { h, resolveComponent, computed, onBeforeUnmount } from "vue";
+import { h, resolveComponent, computed, onBeforeUnmount, watch } from "vue";
 import { debounce } from "lodash-es";
 import type { TableColumn } from "@nuxt/ui";
+import type { Row } from "@tanstack/vue-table";
 import ChainIcon from "./ChainIcon.vue";
 import Token from "./Token.vue";
+import { networkToNameMap } from "./config";
 import { getPaginationRowModel } from "@tanstack/vue-table";
+import { breakpointsTailwind } from "@vueuse/core";
 
 const props = defineProps<{
   tokens: TokenDto[];
@@ -81,6 +94,24 @@ const props = defineProps<{
 
 const table = useTemplateRef("table");
 
+const breakpoints = useBreakpoints(breakpointsTailwind);
+const isDesktop = breakpoints.greaterOrEqual("md");
+
+const columnVisibility = computed<Record<string, boolean>>(() => {
+  if (isDesktop.value) return {};
+  const visibility: Record<string, boolean> = {
+    chain: false,
+    tokenBalance: false,
+    tokenPrice: false,
+  };
+  return visibility;
+});
+
+const onRowSelect = computed<((event: Event, row: Row<TokenDto>) => void) | undefined>(() => {
+  if (isDesktop.value) return undefined;
+  return (_event, row) => row.toggleExpanded();
+});
+
 const searchQuery = ref<string>("");
 const debouncedSearchQuery = ref<string>("");
 const expanded = ref<Record<string, boolean>>({});
@@ -88,6 +119,11 @@ const pagination = ref<{ pageIndex: number; pageSize: number }>({
   pageIndex: 0,
   pageSize: 10,
 });
+
+watch(isDesktop, desktop => {
+  if (desktop) expanded.value = {};
+});
+
 const filteredTokens = computed<TokenDto[]>(() => {
   if (!debouncedSearchQuery.value.trim()) {
     return props.tokens;
@@ -111,10 +147,10 @@ const handleSearchInput = (value: string) => {
   if (!value.trim()) {
     updateDebouncedSearch.cancel();
     debouncedSearchQuery.value = "";
-    pagination.value.pageIndex = 0; // Reset to first page when search is cleared
+    pagination.value.pageIndex = 0;
     return;
   }
-  pagination.value.pageIndex = 0; // Reset to first page when search changes
+  pagination.value.pageIndex = 0;
   updateDebouncedSearch(value);
 };
 
@@ -122,42 +158,31 @@ const UButton = resolveComponent("UButton");
 
 const columns: TableColumn<TokenDto>[] = [
   {
-    id: "expand",
-    cell: ({ row }) =>
-      h(UButton, {
-        color: "neutral",
-        variant: "ghost",
-        icon: "i-lucide-chevron-down",
-        square: true,
-        "aria-label": "Expand",
-        ui: {
-          leadingIcon: [
-            "transition-transform",
-            row.getIsExpanded() ? "duration-200 rotate-180" : "",
-          ],
-        },
-        onClick: () => row.toggleExpanded(),
-      }),
-  },
-  {
+    id: "token",
     accessorKey: "tokenMetadata",
     header: "Token",
     cell: ({ row }) => {
       return h(Token, {
-        tokenMetadata: row.getValue("tokenMetadata") as TokenMetadataDto,
+        tokenMetadata: row.getValue("token") as TokenMetadataDto,
+        tokenAddress: row.original.tokenAddress,
+        network: row.original.network,
+        tokenBalance: row.original.tokenBalance,
+        compact: !isDesktop.value,
       });
     },
   },
   {
+    id: "chain",
     accessorKey: "network",
     header: "Chain",
     cell: ({ row }) => {
       return h(ChainIcon, {
-        network: row.getValue("network") as NetworkId,
+        network: row.getValue("chain") as NetworkId,
       });
     },
   },
   {
+    id: "tokenBalance",
     accessorKey: "tokenBalance",
     header: "Balance",
     cell: ({ row }) => {
@@ -166,6 +191,7 @@ const columns: TableColumn<TokenDto>[] = [
     },
   },
   {
+    id: "tokenPrice",
     accessorKey: "tokenPrice",
     header: "Price",
     cell: ({ row }) => {
@@ -174,7 +200,14 @@ const columns: TableColumn<TokenDto>[] = [
     },
   },
   {
+    id: "tokenValue",
     accessorKey: "tokenValue",
+    meta: {
+      class: {
+        th: "text-end",
+        td: "text-end",
+      },
+    },
     header: ({ column }) => {
       const isSorted = column.getIsSorted();
 
@@ -187,13 +220,18 @@ const columns: TableColumn<TokenDto>[] = [
             ? "i-lucide-arrow-up-narrow-wide"
             : "i-lucide-arrow-down-wide-narrow"
           : "i-lucide-arrow-up-down",
-        class: "-mx-2.5",
+        class: "-me-2.5 -ms-0.5",
         onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
       });
     },
     cell: ({ row }) => {
-      const amount = row.getValue("tokenValue") as number;
-      return formatCurrency(amount);
+      const value = row.getValue("tokenValue") as number;
+      if (isDesktop.value) return formatCurrency(value);
+      const price = row.original.tokenPrice;
+      return h("div", { class: "flex flex-col items-end leading-tight" }, [
+        h("span", { class: "font-medium text-default" }, formatCurrency(value)),
+        h("span", { class: "text-xs text-muted" }, formatCurrency(price)),
+      ]);
     },
   },
 ];

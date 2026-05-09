@@ -41,17 +41,17 @@ interface NetWorthCardProps {
 
 const props = defineProps<NetWorthCardProps>();
 
-const dollars = computed<string>(() => {
-  const value = props.totalValue || 0;
-  return formatCurrency(Math.floor(value), { maximumFractionDigits: 0 });
-});
-
-const cents = computed<string>(() => {
-  const value = props.totalValue || 0;
-  return Math.floor((value % 1) * 100)
+// Round to integer cents once, then split — sidesteps the floating-point
+// drift that makes `(100.05 % 1) * 100` evaluate to 4.999999…
+const totalCents = computed<number>(() => Math.round((props.totalValue || 0) * 100));
+const dollars = computed<string>(() =>
+  formatCurrency(Math.trunc(totalCents.value / 100), { maximumFractionDigits: 0 }),
+);
+const cents = computed<string>(() =>
+  Math.abs(totalCents.value % 100)
     .toString()
-    .padStart(2, "0");
-});
+    .padStart(2, "0"),
+);
 
 const hasChange = computed<boolean>(
   () => props.valueChange24h != null && props.valueChangePercent24h != null,

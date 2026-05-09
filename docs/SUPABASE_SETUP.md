@@ -101,7 +101,7 @@ CREATE INDEX IF NOT EXISTS idx_snapshots_timestamp
 
 -- Function to get or create a wallet by address
 CREATE OR REPLACE FUNCTION get_or_create_wallet(wallet_address TEXT)
-RETURNS UUID 
+RETURNS UUID
 LANGUAGE plpgsql
 SET search_path = public
 AS $$
@@ -126,7 +126,7 @@ $$;
 
 -- Delete old snapshots (keep last 90 days)
 CREATE OR REPLACE FUNCTION cleanup_old_snapshots(days_to_keep INTEGER DEFAULT 90)
-RETURNS INTEGER 
+RETURNS INTEGER
 LANGUAGE plpgsql
 SET search_path = public
 AS $$

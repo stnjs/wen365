@@ -7,12 +7,13 @@ import {
 import { mapToPortfolioDto } from "@server/mappers/portfolio.mapper";
 import { SUPPORTED_NETWORKS } from "@server/config/networks";
 import { BLACKLISTED_TOKENS } from "@server/constants/blacklistedTokens";
-import { NATIVE_TOKENS, DEFAULT_ETH_METADATA } from "@server/constants/nativeTokens";
+import { NETWORK_BY_ID } from "#shared/config/networks";
 import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 import { fetchWithRetry } from "@server/utils/retryUtils";
 import { upstreamFailed, wrapUpstream } from "@server/errors";
 
-const MIN_TOKEN_VALUE_USD = 0.03;
+// $0.50 floor: drops dust + most low-value spam airdrops. See ADR-0006.
+const MIN_TOKEN_VALUE_USD = 0.5;
 const MAX_PAGES = 100;
 
 export const getAlchemyTokensByAddress = async (
@@ -80,11 +81,7 @@ async function fetchAllAlchemyPages(
       });
     }
 
-    const response = await getAlchemyTokensByAddress(
-      walletAddress,
-      alchemyApiKey,
-      pageKey,
-    );
+    const response = await getAlchemyTokensByAddress(walletAddress, alchemyApiKey, pageKey);
     allTokens.push(...response.data.tokens);
     pageKey = response.data.pageKey || undefined;
     pageCount++;
@@ -96,15 +93,12 @@ async function fetchAllAlchemyPages(
 function isTokenBlacklisted(token: TokenDto): boolean {
   return BLACKLISTED_TOKENS.some(
     blacklistedToken =>
-      blacklistedToken.address === token.tokenAddress &&
-      blacklistedToken.network === token.network,
+      blacklistedToken.address === token.tokenAddress && blacklistedToken.network === token.network,
   );
 }
 
-/**
- * Enriches native token metadata with predefined values
- * Uses network-specific metadata if available, otherwise falls back to ETH metadata
- */
+// Falls back to the registry's native-token metadata only when Alchemy
+// returns nothing of its own for a native token (`tokenAddress === null`).
 function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
   if (token.tokenAddress) {
     return token;
@@ -119,11 +113,10 @@ function enrichNativeTokenMetadata(token: AlchemyToken): AlchemyToken {
   if (hasMetadata) {
     return token;
   }
-  const metadata = NATIVE_TOKENS[token.network] || DEFAULT_ETH_METADATA;
 
   return {
     ...token,
-    tokenMetadata: metadata,
+    tokenMetadata: NETWORK_BY_ID[token.network].nativeToken,
   };
 }
 
@@ -149,10 +142,7 @@ function deduplicateTokens(tokens: TokenDto[]): TokenDto[] {
   return Array.from(tokenMap.values());
 }
 
-function addPercentageToTokens(
-  tokens: TokenDto[],
-  totalValue: number,
-): TokenDto[] {
+function addPercentageToTokens(tokens: TokenDto[], totalValue: number): TokenDto[] {
   if (totalValue === 0) {
     return tokens.map(token => ({ ...token, percentage: 0 }));
   }
@@ -169,17 +159,13 @@ export async function getPortfolio(
 ): Promise<PortfolioDto> {
   const allAlchemyTokens = await fetchAllAlchemyPages(walletAddress, alchemyApiKey);
 
-  const enrichedTokens = allAlchemyTokens.map(token =>
-    enrichNativeTokenMetadata(token),
-  );
+  const enrichedTokens = allAlchemyTokens.map(token => enrichNativeTokenMetadata(token));
 
   // Transform to DTOs using Zod schema (validates + transforms).
   // Any ZodError here is an Alchemy contract violation — re-raise as upstream.
   let allTokenDtos: TokenDto[];
   try {
-    allTokenDtos = enrichedTokens.map(token =>
-      TokenDtoFromAlchemySchema.parse(token),
-    );
+    allTokenDtos = enrichedTokens.map(token => TokenDtoFromAlchemySchema.parse(token));
   } catch (err) {
     throw upstreamFailed("alchemy", {
       details: { reason: "token_contract_violation" },
@@ -190,10 +176,7 @@ export async function getPortfolio(
   const uniqueTokens = deduplicateTokens(allTokenDtos);
 
   const activeTokens = uniqueTokens
-    .filter(
-      token =>
-        token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token),
-    )
+    .filter(token => token.tokenValue >= MIN_TOKEN_VALUE_USD && !isTokenBlacklisted(token))
     .sort((a, b) => b.tokenValue - a.tokenValue);
 
   const totalValue = roundToTwoDecimals(

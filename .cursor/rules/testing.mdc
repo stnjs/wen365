@@ -1,336 +1,478 @@
 ---
-description: Testing patterns and best practices for unit and Nuxt tests
-globs: test/**/*.test.ts,test/**/*spec.ts
+description: Testing philosophy and Vitest mechanics for Wen365 — what makes a test worth writing, what to mock, how to query and assert, and how to keep the suite from rotting
+globs: test/**/*.{test,spec}.ts,test/**/*.ts
 alwaysApply: false
 ---
 
-# Testing Guidelines
+# Testing — Philosophy and Practice
 
-This project uses **Vitest** for testing. Follow these patterns for writing maintainable, isolated tests.
+This document is opinionated. It encodes what makes a *good* test in Wen365, not just what makes a test pass. Read it before adding or editing tests. The reviewer checklist at the bottom is the gate every test must pass before merging.
 
-## Test File Naming
+## TL;DR
 
-- Use `.test.ts` or `.spec.ts` extension
-- Match source file structure: `sourceFile.test.ts`
-- Example: `formatterUtils.test.ts` tests `formatterUtils.ts`
+- Test **observable behavior**, not internal structure.
+- Mock at the **process boundary** (network, DB, browser APIs); never mock things inside our own code.
+- Every test must justify its existence by naming a **concrete bug** it catches.
+- One concept per test, behavior-named (no "should"), max two `describe` levels.
+- **No coverage targets, zero tolerance for flakes.**
+- Use the [reviewer checklist](#reviewer-checklist) before committing any new test.
 
-## Test Types
+---
 
-### Unit Tests
+## 1. The root principle: behavior over implementation
 
-- **Environment**: `node`
-- **Location**: `test/unit/**/*.test.ts`
-- **Purpose**: Test pure functions, utilities, mappers, and business logic
-- **Run**: `pnpm test:unit`
+A test passes if and only if the **observable behavior** the user (human or upstream caller) cares about is correct. It does not care how the code is structured internally.
 
-```typescript
-// ✅ Good: Testing pure utility function
+The test of a test:
+
+> *"If I rewrite the implementation completely — different functions, different file layout, different intermediate variables — but the inputs and observable outputs stay the same, does the test still pass?"*
+>
+> If yes → good test. If no → it's coupled to implementation and will create churn on every refactor.
+
+**Narrow exceptions.** Assertions on a thing that *is* the external contract are allowed:
+
+- Asserting `$fetch` was called with a specific URL — the URL is the contract with the server.
+- Asserting an emitted event payload — the event is part of the component's public API.
+- Asserting a route param parsing — the URL is the contract with the browser.
+
+The test for "is this an exception": *would changing the assertion break a real consumer that lives outside this codebase (server, browser, screen reader, another service)?* If yes, it's a contract. If only an internal Wen365 caller would notice, it's implementation.
+
+---
+
+## 2. Where to mock — the seam principle
+
+> **Mock at the boundary of code you don't own. Do not mock things inside your own house.**
+
+"Code you don't own" lives behind a process, network, disk, or environmental boundary. Inside Wen365 — `app/`, `server/`, `shared/` — is yours. Don't mock yours.
+
+**Process boundaries in this codebase:**
+
+- HTTP via `$fetch` (the client → server boundary)
+- Alchemy SDK (network)
+- Supabase client (network)
+- `localStorage` / `sessionStorage` (browser API)
+- `window.ethereum` (wallet API)
+- `Date.now()`, `Math.random()`, `crypto.randomUUID()` (environmental nondeterminism)
+
+**Concrete pattern per layer:**
+
+| Layer | Mock | Run for real |
+|---|---|---|
+| `server/utils`, `server/mappers`, `server/errors` | nothing | the function under test |
+| `server/services/` | Alchemy SDK, Supabase client | `server/utils`, `server/mappers`, retry logic, the service itself |
+| `server/api/<route>.ts` | Alchemy / Supabase | the full Nitro request pipeline via `setup()` + `$fetch()` |
+| `app/composables/queries/*` | `$fetch` only | TanStack Query, the composable, real `QueryClient` |
+| `app/components/**/*.vue` | stub Nuxt UI primitives (third-party) | component logic, real DOM |
+
+**Carve-out — child components in a parent test.** You may stub a child component inside a parent component's test **if and only if** the child has its own dedicated test. This avoids double-testing the child while keeping the parent test focused.
+
+```ts
+// ✅ Stubbing OK — Token has its own test in test/nuxt/components/portfolio/AssetsTable/Token.test.ts
+const stubs = {
+  Token: {
+    template: '<tr data-testid="row" :data-symbol="token.tokenMetadata.symbol" />',
+    props: ["token"],
+  },
+};
+mountSuspended(AssetsTable, { props: { tokens }, global: { stubs } });
+```
+
+If the child has no test of its own, **don't stub it** — that would mean the child's behavior is unverified anywhere.
+
+**Anti-patterns.**
+
+- ❌ Mocking `useQuery` to verify "you passed a `queryFn`" — that tests *that you used TanStack at all*, which is structure. Mock `$fetch` instead and let TanStack run.
+- ❌ Mocking your own `mapToTokenDto` when testing the service that calls it. Run the real mapper.
+- ❌ Mocking your own utility (`roundToTwoDecimals`) when testing a higher layer. It's pure — run it.
+
+---
+
+## 3. What earns a test — the deleting-risk rule
+
+Before writing a test, ask:
+
+> *"If I delete this test, name a specific bug that could ship that wouldn't be caught by other tests, TypeScript, ESLint, or a runtime error in the first 10 seconds of using the feature."*
+
+If you can't name a concrete bug → **don't write the test**.
+
+**Code earns a test when it has at least one of:**
+
+1. **Branching logic** — `if`/`else`, ternaries, `switch`, conditional rendering, optional chaining that handles missing data differently.
+2. **Data transformation** — mappers, formatters, parsers, normalizers (input shape ≠ output shape).
+3. **Edge / boundary values** — null, undefined, empty array, zero, negative, very large, off-by-one.
+4. **Error / failure paths** — rejected promise, 4xx/5xx response, offline, race.
+5. **A contract with the outside world** — fetch URL, request body shape, emitted event payload, route param parsing.
+6. **A regression you just fixed** — every fixed bug ships with a test that fails on the parent commit and passes on the fix.
+7. **Non-obvious correctness** — a future reader would say *"wait, why does it do that?"*.
+
+**Code does NOT earn a test when it's:**
+
+- **Trivial pass-through** — a function that just calls another with no logic between.
+- **Type-checked already** — TypeScript already enforces it; a runtime assert adds nothing.
+- **Framework behavior** — Vue reactivity, Nuxt auto-imports, TanStack caching. Their authors test these.
+- **Pure visual styling** — that a div has class `text-red-500`. Use visual regression tooling or accept the risk.
+- **Configuration / constants** — asserting `MAX_RETRIES === 3` proves nothing.
+- **Glue code with no decisions** — a page that just composes 3 components and passes props.
+
+There is **no automatic test floor** ("every service must have a test"). The deleting-risk rule is the only gate.
+
+---
+
+## 4. DOM queries and assertions in component tests
+
+**Query priority — pick the highest one that works:**
+
+1. **Accessible role or accessible name** — `wrapper.find('button[aria-label="Connect wallet"]')`, `wrapper.find('[role="dialog"]')`. Mimics how a screen reader, e2e test, or human user identifies the element.
+2. **Visible text** — `wrapper.text()`, `wrapper.find('h1').text()`. Best for content assertions.
+3. **`data-testid`** — opt-in test hook. Use when (1) and (2) don't apply, or to disambiguate. Convention: `data-testid="net-worth-badge"` (kebab-case, namespaced to the component).
+4. **Component reference** — `wrapper.findComponent(Token)`. Only to assert *what props you passed to a child*. Never to reach into the child's internal state.
+
+**Forbidden queries:**
+
+- ❌ `wrapper.find(".text-success-500")` — couples to a Tailwind utility that may change for unrelated reasons.
+- ❌ `wrapper.find("div > div > span:nth-child(2)")` — couples to DOM structure.
+- ❌ `wrapper.find("#some-id")` — IDs are usually presentational and churn.
+- ❌ `wrapper.vm.someInternalRef` — reaches into Vue internals.
+
+**Assertion shape:**
+
+- Assert what the user **perceives**: text, presence/absence, ARIA state, semantic color via stub attribute, input value, emitted event payload.
+- Prefer matchers that produce informative diffs (`toBe`, `toEqual`, `toContain`, `toMatchObject`) over boolean coercion (`toBe(true)` on a derived expression).
+- ❌ Don't snapshot test entire components — they fail on every cosmetic change and nobody reads the diff. Targeted snapshots are OK for *small, stable, semantic* outputs (e.g. a parser/formatter result).
+
+**Stub design-system components to expose semantic surfaces.**
+
+```ts
+const uiStubs = {
+  UCard: { template: '<div><slot name="header" /><slot /></div>' },
+  UBadge: {
+    inheritAttrs: false,
+    props: ["color", "variant", "size"],
+    template: '<span data-testid="badge" :data-color="color"><slot /></span>',
+  },
+  UIcon: {
+    inheritAttrs: false,
+    props: ["name"],
+    template: '<i :data-icon="name" />',
+  },
+};
+
+// The test asserts on the *meaning* (data-color), not the styling (Tailwind class).
+expect(badge.attributes("data-color")).toBe("success");
+```
+
+---
+
+## 5. Single-test shape
+
+**Naming.** The full `describe` + `it` reads like a spec line in plain English. Imperative, present tense, behavior-focused. Drop `"should"` — it's filler.
+
+```ts
+// ✅ Good
+describe("NetWorthCard", () => {
+  it("splits totalValue into a dollars-and-cents pair", () => { /* … */ });
+  it("pads single-digit cents with a leading zero", () => { /* … */ });
+  it("hides the 24h badge when delta data is absent", () => { /* … */ });
+});
+
+// ❌ Bad
+it("works", () => { /* … */ });
+it("test 1", () => { /* … */ });
+it("returns correct value", () => { /* … */ });
+it("should test the badge", () => { /* … */ });
+```
+
+**AAA structure with blank lines, no comments.** Blank lines do the work; `// Arrange` comments are noise.
+
+```ts
+it("rounds 23.125 to 23.13", () => {
+  const input = 23.125;
+
+  const result = roundToTwoDecimals(input);
+
+  expect(result).toBe(23.13);
+});
+```
+
+**One concept per test.** Multiple `expect`s OK when they support the same concept. The "and" rule: if the test name contains "and", split the test.
+
+```ts
+// ✅ Good — one concept (positive badge appearance), three expects on the same badge
+it("renders a positive 24h badge in success color with a + sign", async () => {
+  const wrapper = await mountCard({ totalValue: 1000, valueChangePercent24h: 5.5 });
+  const badge = wrapper.find("[data-testid='badge']");
+
+  expect(badge.attributes("data-color")).toBe("success");
+  expect(badge.text()).toContain("+");
+  expect(badge.text()).toContain("5.50%");
+});
+
+// ❌ Bad — multiple concepts in one test
+it("renders badge correctly and disables when no data and pads cents", () => { /* … */ });
+```
+
+**`describe` nesting: max two levels.**
+
+- Level 1: the unit under test → `describe("NetWorthCard")` or `describe("formatterUtils")`.
+- Level 2 (optional): by method (`describe("roundToTwoDecimals")`) or scenario (`describe("when address is null")`).
+- 3+ levels is a code smell — extract a separate file or flatten cases into the test name.
+
+**No committed `it.only`, `it.skip`, `xit`, or `describe.only`.** If a test is broken, fix it or delete it. CI must reject `.only`.
+
+**`beforeEach` is for mock reset and fresh fixtures only.** Don't share elaborate setup across tests through `beforeEach` — that creates implicit dependencies. Each test should be readable top-to-bottom on its own. If multiple tests need the same setup, extract a helper function (`mountCard(props)`) — see `NetWorthCard.test.ts` for the pattern.
+
+**Failure messages should self-explain.**
+
+```ts
+// ❌ Bad — diff says "expected true, got false"; have to read the test source.
+expect(badge.classes().includes("text-success-500")).toBe(true);
+
+// ✅ Good — diff says 'expected "muted", got "success"'; self-evident.
+expect(badge.attributes("data-color")).toBe("success");
+```
+
+---
+
+## 6. Test data — pragmatic factories
+
+**Default to inline literals or top-of-file `const` in small files.** Extract a factory only when the same shape is duplicated across multiple tests (rule of thumb: 3+ uses, or whenever inline noise is drowning the test's intent).
+
+**When you do extract a factory:**
+
+```ts
+// test/factories/portfolio.ts
+import type { Token, PortfolioDto } from "#shared/types";
+
+export const makeToken = (overrides: Partial<Token> = {}): Token => ({
+  network: "eth-mainnet",
+  tokenAddress: "0x0000000000000000000000000000000000000001",
+  tokenMetadata: { name: "Test Token", symbol: "TST", decimals: 18, logo: null },
+  tokenBalance: "1.5",
+  tokenValue: 100,
+  tokenPrice: 66.67,
+  ...overrides,
+});
+
+export const makePortfolio = (overrides: Partial<PortfolioDto> = {}): PortfolioDto => ({
+  totalValue: 0,
+  totalValueChange24h: 0,
+  totalValueChangePercent24h: 0,
+  tokens: [],
+  ...overrides,
+});
+```
+
+```ts
+// In a test — the reader instantly sees what this test is about
+it("filters out tokens with zero value", () => {
+  const tokens = [makeToken({ tokenValue: 100 }), makeToken({ tokenValue: 0 })];
+  // …
+});
+```
+
+**Rules:**
+
+- Defaults represent a **valid, minimal happy-path** object. The convention: *"the default is correct; this test varies one thing."*
+- Each call returns a fresh object (use spread, not a frozen reference). No shared mutable instances across `it` blocks.
+- **Type overrides as `Partial<T>`.** TypeScript enforces completeness on the defaults; tests fill only what matters.
+- **Per ADR-0003, separate factories per layer.** `makeAlchemyToken` (server-side, for mapper/service tests) is **separate from** `makeToken` (client DTO, for component/composable tests). Don't mix.
+
+**Forbidden anti-patterns regardless of approach:**
+
+- ❌ **Type casts to fudge missing fields** — `{ tokenValue: 100 } as Token`. Defeats the type system. Use a factory or fill the literal.
+- ❌ **Top-of-file mutable shared instances.** Tests must not mutate shared state across `it` blocks.
+- ❌ **Production data** — real wallet addresses, real Alchemy responses. Use synthetic addresses (`0x0000…0001`, `0x0000…0002`) — easier to read in failure diffs, no privacy concerns. *Exception:* dedicated "real-payload contract" fixtures whose entire purpose is detecting upstream API drift.
+
+---
+
+## 7. The test pyramid for Wen365
+
+**Trophy-shaped, with a heavy server-side unit base.** Priority order when adding tests:
+
+**Tier 1 — always test:**
+
+- `server/utils/`, `server/mappers/`, `server/errors/`, `server/config/` — pure functions, branching logic. Cheap, fast unit tests in node env.
+- `server/services/` — orchestrators with business logic (retry, filtering, sorting, aggregation). Mock at the process boundary (Alchemy, Supabase).
+
+**Tier 2 — test when there's logic worth protecting:**
+
+- Composables in `app/composables/` with branching, state, or a route contract.
+- Components with conditional rendering, formatting, branching, or user interaction.
+
+**Tier 3 — underinvested today, should grow:**
+
+- **API route handlers in `server/api/`** using `@nuxt/test-utils` `setup()` + `$fetch()` against a test instance. Catches: validation gaps, auth bypass, error leakage, response-shape drift. *Currently zero coverage; the biggest gap.*
+
+**Tier 4 — defer:**
+
+- Full-page tests for pure layout pages (`dashboard.vue`, `index.vue`).
+- Browser e2e (Playwright/Cypress through real wallet flow). Defer until features stabilize and a regression class consistently escapes Tiers 1–3.
+
+**Heuristic for adding tests after a feature:**
+
+1. New pure function in `server/utils|mappers|errors|services` → **always** add a test.
+2. New API route in `server/api/` → **always** add a route test (`setup()` + `$fetch()`). Assert auth gating, validation errors, success shape.
+3. New composable → test only if it has branching, state, or a URL contract.
+4. New component → test only if it has conditional rendering, interaction, or formatting logic.
+5. **Don't write a "renders without throwing" smoke test.** It catches almost nothing TypeScript doesn't already catch.
+
+**Two specific patterns to reject:**
+
+- ❌ `wrapper.findComponent(NetWorthCard).exists()` from a `dashboard.vue` mount — that tests Vue's rendering, not behavior.
+- ❌ `expect(useDemoMode().enabled.value).toBeDefined()` — that tests TypeScript, which already enforces it.
+
+---
+
+## 8. Maintenance — coverage, flakes, deletion, churn
+
+**Coverage.** **No coverage targets.** Coverage is a *diagnostic*, not a goal. Goodhart's Law applies: targets cause meaningless tests that exercise lines without asserting anything. When reviewing a PR, look at *which lines you changed are uncovered* and ask whether they're risk-bearing. If yes, add a test. If they're trivial pass-throughs, leave them.
+
+**Flakes.** **Zero tolerance.** A flaky test is worse than no test — it teaches the team to ignore CI.
+
+When a test flakes:
+
+1. Investigate the **root cause**: real timer instead of fake, race, shared state, network call leak, async assertion without `await`, ordering dependency, missing `vi.clearAllMocks()`.
+2. Fix it the same session.
+3. **Forbidden "fixes":** `retry: 3`, `it.skip`, `setTimeout` waits, `try/catch` swallowing the assertion, raised timeouts.
+4. If you can't fix it in the same PR → **delete the test**. A deleted test is honest; a flaky test is a lie.
+
+**Deletion criteria.** Delete a test when:
+
+- ✅ The feature it tests was removed.
+- ✅ It duplicates another test with strictly broader coverage (kill the narrower one).
+- ✅ It tests implementation details that legitimately changed during a refactor, **and** another test still covers the behavior.
+- ✅ It's flaky and the root cause isn't fixable now.
+- ✅ Its only assertion is trivial (`toBeDefined`, `wrapper.exists()`).
+- ✅ Coverage exists at a higher seam that catches the same bug less brittly.
+
+Don't delete a test just because it's currently failing — investigate first.
+
+**Churn signal.** If a refactor that doesn't change behavior requires editing N tests, the tests are over-coupled. The fix is to *rewrite the tests against behavior* (per §1 / §2), not to keep updating them. AI agents whose PRs edit ≥5 tests for a non-behavior-changing refactor are exhibiting this smell.
+
+---
+
+## Reviewer checklist
+
+Before committing or merging any new or changed test, walk through these in order. Any "no" → reject or rewrite.
+
+1. **Deleting-risk** (§3): can you name a concrete bug this test catches?
+2. **Refactor-resilient** (§1): would the test still pass if I rewrote the implementation while keeping observable behavior the same?
+3. **Process-boundary mocks only** (§2): does it mock only `$fetch`, Alchemy, Supabase, browser APIs — and nothing inside our own house? (Carve-out: child components with their own dedicated test may be stubbed.)
+4. **Robust queries** (§4): no CSS-class queries, no DOM-structure queries, no `wrapper.vm.*`?
+5. **Reads as a sentence** (§5): does `describe` + `it` read like a spec line in plain English? One concept per test?
+6. **Right tier** (§7): is this test at the cheapest tier that can catch the bug?
+
+---
+
+## Mechanics — Vitest in Wen365
+
+**Project layout** (enforced by `vitest.config.ts`):
+
+- `test/unit/**/*.{test,spec}.ts` — node env, pure logic. Run via `pnpm test:unit`.
+- `test/nuxt/**/*.{test,spec}.ts` — Nuxt env (auto-imports, components, composables). Run via `pnpm test:nuxt`.
+- `test/factories/<domain>.ts` — domain-specific factories (when extracted; see §6).
+- `test/nuxt/api/**` — API route tests with `setup()` + `$fetch()` (Tier 3 area; should grow).
+
+Both run via `pnpm test`. Always run `pnpm type-check` and `pnpm lint` before claiming work done (per `AGENTS.md`).
+
+**Async + time.**
+
+```ts
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+it("retries with exponential backoff", async () => {
+  const promise = serviceCall();
+
+  await vi.runAllTimersAsync();
+
+  await expect(promise).resolves.toEqual(expected);
+});
+```
+
+Always restore real timers in `afterEach`. Never `await new Promise(r => setTimeout(r, 1000))`.
+
+**Mock isolation.**
+
+```ts
+beforeEach(() => {
+  vi.clearAllMocks();
+  // re-prime any default mock returns here
+});
+```
+
+**Composable testing pattern (§2).** Mock at the process boundary — `$fetch` only. Let TanStack Query run.
+
+```ts
+const mockFetch = vi.fn();
+global.$fetch = mockFetch as unknown as typeof global.$fetch;
+
+it("does not fetch when address is null", async () => {
+  const address = ref<string | null>(null);
+
+  const { data } = usePortfolio(address);
+  await flushPromises();
+
+  expect(mockFetch).not.toHaveBeenCalled();
+  expect(data.value).toBeUndefined();
+});
+```
+
+**Component testing pattern (§4).** Stub external UI primitives to expose semantic attributes; render real DOM otherwise.
+
+```ts
+const uiStubs = {
+  UCard: { template: '<div><slot name="header" /><slot /></div>' },
+  UBadge: {
+    inheritAttrs: false,
+    props: ["color", "variant", "size"],
+    template: '<span data-testid="badge" :data-color="color"><slot /></span>',
+  },
+};
+
+async function mountCard(props: Record<string, unknown>) {
+  return mountSuspended(NetWorthCard, { props, global: { stubs: uiStubs } });
+}
+```
+
+**API route test pattern (Tier 3, §7).** Use `@nuxt/test-utils` to boot a test Nuxt instance and call routes via `$fetch`. Mock Alchemy / Supabase at the boundary; let Nitro, validation, error handlers, and the route itself run.
+
+```ts
+// test/nuxt/api/portfolio.test.ts
+import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { describe, it, expect } from "vitest";
-import { roundToTwoDecimals } from "@server/utils/formatterUtils";
 
-describe("formatterUtils", () => {
-  describe("roundToTwoDecimals", () => {
-    it("should round 23.125 to 23.13", () => {
-      expect(roundToTwoDecimals(23.125)).toBe(23.13);
-    });
+await setup({ /* test fixture options */ });
+
+describe("/api/portfolio/:address", () => {
+  it("returns 401 when unauthenticated", async () => {
+    await expect($fetch("/api/portfolio/0x0000000000000000000000000000000000000001"))
+      .rejects.toMatchObject({ statusCode: 401 });
   });
 });
 ```
 
-### Nuxt Tests
-
-- **Environment**: `nuxt`
-- **Location**: `test/nuxt/**/*.test.ts`
-- **Purpose**: Test composables, components, and Nuxt-specific functionality
-- **Run**: `pnpm test:nuxt`
-
-```typescript
-// ✅ Good: Testing Nuxt composable
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { usePortfolio } from "~/composables/queries/usePortfolio";
-import { ref } from "vue";
-
-describe("usePortfolio", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("should disable query when address is null", () => {
-    const address = ref<string | null>(null);
-    usePortfolio(address);
-    // Assertions...
-  });
-});
-```
-
-## Best Practices
-
-### 1. Test Organization
-
-- Use `describe` blocks to group related tests
-- Use descriptive test names that explain expected behavior
-- Follow AAA pattern: Arrange, Act, Assert
-
-```typescript
-// ✅ Good: Well-organized test
-describe("portfolio.service", () => {
-  describe("getPortfolio", () => {
-    it("should filter tokens with zero balance", async () => {
-      // Arrange
-      const promise = getPortfolio("0x123", "test-key");
-
-      // Act
-      await vi.runAllTimersAsync();
-      const result = await promise;
-
-      // Assert
-      expect(result.tokens.every(token => token.tokenValue > 0)).toBe(true);
-    });
-  });
-});
-```
-
-### 2. Mocking
-
-- Use `vi.mock()` for module-level mocks
-- Reset mocks in `beforeEach` for test isolation
-- Verify mock calls when testing integration
-
-```typescript
-// ✅ Good: Proper mock setup
-const mockConvertTokenBalanceToNumber = vi.fn();
-const mockCalculateTokenUsdValue = vi.fn();
-
-vi.mock("@server/utils/blockchainUtils", () => ({
-  convertTokenBalanceToNumber: (token: AlchemyToken) => mockConvertTokenBalanceToNumber(token),
-  calculateTokenUsdValue: (token: AlchemyToken) => mockCalculateTokenUsdValue(token),
-}));
-
-describe("portfolio.mapper", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockConvertTokenBalanceToNumber.mockReturnValue(1);
-  });
-
-  it("should call mocked functions correctly", () => {
-    // Test implementation
-    expect(mockConvertTokenBalanceToNumber).toHaveBeenCalledWith(alchemyToken);
-  });
-});
-```
-
-### 3. Async Testing
-
-- Use `async/await` for async operations
-- Use `vi.useFakeTimers()` and `vi.runAllTimersAsync()` for time-based tests
-- Always restore real timers in `afterEach`
-
-```typescript
-// ✅ Good: Fake timers for async tests
-describe("portfolio.service", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("should handle async operations", async () => {
-    const promise = getPortfolio("0x123", "test-key");
-    await vi.runAllTimersAsync();
-    const result = await promise;
-    expect(result).toBeDefined();
-  });
-});
-```
-
-### 4. Assertions
-
-- Use specific matchers (`toBe`, `toEqual`, `toHaveProperty`)
-- Use `toBeCloseTo` for floating-point comparisons
-- Test edge cases (null, undefined, empty arrays, zero values)
-
-```typescript
-// ✅ Good: Comprehensive assertions
-it("should handle edge cases", () => {
-  expect(roundToTwoDecimals(0)).toBe(0);
-  expect(roundToTwoDecimals(-23.125)).toBe(-23.12);
-  expect(roundToTwoDecimals(0.005)).toBe(0.01);
-});
-
-// Good example: Floating-point comparison
-it("should handle fractional balances", () => {
-  const result = convertTokenBalanceToNumber(token);
-  expect(result).toBeCloseTo(0.001, 10);
-});
-```
-
-### 5. Test Isolation
-
-- Each test should be independent
-- Use `beforeEach`/`afterEach` for setup/teardown
-- Clear mocks between tests
-
-```typescript
-// ✅ Good: Proper test isolation
-describe("usePortfolio", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockFetch.mockResolvedValue({});
-  });
-
-  it("should test scenario A", () => {
-    // Test A
-  });
-
-  it("should test scenario B", () => {
-    // Test B - independent of Test A
-  });
-});
-```
-
-### 6. Error Handling
-
-- Test error scenarios explicitly
-- Verify error messages and types
-- Test graceful degradation
-
-```typescript
-// ✅ Good: Error handling test
-it("should handle API errors gracefully", async () => {
-  const error = new Error("API Error");
-  mockFetch.mockRejectedValue(error);
-
-  const address = ref("0x123");
-  usePortfolio(address);
-
-  const call = mockUseQuery.mock.calls[0]?.[0];
-  if (call && call.queryFn) {
-    await expect(call.queryFn()).rejects.toThrow("API Error");
-  }
-});
-```
-
-## Test Coverage Goals
-
-- **Unit Tests**: Aim for 80%+ coverage of utility functions, mappers, and services
-- **Nuxt Tests**: Test all composables and critical component logic
-- **Edge Cases**: Always test null, undefined, empty, and error scenarios
-
-## Running Tests
+**Commands.**
 
 ```bash
-# Run all tests
-pnpm test
-
-# Run unit tests only
-pnpm test:unit
-
-# Run Nuxt tests only
-pnpm test:nuxt
-
-# Watch mode
-pnpm test:watch
-
-# Coverage report
-pnpm test:coverage
+pnpm test          # all tests
+pnpm test:unit     # node env only
+pnpm test:nuxt     # Nuxt env only
+pnpm test:watch    # watch mode
+pnpm test:coverage # coverage report (diagnostic only — no targets, see §8)
 ```
 
-## Common Patterns
-
-### Testing Business Logic
-
-```typescript
-it("should filter and sort tokens correctly", async () => {
-  const result = await getPortfolio("0x123", "test-key");
-
-  // Verify filtering
-  expect(result.tokens.every(token => token.tokenValue > 0)).toBe(true);
-
-  // Verify sorting
-  if (result.tokens.length > 1) {
-    for (let i = 0; i < result.tokens.length - 1; i++) {
-      expect(result.tokens[i].tokenValue).toBeGreaterThanOrEqual(result.tokens[i + 1].tokenValue);
-    }
-  }
-});
-```
-
-### Testing Data Transformations
-
-```typescript
-it("should map Alchemy token to DTO correctly", () => {
-  const alchemyToken: AlchemyToken = {
-    /* ... */
-  };
-  const result = mapToTokenDto(alchemyToken);
-
-  expect(result.network).toBe("eth-mainnet");
-  expect(result.tokenAddress).toBe("0x123");
-  expect(result.tokenMetadata.symbol).toBe("ETH");
-});
-```
-
-## Anti-Patterns to Avoid
-
-❌ **Don't**: Test implementation details
-
-```typescript
-// Bad: Testing internal function calls
-expect(mockInternalFunction).toHaveBeenCalledTimes(3);
-```
-
-✅ **Do**: Test behavior and outcomes
-
-```typescript
-// Good: Testing the result
-expect(result.tokens.length).toBe(5);
-```
-
-❌ **Don't**: Use real timers for async tests
-
-```typescript
-// Bad: Slow tests
-await new Promise(resolve => setTimeout(resolve, 1000));
-```
-
-✅ **Do**: Use fake timers
-
-```typescript
-// Good: Fast tests
-vi.useFakeTimers();
-await vi.runAllTimersAsync();
-```
-
-❌ **Don't**: Share state between tests
-
-```typescript
-// Bad: Shared mutable state
-let sharedData = {};
-
-it("test 1", () => {
-  sharedData.value = 1;
-});
-
-it("test 2", () => {
-  // May depend on test 1
-});
-```
-
-✅ **Do**: Isolate test data
-
-```typescript
-// Good: Isolated test data
-it("test 1", () => {
-  const data = { value: 1 };
-  // Test with data
-});
-```
+---
 
 ## References
 
-- [Vitest Getting Started](https://vitest.dev/guide/)
-- [Vitest API Reference](https://vitest.dev/api/)
-- [Nuxt 4 Testing Guide](https://nuxt.com/docs/4.x/getting-started/testing)
-- [Vitest Migration Guide](https://vitest.dev/guide/migration)
+- ADRs in `docs/adr/` — especially ADR-0003 (Alchemy types stay server-side), which dictates separate factories per layer (§6).
+- `CONTEXT.md` — domain vocabulary used in test names.
+- [Vitest](https://vitest.dev/) and [@nuxt/test-utils](https://nuxt.com/docs/4.x/getting-started/testing).
+- [Testing Library — Guiding Principles](https://testing-library.com/docs/guiding-principles) — source for the query priority in §4.
+- [Kent C. Dodds — The Testing Trophy](https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications) — source for the pyramid shape in §7.

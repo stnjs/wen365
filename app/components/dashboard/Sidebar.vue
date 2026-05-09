@@ -34,45 +34,18 @@ const items = [
       icon: "i-lucide-house",
       to: "/dashboard",
     },
-    {
-      label: "Assets",
-      icon: "i-lucide-wallet",
-      to: "/assets",
-      disabled: true,
-    },
-
-    {
-      label: "Settings",
-      icon: "i-lucide-settings",
-      defaultOpen: true,
-      disabled: true,
-      children: [
-        {
-          label: "General",
-          disabled: true,
-        },
-        {
-          label: "Wallets",
-          disabled: true,
-        },
-        {
-          label: "Notifications",
-          disabled: true,
-        },
-      ],
-    },
   ],
   [
     {
       label: "Feedback",
       icon: "i-lucide-message-circle",
-      to: "https://github.com/nuxt-ui-templates/dashboard",
+      to: "https://github.com/stnjs/wen365/issues",
       target: "_blank",
     },
     {
       label: "Help & Support",
       icon: "i-lucide-info",
-      to: "https://github.com/nuxt/ui",
+      to: "https://github.com/stnjs/wen365#readme",
       target: "_blank",
     },
   ],

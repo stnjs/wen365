@@ -1,69 +1,53 @@
-import { NETWORK_IDS } from "#shared/types/NetworkId";
+import { NETWORK_BY_ID, NETWORKS, type NetworkId } from "#shared/config/networks";
+import { logWarn } from "@server/utils/logger";
+
+const ALL_SUPPORTED_NETWORK_IDS: readonly NetworkId[] = NETWORKS.map(n => n.alchemySlug);
 
 /**
- * Valid NetworkId values for validation
- */
-const VALID_NETWORK_IDS: readonly NetworkId[] = NETWORK_IDS;
-
-/**
- * Default networks for development (fallback if env var not set)
- */
-const DEFAULT_NETWORKS: NetworkId[] = ["eth-mainnet", "base-mainnet"];
-
-/**
- * Parses and validates supported networks from environment variable
- * Format: SUPPORTED_NETWORKS=eth-mainnet,base-mainnet,matic-mainnet
- *
- * @returns Array of validated NetworkId values
+ * Defaults to the full registry. `SUPPORTED_NETWORKS=eth-mainnet,base-mainnet`
+ * narrows the active set — useful for keeping Alchemy compute units low in
+ * dev/staging. Unknown slugs are warned and skipped; an all-invalid env var
+ * falls back to the full registry rather than failing closed.
  */
 function parseSupportedNetworks(): NetworkId[] {
-  const envNetworks = process.env.SUPPORTED_NETWORKS;
+  const envValue = process.env.SUPPORTED_NETWORKS;
 
-  // If no env var set, use defaults (development)
-  if (!envNetworks) {
-    return DEFAULT_NETWORKS;
+  if (!envValue) {
+    return [...ALL_SUPPORTED_NETWORK_IDS];
   }
 
-  // Parse comma-separated string
-  const networks = envNetworks
+  const candidates = envValue
     .split(",")
-    .map(n => n.trim())
-    .filter(n => n.length > 0);
+    .map(s => s.trim())
+    .filter(Boolean);
 
-  // Validate each network
-  const validNetworks: NetworkId[] = [];
-  const invalidNetworks: string[] = [];
+  const valid: NetworkId[] = [];
+  const invalid: string[] = [];
 
-  for (const network of networks) {
-    if (VALID_NETWORK_IDS.includes(network as NetworkId)) {
-      validNetworks.push(network as NetworkId);
+  for (const slug of candidates) {
+    if (slug in NETWORK_BY_ID) {
+      valid.push(slug as NetworkId);
     } else {
-      invalidNetworks.push(network);
+      invalid.push(slug);
     }
   }
 
-  // Warn about invalid networks but don't fail (graceful degradation)
-  if (invalidNetworks.length > 0) {
-    console.warn(
-      `[Config] Invalid network IDs ignored: ${invalidNetworks.join(", ")}. ` +
-        `Valid networks: ${VALID_NETWORK_IDS.join(", ")}`,
-    );
+  if (invalid.length > 0) {
+    logWarn("Unknown SUPPORTED_NETWORKS entries ignored", {
+      invalid,
+      validOptions: ALL_SUPPORTED_NETWORK_IDS,
+    });
   }
 
-  // If no valid networks found, fall back to defaults
-  if (validNetworks.length === 0) {
-    console.warn(
-      `[Config] No valid networks found in SUPPORTED_NETWORKS. Using defaults: ${DEFAULT_NETWORKS.join(", ")}`,
-    );
-    return DEFAULT_NETWORKS;
+  if (valid.length === 0) {
+    logWarn("SUPPORTED_NETWORKS yielded no valid entries; using registry default", {
+      provided: envValue,
+      defaultingTo: ALL_SUPPORTED_NETWORK_IDS,
+    });
+    return [...ALL_SUPPORTED_NETWORK_IDS];
   }
 
-  return validNetworks;
+  return valid;
 }
 
-/**
- * Supported blockchain networks for fetching portfolio data
- * Configured via SUPPORTED_NETWORKS environment variable
- * Format: SUPPORTED_NETWORKS=eth-mainnet,base-mainnet,matic-mainnet
- */
 export const SUPPORTED_NETWORKS: NetworkId[] = parseSupportedNetworks();
