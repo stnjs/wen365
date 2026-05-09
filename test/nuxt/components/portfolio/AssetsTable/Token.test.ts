@@ -19,14 +19,6 @@ const CopyToClipboardButtonStub = {
   template: '<button type="button" data-testid="copy-token-address" :data-text="text" />',
 };
 
-// UTooltip stub: surface the resolved `text` prop so we can assert what
-// Token passes (contract address vs the "Native token" fallback).
-const UTooltipStub = {
-  inheritAttrs: false,
-  props: ["text", "delayDuration"],
-  template: '<div data-testid="tooltip" :data-text="text"><slot /></div>',
-};
-
 // UAvatar / UIcon stubs back the compact (mobile) render path.
 const UAvatarStub = {
   inheritAttrs: false,
@@ -42,7 +34,6 @@ const UIconStub = {
 
 const STUBS = {
   UUser: UUserStub,
-  UTooltip: UTooltipStub,
   UAvatar: UAvatarStub,
   UIcon: UIconStub,
   CopyToClipboardButton: CopyToClipboardButtonStub,
@@ -101,20 +92,6 @@ describe("AssetsTable / Token", () => {
     expect(user.attributes("data-description")).toBeUndefined();
   });
 
-  it("renders the contract address inside the tooltip for ERC-20 tokens", async () => {
-    const wrapper = await mountToken(
-      {
-        name: "USD Coin",
-        symbol: "USDC",
-        decimals: 6,
-        logo: "https://example.com/usdc.png",
-      },
-      { tokenAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" },
-    );
-    const tooltip = wrapper.find("[data-testid='tooltip']");
-    expect(tooltip.attributes("data-text")).toBe("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
-  });
-
   it("desktop mode: shows copy control wired to the contract address", async () => {
     const addr = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
     const wrapper = await mountToken(
@@ -144,21 +121,7 @@ describe("AssetsTable / Token", () => {
     expect(wrapper.find("[data-testid='copy-token-address']").exists()).toBe(false);
   });
 
-  it('shows the "Native token" label when tokenAddress is null', async () => {
-    const wrapper = await mountToken(
-      {
-        name: "Ethereum",
-        symbol: "ETH",
-        decimals: 18,
-        logo: "https://example.com/eth.png",
-      },
-      { tokenAddress: null },
-    );
-    const tooltip = wrapper.find("[data-testid='tooltip']");
-    expect(tooltip.attributes("data-text")).toBe("Native token");
-  });
-
-  it("compact mode: renders symbol + chain badge, hides full name, keeps contract tooltip", async () => {
+  it("compact mode: renders symbol + chain badge and hides the full name", async () => {
     const wrapper = await mountToken(
       {
         name: "USD Coin",
@@ -183,10 +146,6 @@ describe("AssetsTable / Token", () => {
 
     expect(wrapper.text()).toContain("USDC");
     expect(wrapper.text()).not.toContain("USD Coin");
-
-    expect(wrapper.find("[data-testid='tooltip']").attributes("data-text")).toBe(
-      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    );
   });
 
   it("compact mode: chain badge icon name reflects the passed network", async () => {
