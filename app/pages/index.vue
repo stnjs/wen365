@@ -1,7 +1,7 @@
 <template>
   <NuxtLayout name="landing-page">
     <!-- Hero Section -->
-    <section class="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+    <section class="relative z-10 pt-32 pb-20 px-6">
       <div class="max-w-4xl mx-auto text-center">
         <div
           class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-default bg-white/5 backdrop-blur-sm mb-8 animate-fade-up"

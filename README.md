@@ -18,7 +18,7 @@
   <img src="docs/screenshots/dashboard.gif" alt="Wen365 dashboard demo" width="820" />
 </p>
 
-> **No wallet?** The live demo has a one-click "Try the demo" button that loads the dashboard with deterministic fixture data — every chart and table is real, only the wallet is fake.
+> **No wallet?** The live demo has a one-click "Explore Demo" button that loads the dashboard with deterministic fixture data — every chart and table is real, only the wallet is fake.
 
 ---
 
@@ -176,4 +176,4 @@ Next things I'd build, in rough order:
 
 ## License
 
-[MIT](./LICENSE) — Copyright (c) 2026 stnjs.
+[MIT](./LICENSE) — Copyright (c) 2026 Son Tung Nong.

@@ -19,7 +19,7 @@ const config = useRuntimeConfig(event);
 const apiKey = config.alchemyApiKey;
 
 // ❌ Bad: Hardcoded secrets
-const apiKey = "sk_live_1234567890abcdef";
+const apiKey = "<example_secret>";
 ```
 
 ## Authentication & Authorization

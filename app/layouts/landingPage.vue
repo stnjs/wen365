@@ -31,18 +31,34 @@
     </UMain>
 
     <!-- Footer -->
-    <UFooter class="border-t border-muted py-12 bg-app">
+    <UFooter class="border-t border-muted py-12 px-6 bg-app">
       <template #left>
-        <div>
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-3 h-3 bg-white rounded-full" />
-            <span class="text-default font-medium tracking-tighter">wen365</span>
-          </div>
-          <p class="text-dimmed text-xs max-w-50 mb-4">
-            A full-stack crypto portfolio tracker.<br />
-            Built as an open-source technical demo.
+        <div class="flex flex-col gap-3">
+          <div class="text-default font-medium tracking-tighter">wen365</div>
+          <p class="text-dimmed text-xs">
+            © {{ new Date().getFullYear() }} ·
+            <a
+              href="https://github.com/stnjs/wen365/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-default transition-colors"
+            >
+              MIT License
+            </a>
+            · Built by
+            <a
+              href="https://www.linkedin.com/in/son-tung-nong-a49040206/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-default transition-colors"
+            >
+              Son Tung Nong
+            </a>
           </p>
-          <div class="flex items-center gap-4">
+          <p class="text-dimmed text-xs max-w-xs">
+            Demo project for portfolio purposes. Not financial or tax advice.
+          </p>
+          <div class="flex items-center gap-3 mt-1">
             <a
               href="https://github.com/stnjs/wen365"
               target="_blank"
@@ -52,33 +68,42 @@
             >
               <UIcon name="i-lucide-github" class="w-5 h-5" />
             </a>
+            <a
+              href="https://www.linkedin.com/in/son-tung-nong-a49040206/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-dimmed hover:text-default transition-colors"
+              aria-label="LinkedIn profile"
+            >
+              <UIcon name="i-lucide-linkedin" class="w-5 h-5" />
+            </a>
           </div>
         </div>
       </template>
-
       <template #right>
-        <div class="flex gap-16">
-          <div class="flex flex-col gap-3">
-            <span class="text-xs font-medium text-default uppercase tracking-widest mb-1"
-              >Explore</span
-            >
-            <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Features</a
-            >
-            <a href="#architecture" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Architecture</a
-            >
-            <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors"
-              >Tech Stack</a
-            >
-            <a
-              href="https://github.com/stnjs/wen365"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-dimmed text-xs hover:text-default transition-colors"
-              >Source Code</a
-            >
-          </div>
+        <div class="flex flex-row flex-wrap gap-x-4 gap-y-2 sm:flex-col sm:gap-3">
+          <span
+            class="hidden sm:block text-xs font-medium text-default uppercase tracking-widest mb-1"
+          >
+            Explore
+          </span>
+          <a href="#features" class="text-dimmed text-xs hover:text-default transition-colors">
+            Features
+          </a>
+          <a href="#architecture" class="text-dimmed text-xs hover:text-default transition-colors">
+            Architecture
+          </a>
+          <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors">
+            Tech Stack
+          </a>
+          <a
+            href="https://github.com/stnjs/wen365"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-dimmed text-xs hover:text-default transition-colors"
+          >
+            Source Code
+          </a>
         </div>
       </template>
     </UFooter>
