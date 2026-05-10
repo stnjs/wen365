@@ -14,8 +14,7 @@
 </p>
 
 <p align="center">
-  <!-- TODO: record a 20-30s capture of the demo flow and drop it at docs/screenshots/dashboard.gif -->
-  <img src="docs/screenshots/dashboard.gif" alt="Wen365 dashboard demo" width="820" />
+  <img src="docs/screenshots/landing-page.png" alt="Wen365 landing page" width="820" />
 </p>
 
 > **No wallet?** The live demo has a one-click "Explore Demo" button that loads the dashboard with deterministic fixture data — every chart and table is real, only the wallet is fake.
