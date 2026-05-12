@@ -4,24 +4,29 @@
   >
     <!-- Background Atmosphere -->
     <div
-      class="fixed inset-0 z-0 pointer-events-none bg-grid [mask-image:linear-gradient(to_bottom,white,transparent)]"
+      class="fixed inset-0 z-0 pointer-events-none bg-grid mask-[linear-gradient(to_bottom,white,transparent)]"
     />
     <div
       class="fixed top-0 left-1/2 -translate-x-1/2 w-full h-150 pointer-events-none z-0 blur-3xl bg-radial-glow"
     />
 
-    <UHeader class="fixed w-full bg-app-overlay backdrop-blur-xl">
+    <UHeader
+      v-model:open="isMenuOpen"
+      class="fixed w-full bg-app-overlay backdrop-blur-xl"
+      mode="drawer"
+    >
       <template #title>
         <Logo size="sm" />
       </template>
 
-      <div class="hidden md:flex items-center gap-8 text-sm text-muted font-medium">
-        <a href="#features" class="hover:text-default transition-colors">Features</a>
-        <a href="#architecture" class="hover:text-default transition-colors">Architecture</a>
-        <a href="#tech" class="hover:text-default transition-colors">Tech Stack</a>
-      </div>
+      <UNavigationMenu :items="navItems" />
+
       <template #right>
         <ConnectWalletButton />
+      </template>
+
+      <template #body>
+        <UNavigationMenu class="pb-5" :items="navItems" orientation="vertical" />
       </template>
     </UHeader>
 
@@ -111,8 +116,39 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import type { NavigationMenuItem } from "@nuxt/ui";
 import { useAppKitTheme } from "@reown/appkit/vue";
+
+const isMenuOpen = ref<boolean>(false);
+
+const closeMenu = (): void => {
+  isMenuOpen.value = false;
+};
+
+const navItems: NavigationMenuItem[][] = [
+  [
+    { label: "Features", to: "#features", icon: "i-lucide-sparkles", onSelect: closeMenu },
+    { label: "Architecture", to: "#architecture", icon: "i-lucide-layers", onSelect: closeMenu },
+    { label: "Tech Stack", to: "#tech", icon: "i-lucide-blocks", onSelect: closeMenu },
+  ],
+  [
+    {
+      label: "GitHub",
+      to: "https://github.com/stnjs/wen365",
+      target: "_blank",
+      icon: "i-lucide-github",
+      onSelect: closeMenu,
+    },
+    {
+      label: "LinkedIn",
+      to: "https://www.linkedin.com/in/son-tung-nong-a49040206/",
+      target: "_blank",
+      icon: "i-lucide-linkedin",
+      onSelect: closeMenu,
+    },
+  ],
+];
 
 const { setThemeMode } = useAppKitTheme();
 
