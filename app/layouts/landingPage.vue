@@ -119,9 +119,9 @@ const closeMenu = (): void => {
 };
 
 const navItemsBase: NavigationMenuItem[] = [
-  { label: "Features", to: "#features", icon: "i-lucide-sparkles" },
-  { label: "Architecture", to: "#architecture", icon: "i-lucide-layers" },
-  { label: "Tech Stack", to: "#tech", icon: "i-lucide-blocks" },
+  { label: "Features", to: "#features", icon: "i-lucide-sparkles", onSelect: closeMenu },
+  { label: "Architecture", to: "#architecture", icon: "i-lucide-layers", onSelect: closeMenu },
+  { label: "Tech Stack", to: "#tech", icon: "i-lucide-blocks", onSelect: closeMenu },
 ];
 
 const navItemsExtended: NavigationMenuItem[][] = [
