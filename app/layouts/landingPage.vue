@@ -19,14 +19,14 @@
         <Logo size="sm" />
       </template>
 
-      <UNavigationMenu :items="navItems" />
+      <UNavigationMenu :items="navItemsBase" />
 
       <template #right>
         <ConnectWalletButton />
       </template>
 
       <template #body>
-        <UNavigationMenu class="pb-5" :items="navItems" orientation="vertical" />
+        <UNavigationMenu class="pb-5" :items="navItemsExtended" orientation="vertical" />
       </template>
     </UHeader>
 
@@ -101,14 +101,6 @@
           <a href="#tech" class="text-dimmed text-xs hover:text-default transition-colors">
             Tech Stack
           </a>
-          <a
-            href="https://github.com/stnjs/wen365"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-dimmed text-xs hover:text-default transition-colors"
-          >
-            Source Code
-          </a>
         </div>
       </template>
     </UFooter>
@@ -126,12 +118,14 @@ const closeMenu = (): void => {
   isMenuOpen.value = false;
 };
 
-const navItems: NavigationMenuItem[][] = [
-  [
-    { label: "Features", to: "#features", icon: "i-lucide-sparkles", onSelect: closeMenu },
-    { label: "Architecture", to: "#architecture", icon: "i-lucide-layers", onSelect: closeMenu },
-    { label: "Tech Stack", to: "#tech", icon: "i-lucide-blocks", onSelect: closeMenu },
-  ],
+const navItemsBase: NavigationMenuItem[] = [
+  { label: "Features", to: "#features", icon: "i-lucide-sparkles" },
+  { label: "Architecture", to: "#architecture", icon: "i-lucide-layers" },
+  { label: "Tech Stack", to: "#tech", icon: "i-lucide-blocks" },
+];
+
+const navItemsExtended: NavigationMenuItem[][] = [
+  [...navItemsBase],
   [
     {
       label: "GitHub",
