@@ -24,7 +24,7 @@
     "reinstall": "pnpm clean && pnpm install"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.7.1",
+    "@nuxt/ui": "^4.8.1",
     "@reown/appkit": "^1.8.19",
     "@reown/appkit-adapter-wagmi": "^1.8.19",
     "@reown/appkit-siwe": "^1.8.19",
