@@ -72,6 +72,8 @@ export function findGateChanges({ cwd = process.cwd(), base } = {}) {
 /**
  * Gate patterns in added lines of code files, and assertions removed from
  * test files whose exact text was not added back elsewhere in the same file.
+ * Each added copy covers one removed copy, so removing two identical
+ * assertions and adding one back still reports one.
  *
  * @param {string} diff unified diff with zero context lines
  * @returns {GateChange[]}
@@ -79,13 +81,13 @@ export function findGateChanges({ cwd = process.cwd(), base } = {}) {
 function lineChanges(diff) {
   /** @type {GateChange[]} */
   const changes = [];
-  /** @type {Map<string, { added: Set<string>, removed: Array<{ line: number, text: string }> }>} */
+  /** @type {Map<string, { added: Map<string, number>, removed: Array<{ line: number, text: string }> }>} */
   const testFiles = new Map();
   /** @param {string} path */
   const testFile = path => {
     let entry = testFiles.get(path);
     if (entry === undefined) {
-      entry = { added: new Set(), removed: [] };
+      entry = { added: new Map(), removed: [] };
       testFiles.set(path, entry);
     }
     return entry;
@@ -125,7 +127,10 @@ function lineChanges(diff) {
           changes.push({ file, line: newLine, kind, text });
         }
       }
-      if (isTest) testFile(file).added.add(text);
+      if (isTest) {
+        const { added } = testFile(file);
+        added.set(text, (added.get(text) ?? 0) + 1);
+      }
       newLine++;
     } else if (raw.startsWith("-")) {
       const text = raw.slice(1).trim();
@@ -136,7 +141,9 @@ function lineChanges(diff) {
 
   for (const [path, { added, removed }] of testFiles) {
     for (const { line, text } of removed) {
-      if (!added.has(text)) changes.push({ file: path, line, kind: "removed-assertion", text });
+      const copiesLeft = added.get(text) ?? 0;
+      if (copiesLeft > 0) added.set(text, copiesLeft - 1);
+      else changes.push({ file: path, line, kind: "removed-assertion", text });
     }
   }
   return changes;

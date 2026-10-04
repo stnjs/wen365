@@ -131,6 +131,19 @@ describe("findGateChanges", () => {
     expect(findGateChanges({ cwd: repo.dir })).toEqual([]);
   });
 
+  it("reports a removed copy of an assertion that appears twice when only one copy comes back", () => {
+    repo.baseline({
+      [TEST_FILE]:
+        'it("totals Wallets", () => {\n  expect(total).toBe(3);\n  expect(total).toBe(3);\n});\n',
+    });
+    repo.write(TEST_FILE, 'it("totals Wallets", () => {\n    expect(total).toBe(3);\n});\n');
+    repo.commit("test: deduplicate");
+
+    expect(findGateChanges({ cwd: repo.dir })).toEqual([
+      { file: TEST_FILE, line: 3, kind: "removed-assertion", text: "expect(total).toBe(3);" },
+    ]);
+  });
+
   it("keeps parsing after a removed line that starts with --", () => {
     repo.baseline({ [TEST_FILE]: "let count = 2;\n--count;\nexpect(count).toBe(1);\n" });
     repo.write(TEST_FILE, "let count = 2;\n");
