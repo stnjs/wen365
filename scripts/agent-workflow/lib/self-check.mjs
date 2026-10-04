@@ -1,6 +1,7 @@
 // @ts-check
 import { splitSections } from "./contract.mjs";
 import { parseFrontmatter } from "./frontmatter.mjs";
+import { criterionRows, unwrapCode, visibleText } from "./markdown.mjs";
 
 export const CRITERION_STATUSES = ["met", "partial", "not met", "not verified"];
 
@@ -11,6 +12,7 @@ export const CRITERION_STATUSES = ["met", "partial", "not met", "not verified"];
  *   frontmatter: Record<string, string> | null,
  *   rows: CriterionRow[],
  *   gateEntries: GateEntry[],
+ *   unreadable: Array<{ section: string, line: string }>,
  * }} SelfCheck
  */
 
@@ -23,48 +25,43 @@ const GATE_ENTRY = /^- `([^`]+)` · ([a-z-]+) · (.+?) — justified: (.+)$/;
 export function parseSelfCheck(text) {
   const parsed = parseFrontmatter(text);
   const sections = splitSections(parsed ? parsed.body : text.replace(/\r\n/g, "\n"));
+  const criteria = criterionRows(sections.get("Criteria") ?? "");
+  const gate = parseGateEntries(sections.get("Gate changes") ?? "");
   return {
     frontmatter: parsed ? parsed.data : null,
-    rows: parseRows(sections.get("Criteria") ?? ""),
-    gateEntries: parseGateEntries(sections.get("Gate changes") ?? ""),
+    rows: criteria.rows.map(cells => ({
+      id: cells[0] ?? "",
+      status: (cells[1] ?? "").toLowerCase(),
+      evidence: cells.slice(2).join(" | ").trim(),
+    })),
+    gateEntries: gate.entries,
+    unreadable: [
+      ...criteria.unreadable.map(line => ({ section: "Criteria", line })),
+      ...gate.unreadable.map(line => ({ section: "Gate changes", line })),
+    ],
   };
 }
 
 /**
- * Table rows whose first cell is a criterion ID; the header and separator rows are skipped.
+ * Bullet lines in `## Gate changes`; a bullet that doesn't match the entry
+ * format is returned in `unreadable`.
  *
  * @param {string} section
- * @returns {CriterionRow[]}
- */
-function parseRows(section) {
-  /** @type {CriterionRow[]} */
-  const rows = [];
-  for (const line of section.split("\n")) {
-    const inner = /^\|(.*)\|\s*$/.exec(line.trim())?.[1];
-    if (inner === undefined) continue;
-    // `\|` is an escaped pipe inside a cell, e.g. in a test name.
-    const cells = inner.split(/(?<!\\)\|/).map(cell => cell.trim());
-    const id = cells[0] ?? "";
-    if (!/^AC-\d+$/.test(id)) continue;
-    rows.push({
-      id,
-      status: (cells[1] ?? "").toLowerCase(),
-      evidence: cells.slice(2).join(" | ").trim(),
-    });
-  }
-  return rows;
-}
-
-/**
- * @param {string} section
- * @returns {GateEntry[]}
+ * @returns {{ entries: GateEntry[], unreadable: string[] }}
  */
 function parseGateEntries(section) {
   /** @type {GateEntry[]} */
   const entries = [];
-  for (const line of section.split("\n")) {
-    const match = GATE_ENTRY.exec(line.trim());
-    if (!match) continue;
+  /** @type {string[]} */
+  const unreadable = [];
+  for (const raw of visibleText(section).split("\n")) {
+    const line = raw.trim();
+    if (!line.startsWith("- ")) continue;
+    const match = GATE_ENTRY.exec(line);
+    if (!match) {
+      unreadable.push(line);
+      continue;
+    }
     entries.push({
       file: match[1] ?? "",
       kind: match[2] ?? "",
@@ -72,17 +69,5 @@ function parseGateEntries(section) {
       justification: (match[4] ?? "").trim(),
     });
   }
-  return entries;
-}
-
-/**
- * Removes one Markdown code span around `text`, including longer fences such
- * as ``` `` a`b `` ``` used for text that itself contains backticks.
- *
- * @param {string} text
- */
-function unwrapCode(text) {
-  const trimmed = text.trim();
-  const match = /^(`+) ?([\s\S]*?) ?\1$/.exec(trimmed);
-  return match ? (match[2] ?? "") : trimmed;
+  return { entries, unreadable };
 }

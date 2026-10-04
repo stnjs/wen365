@@ -2,9 +2,12 @@
 import { readFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import process from "node:process";
-import { isMain, printJson, readFlag } from "./lib/cli.mjs";
+import { printJson, readFlag, runCli } from "./lib/cli.mjs";
 import { parseContract } from "./lib/contract.mjs";
 import { git, nulFields, repoRoot, resolveBase } from "./lib/git.mjs";
+
+/** Thrown when the branch has no contract; callers that allow that case catch this type. */
+export class NoContractError extends Error {}
 
 const CONTRACT_PATH = /^docs\/plans\/(?!_template\/)[^/]+\/contract\.md$/;
 
@@ -35,20 +38,14 @@ export function findPlan({ cwd = process.cwd(), base } = {}) {
   const baseRef = resolveBase(root, base);
   const mergeBase = git(["merge-base", baseRef, "HEAD"], root);
 
-  const committed = nulFields(
-    git(
-      ["diff", "--name-only", "-z", "--diff-filter=A", `${mergeBase}..HEAD`, "--", "docs/plans"],
-      root,
-    ),
-  );
-  const uncommitted = addedInWorkingTree(root);
-  const paths = [...new Set([...committed, ...uncommitted])].filter(path =>
+  const committed = committedAdditions(root, mergeBase);
+  const paths = [...new Set([...committed, ...addedInWorkingTree(root)])].filter(path =>
     CONTRACT_PATH.test(path),
   );
 
   const [contractPath, ...others] = paths;
   if (contractPath === undefined) {
-    throw new Error(
+    throw new NoContractError(
       `No contract on this branch: expected one docs/plans/<folder>/contract.md added since ${baseRef}. Run /wen-contract to write one.`,
     );
   }
@@ -72,6 +69,30 @@ export function findPlan({ cwd = process.cwd(), base } = {}) {
     criteria: contract.criteria.map(criterion => criterion.id),
     hasAmendments: contract.hasAmendments,
   };
+}
+
+/**
+ * Paths under docs/plans added on the branch: committed since `mergeBase`, or
+ * new in the working tree (untracked, staged, or intent-to-add).
+ *
+ * @param {string} root
+ * @param {string} mergeBase
+ */
+export function addedOnBranch(root, mergeBase) {
+  return [...new Set([...committedAdditions(root, mergeBase), ...addedInWorkingTree(root)])];
+}
+
+/**
+ * @param {string} root
+ * @param {string} mergeBase
+ */
+function committedAdditions(root, mergeBase) {
+  return nulFields(
+    git(
+      ["diff", "--name-only", "-z", "--diff-filter=A", `${mergeBase}..HEAD`, "--", "docs/plans"],
+      root,
+    ),
+  );
 }
 
 /**
@@ -102,13 +123,8 @@ function addedInWorkingTree(root) {
  * @returns {number} exit code
  */
 function main(args) {
-  try {
-    printJson(findPlan({ base: readFlag(args, "base") }));
-    return 0;
-  } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-    return 1;
-  }
+  printJson(findPlan({ base: readFlag(args, "base") }));
+  return 0;
 }
 
-if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));
+runCli(import.meta.url, main);

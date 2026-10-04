@@ -1,7 +1,7 @@
 // @ts-check
 import { readFileSync } from "node:fs";
 import process from "node:process";
-import { isMain } from "./lib/cli.mjs";
+import { runCli } from "./lib/cli.mjs";
 import {
   CONTRACT_STATUSES,
   CONTRACT_TYPES,
@@ -135,4 +135,4 @@ function main(args) {
   return 0;
 }
 
-if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));
+runCli(import.meta.url, main);

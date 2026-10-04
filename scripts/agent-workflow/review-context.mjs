@@ -1,11 +1,12 @@
 // @ts-check
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import process from "node:process";
-import { isMain, printJson, readFlag } from "./lib/cli.mjs";
+import { printJson, readFlag, runCli } from "./lib/cli.mjs";
 import { parseFrontmatter } from "./lib/frontmatter.mjs";
 import { git, lines, nulFields, repoRoot, resolveBase } from "./lib/git.mjs";
-import { findPlan } from "./plan.mjs";
+import { listMarkdown } from "./lib/markdown.mjs";
+import { NoContractError, findPlan } from "./plan.mjs";
 
 /**
  * @typedef {{
@@ -47,7 +48,7 @@ export function buildReviewContext({ cwd = process.cwd(), base } = {}) {
     commits,
     changedFiles,
     agentsFiles: agentsFilesFor(root, changedFiles),
-    adrs: markdownIn(root, "docs/adr").filter(path => !path.endsWith("/0000-template.md")),
+    adrs: listMarkdown(root, "docs/adr").filter(path => !path.endsWith("/0000-template.md")),
     patterns: patternsToCheck(root),
     ...planPaths(root, base),
   };
@@ -72,18 +73,6 @@ function agentsFilesFor(root, files) {
 }
 
 /**
- * @param {string} root
- * @param {string} dir repo-relative directory
- */
-function markdownIn(root, dir) {
-  if (!existsSync(join(root, dir))) return [];
-  return readdirSync(join(root, dir))
-    .filter(name => name.endsWith(".md"))
-    .sort()
-    .map(name => `${dir}/${name}`);
-}
-
-/**
  * Patterns reviewers check by hand: `watching`, and `promoted` ones whose
  * rule lives in prose (a Markdown file). Lint-promoted and rejected patterns
  * are enforced or dropped already.
@@ -91,7 +80,7 @@ function markdownIn(root, dir) {
  * @param {string} root
  */
 function patternsToCheck(root) {
-  return markdownIn(root, "docs/patterns").filter(path => {
+  return listMarkdown(root, "docs/patterns").filter(path => {
     const data = parseFrontmatter(readFileSync(join(root, path), "utf8"))?.data ?? {};
     if (data.status === "watching") return true;
     return data.status === "promoted" && (data["promoted-to"] ?? "").endsWith(".md");
@@ -112,7 +101,7 @@ function planPaths(root, base) {
       selfCheck: existsSync(join(root, selfCheck)) ? selfCheck : null,
     };
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith("No contract on this branch")) {
+    if (error instanceof NoContractError) {
       return { contract: null, selfCheck: null };
     }
     throw error;
@@ -124,13 +113,8 @@ function planPaths(root, base) {
  * @returns {number} exit code
  */
 function main(args) {
-  try {
-    printJson(buildReviewContext({ base: readFlag(args, "base") }));
-    return 0;
-  } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-    return 1;
-  }
+  printJson(buildReviewContext({ base: readFlag(args, "base") }));
+  return 0;
 }
 
-if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));
+runCli(import.meta.url, main);

@@ -1,6 +1,6 @@
 // @ts-check
 import process from "node:process";
-import { isMain, printJson, readFlag } from "./lib/cli.mjs";
+import { printJson, readFlag, runCli } from "./lib/cli.mjs";
 import { git, nulFields, repoRoot, resolveBase } from "./lib/git.mjs";
 
 /**
@@ -227,7 +227,14 @@ function scriptsAt(root, rev) {
   } catch {
     return {};
   }
-  const scripts = JSON.parse(text).scripts;
+  let scripts;
+  try {
+    scripts = JSON.parse(text).scripts;
+  } catch (error) {
+    throw new Error(
+      `package.json at ${rev} is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
   return scripts !== null && typeof scripts === "object" ? scripts : {};
 }
 
@@ -236,13 +243,8 @@ function scriptsAt(root, rev) {
  * @returns {number} exit code
  */
 function main(args) {
-  try {
-    printJson(findGateChanges({ base: readFlag(args, "base") }));
-    return 0;
-  } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-    return 1;
-  }
+  printJson(findGateChanges({ base: readFlag(args, "base") }));
+  return 0;
 }
 
-if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));
+runCli(import.meta.url, main);
