@@ -22,18 +22,35 @@ afterEach(() => {
 });
 
 describe("buildReviewContext", () => {
-  it("lists the branch's commits newest first and its changed files", () => {
+  it("lists the branch's commits newest first", () => {
     repo.write("app/a.ts", "export const a = 1;\n");
     repo.commit("feat: add a");
     repo.write("app/b.ts", "export const b = 2;\n");
     repo.commit("feat: add b");
 
-    const context = buildReviewContext({ cwd: repo.dir });
+    const subjects = buildReviewContext({ cwd: repo.dir }).commits.map(commit => commit.subject);
 
-    expect(context.commits.map(commit => commit.subject)).toEqual(["feat: add b", "feat: add a"]);
-    expect(context.changedFiles).toEqual(["app/a.ts", "app/b.ts"]);
-    expect(context.mergeBase).toBe(repo.git("rev-parse", "main"));
-    expect(context.diffCommand).toBe(`git diff ${context.mergeBase}..HEAD`);
+    expect(subjects).toEqual(["feat: add b", "feat: add a"]);
+  });
+
+  it("lists every file the branch changed", () => {
+    repo.write("app/a.ts", "export const a = 1;\n");
+    repo.commit("feat: add a");
+    repo.write("app/b.ts", "export const b = 2;\n");
+    repo.commit("feat: add b");
+
+    expect(buildReviewContext({ cwd: repo.dir }).changedFiles).toEqual(["app/a.ts", "app/b.ts"]);
+  });
+
+  it("diffs from the point where the branch left main", () => {
+    repo.write("app/a.ts", "export const a = 1;\n");
+    repo.commit("feat: add a");
+    const mainSha = repo.git("rev-parse", "main");
+
+    expect(buildReviewContext({ cwd: repo.dir })).toMatchObject({
+      mergeBase: mainSha,
+      diffCommand: `git diff ${mainSha}..HEAD`,
+    });
   });
 
   it("returns empty lists for a branch without commits", () => {
@@ -82,14 +99,19 @@ describe("buildReviewContext", () => {
     ]);
   });
 
-  it("points at the contract and self-check when the branch has a plan", () => {
+  it("points at the contract and reports no self-check before one is written", () => {
     repo.write(`${FOLDER}/contract.md`, makeContract());
+
     expect(buildReviewContext({ cwd: repo.dir })).toMatchObject({
       contract: `${FOLDER}/contract.md`,
       selfCheck: null,
     });
+  });
 
+  it("points at the self-check once the plan folder has one", () => {
+    repo.write(`${FOLDER}/contract.md`, makeContract());
     repo.write(`${FOLDER}/self-check.md`, makeSelfCheck());
+
     expect(buildReviewContext({ cwd: repo.dir }).selfCheck).toBe(`${FOLDER}/self-check.md`);
   });
 

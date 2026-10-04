@@ -143,7 +143,8 @@ function lineChanges(diff) {
 }
 
 /**
- * Deleted test files and any change to gate configuration.
+ * Deleted test files and any change to gate configuration, including
+ * renames that move either out of the names the tools read.
  *
  * @param {string[]} fields output of `git diff --name-status -z -M`
  * @returns {GateChange[]}
@@ -157,9 +158,22 @@ function fileChanges(fields) {
     // A rename or copy lists the old path, then the new one.
     const moved = letter === "R" || letter === "C";
     const path = fields[index + (moved ? 2 : 1)] ?? "";
+    const oldPath = moved ? (fields[index + 1] ?? "") : path;
     index += moved ? 2 : 1;
     if (letter === "D" && TEST_FILE.test(path)) {
       changes.push({ file: path, line: null, kind: "deleted-test-file", text: "deleted" });
+    }
+    // Renaming a test or config file to a name the tools don't read removes it just as deleting does.
+    if (letter === "R" && TEST_FILE.test(oldPath) && !TEST_FILE.test(path)) {
+      changes.push({
+        file: oldPath,
+        line: null,
+        kind: "deleted-test-file",
+        text: `renamed to ${path}`,
+      });
+    }
+    if (letter === "R" && GATE_CONFIG.test(oldPath) && !GATE_CONFIG.test(path)) {
+      changes.push({ file: oldPath, line: null, kind: "gate-config", text: `renamed to ${path}` });
     }
     if (GATE_CONFIG.test(path)) {
       changes.push({

@@ -72,14 +72,15 @@ export function lintSelfCheck({ selfCheck, contract, gateChanges }) {
 }
 
 /**
- * Criterion IDs named by amendment entries (`- YYYY-MM-DD — AC-n: …`).
+ * Criterion IDs named by amendment entries (`- YYYY-MM-DD — AC-n: …`; an en
+ * dash or hyphen is accepted in place of the em dash).
  *
  * @param {string} section
  */
 function amendedCriteria(section) {
   /** @type {Set<string>} */
   const ids = new Set();
-  for (const match of section.matchAll(/^- \d{4}-\d{2}-\d{2} — (AC-\d+):/gm)) {
+  for (const match of section.matchAll(/^- \d{4}-\d{2}-\d{2} [—–-] (AC-\d+):/gm)) {
     if (match[1] !== undefined) ids.add(match[1]);
   }
   return ids;

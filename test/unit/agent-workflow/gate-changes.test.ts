@@ -72,6 +72,36 @@ describe("findGateChanges", () => {
     ]);
   });
 
+  it("reports a test file renamed so it no longer matches the test pattern", () => {
+    repo.baseline({ [TEST_FILE]: ASSERTIONS });
+    repo.git("mv", TEST_FILE, "test/unit/wallet.ts");
+    repo.commit("test: rename");
+
+    expect(findGateChanges({ cwd: repo.dir })).toEqual([
+      {
+        file: TEST_FILE,
+        line: null,
+        kind: "deleted-test-file",
+        text: "renamed to test/unit/wallet.ts",
+      },
+    ]);
+  });
+
+  it("reports gate configuration renamed to a name the tools no longer read", () => {
+    repo.baseline({ "vitest.config.ts": "export default {};\n" });
+    repo.git("mv", "vitest.config.ts", "vitest.config.old");
+    repo.commit("chore: rename config");
+
+    expect(findGateChanges({ cwd: repo.dir })).toEqual([
+      {
+        file: "vitest.config.ts",
+        line: null,
+        kind: "gate-config",
+        text: "renamed to vitest.config.old",
+      },
+    ]);
+  });
+
   it("does not report a test file that was only moved", () => {
     repo.baseline({ [TEST_FILE]: ASSERTIONS });
     repo.git("mv", TEST_FILE, "test/unit/wallets.test.ts");

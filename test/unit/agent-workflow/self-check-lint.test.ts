@@ -79,6 +79,19 @@ describe("lintSelfCheck", () => {
     expect(lintSelfCheck({ selfCheck, contract: amended, gateChanges: [] }).problems).toEqual([]);
   });
 
+  it.each(["–", "-"])("accepts an amendment written with %s instead of an em dash", dash => {
+    const selfCheck = makeSelfCheck({
+      rows: [makeRow("AC-1"), makeRow("AC-2", "not met", "CSV export not built"), makeRow("AC-3")],
+    });
+    const amended = makeContract({
+      status: "approved",
+      approved: "2026-10-06",
+      amendments: `- 2026-10-06 ${dash} AC-2: CSV export moved to a later contract ${dash} out of time`,
+    });
+
+    expect(lintSelfCheck({ selfCheck, contract: amended, gateChanges: [] }).problems).toEqual([]);
+  });
+
   it("warns about, but does not fail, a criterion that is not verified", () => {
     const selfCheck = makeSelfCheck({
       rows: [

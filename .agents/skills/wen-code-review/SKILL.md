@@ -14,7 +14,10 @@ Two axes, reported separately: code can follow every rule and build the wrong th
 Run `node scripts/agent-workflow/review-context.mjs`. The base is `origin/main` (falling back to `main`); the script reports it as `base`.
 
 - `changedFiles` empty → stop: nothing to review.
-- `contract` null → small path: skip the Spec axis and say so in the report.
+- The path comes from the branch prefix (see [Paths](../../../docs/agent-workflow.md#paths)), not from whether a contract exists:
+  - **Full path** (`feat`, `fix`, `refactor`) and `contract` null → stop: the work needs `/wen-contract` first.
+  - **Full path** and `selfCheck` null → stop: run `/wen-self-check` first; the Spec reviewer checks its claims.
+  - **Small path** → `contract` is null by design: skip the Spec axis and say so in the report.
 
 ## 2. Two reviewers in parallel
 
@@ -29,7 +32,7 @@ Send one message with two subagents, both with fresh context: they get only what
 
 **Spec reviewer** (full path only). Give it `diffCommand`, `commits`, the `contract` and `selfCheck` files, and the "Vocabulary" section of `docs/agent-workflow.md`. Brief:
 
-> Check the diff against the contract and the self-check's claims. For each criterion: is it delivered, and does the evidence the self-check cites actually show it? A test named after a behaviour that asserts nothing useful is not evidence. Report every criterion as `delivered`, `dropped`, `weakened`, `substituted` or `unverified`, quoting the criterion for anything not delivered, plus `added` for changes no criterion asked for. Under 400 words.
+> Check the diff against the contract and the self-check's claims. For each criterion: is it delivered, and does the evidence the self-check cites actually show it? A test named after a behaviour that asserts nothing useful is not evidence. Report every criterion as `delivered`, `amended` (changed by an entry under `## Amendments`; not a finding), `dropped`, `weakened`, `substituted` or `unverified`, quoting the criterion for anything not delivered, plus `added` for changes no criterion asked for. Under 400 words.
 
 ## 3. Report
 
