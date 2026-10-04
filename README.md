@@ -36,7 +36,7 @@ If you're a recruiter or reviewer, the things probably worth your time are:
 
 - **The ADRs in [`docs/adr/`](./docs/adr/)** — short, dated records of the six architectural decisions that shape the codebase (CSR-only, TanStack Query for remote state, DTO contracts at the boundary, domain error taxonomy, repository pattern, and the shared Network registry).
 - **[`CONTEXT.md`](./CONTEXT.md)** — the project's domain vocabulary. Code, commits, and conversations all use the same six nouns.
-- **[`AGENTS.md`](./AGENTS.md)** — the entry point for AI coding agents (Cursor, Copilot, Claude Code). Doubles as a fast onboarding doc for a human.
+- **[`AGENTS.md`](./AGENTS.md)** — the entry point for AI coding agents (Claude Code, Codex, Cursor, Copilot), with per-area guides in [`server/`](./server/AGENTS.md), [`app/`](./app/AGENTS.md), and [`test/`](./test/AGENTS.md). Doubles as a fast onboarding doc for a human.
 
 ## Tech stack
 

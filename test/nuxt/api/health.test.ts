@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import pkg from "../../../package.json";
 
-// Tier 3 starter (per testing.mdc §7): boot a real Nitro instance and call
+// Tier 3 starter (per test/AGENTS.md §7): boot a real Nitro instance and call
 // the route via $fetch. This is the cheapest legitimate route test — no
 // upstream services to mock for /health, so it doubles as a smoke test that
 // the test harness itself works.

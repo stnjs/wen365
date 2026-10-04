@@ -7,7 +7,7 @@ import { usePortfolio } from "~/composables/queries/usePortfolio";
 import { DEMO_PORTFOLIO } from "~/utils/demoData";
 
 // $fetch is the process boundary — the only thing this composable talks to
-// outside of TanStack. Per testing.mdc §2 we mock $fetch and let the real
+// outside of TanStack. Per test/AGENTS.md §2 we mock $fetch and let the real
 // TanStack Query run. Since Nuxt 4.5, `$fetch` is an auto-import bound when
 // `#build/fetch.mjs` loads, so reassigning `globalThis.$fetch` here is too late.
 const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));

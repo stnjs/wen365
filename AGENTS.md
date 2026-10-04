@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Entry point for any coding agent (Cursor, Codex, Copilot CLI, Claude Code, Gemini CLI) working on Wen365. Keep this file short; link out for detail.
+Entry point for any coding agent (Claude Code, Codex, Cursor, Copilot, Gemini CLI) working on Wen365. Keep this file short; link out for detail.
 
 ## What this repo is
 
@@ -13,7 +13,13 @@ Read these in order:
 1. [`README.md`](./README.md) — product shape, tech stack, env vars, setup.
 2. [`CONTEXT.md`](./CONTEXT.md) — domain vocabulary. Use these terms exactly (`Wallet`, `Portfolio`, `Snapshot`, `Session`, `Network`, `Token`, `Address`).
 3. [`docs/adr/`](./docs/adr/) — decisions that are **not up for debate** unless explicitly revisiting. If you're about to propose something that contradicts an ADR, surface the conflict first.
-4. **Cursor-specific style rules** in [`.cursor/rules/`](./.cursor/rules/) — detailed coding guidance (`server-api.mdc`, `testing.mdc`, `security.mdc`, `ui-components.mdc`). Read the relevant one before editing a matching file. Agents other than Cursor should treat these as advisory but they encode the project's conventions.
+4. The `AGENTS.md` in the directory you're editing. Most agents load it automatically when they touch a file there; if yours doesn't, read it yourself.
+
+| Editing     | Read                                     | Covers                                                                             |
+| ----------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| `server/**` | [`server/AGENTS.md`](./server/AGENTS.md) | Handler shape, DomainError taxonomy, validation, upstream calls, logging, security |
+| `app/**`    | [`app/AGENTS.md`](./app/AGENTS.md)       | TanStack Query, Network registry, Nuxt UI, component conventions                   |
+| `test/**`   | [`test/AGENTS.md`](./test/AGENTS.md)     | What earns a test, where to mock, queries, Vitest mechanics                        |
 
 ## Canonical commands
 
@@ -29,33 +35,40 @@ pnpm type-check       # vue-tsc strict check
 pnpm format           # Prettier
 ```
 
-Run `pnpm type-check` and `pnpm lint` before claiming work is done.
+Run `pnpm type-check` and `pnpm lint` before claiming work is done. CI also runs `pnpm format:check`.
 
 ## Conventions at a glance
 
 - **TypeScript strict** is on. `any` needs a reason.
 - **Shared types** in `shared/types/` are auto-imported by Nuxt — do not import them explicitly.
 - **Zod at API boundaries** for request parsing (params, query, body). See `server/utils/validation.ts` and `server/types/common.ts`.
-- **HTTP errors** use `createError({ statusCode, statusMessage })`. Do not leak internal error messages to clients (see `.cursor/rules/server-api.mdc`).
-- **Logging** uses the structured logger at `server/utils/logger.ts`. No `console.log` in shipped code.
+- **Server errors** are `DomainError`s from `server/errors/`, translated once at the edge by `toHttp` (ADR-0004). No `createError` outside `server/errors/toHttp.ts`, and no internal messages sent to clients.
+- **Logging** uses `logError` / `logWarn` / `logInfo` from `server/utils/logger.ts`. No bare `console.*` in shipped code.
 - **Server addresses** are normalized to lowercase before storage or lookup.
 - **DTO pattern**: external API shapes (Alchemy) stay server-side; the client only sees types from `shared/types/`.
 
-## Writing tests
+## MCP servers
 
-- Unit tests go in `test/unit/`, Nuxt-env tests in `test/nuxt/`. The split is enforced by `vitest.config.ts`.
-- Use fake timers (`vi.useFakeTimers()`) for anything that awaits retry delays.
-- Mock at the seam, not at the implementation detail — see `.cursor/rules/testing.mdc`.
+No MCP config is committed; each developer configures servers in their own tool. If your agent has these servers, prefer them over the equivalent CLI:
 
-## MCP servers available in this workspace
-
-See [`.cursor/rules/mcp-servers.mdc`](./.cursor/rules/mcp-servers.mdc) for the full list. Prefer MCP calls (`user-Vercel`, `user-Supabase`, `user-Context7`) over their CLI equivalents.
+- **Context7** — current docs for Nuxt, Nuxt UI, TanStack Query, Vitest, etc. Check it before writing code against a library API.
+- **Vercel** — deployments, logs, domains. Use instead of the `vercel` CLI.
+- **Chrome DevTools** — inspect the running app in a browser, profile performance.
+- **Supabase** — schema and data inspection. Read-only use only: schema changes are made by a human and documented in [`docs/SUPABASE_SETUP.md`](./docs/SUPABASE_SETUP.md), never through the MCP.
 
 ## Proposing changes
 
 - **Surprising or hard-to-reverse decision?** Record it as an ADR in `docs/adr/` before the PR lands. Template at [`docs/adr/0000-template.md`](./docs/adr/0000-template.md).
 - **New domain vocabulary?** Add the term to `CONTEXT.md` in the same PR. Don't introduce aliases ("the user's wallet address") when the canonical name exists (`Address`).
-- **Touching an area with a Cursor rule?** Follow it.
+- **Touching a directory with its own `AGENTS.md`?** Follow it.
+
+## Maintaining agent guidance
+
+- Plain Markdown only, so every agent can read it. Repo-wide rules go here; rules for one area go in that directory's `AGENTS.md`. Add a row to the table above when you create one.
+- Don't copy guidance into tool-specific files (`.cursor/rules/`, `.github/copilot-instructions.md`, …). A tool-specific file that only points back here is fine.
+- Claude Code reads `AGENTS.md` only when a directory has no `CLAUDE.md`. If you ever add a `CLAUDE.md`, its first line must be `@AGENTS.md`.
+- Write only what is specific to this repo. Generic advice the agent already knows ("validate inputs", "write clear names") is noise.
+- Check examples against the code when you change a convention; stale examples are worse than none.
 
 ## What NOT to do
 

@@ -1,12 +1,8 @@
----
-description: Testing philosophy and Vitest mechanics for Wen365 — what makes a test worth writing, what to mock, how to query and assert, and how to keep the suite from rotting
-globs: test/**/*.{test,spec}.ts,test/**/*.ts
-alwaysApply: false
----
+# test/ — Testing philosophy and practice
 
-# Testing — Philosophy and Practice
+Guidance for everything under `test/`. Root rules in [`../AGENTS.md`](../AGENTS.md) still apply.
 
-This document is opinionated. It encodes what makes a *good* test in Wen365, not just what makes a test pass. Read it before adding or editing tests. The reviewer checklist at the bottom is the gate every test must pass before merging.
+This document is opinionated. It encodes what makes a _good_ test in Wen365, not just what makes a test pass. Read it before adding or editing tests. The reviewer checklist at the bottom is the gate every test must pass before merging.
 
 ## TL;DR
 
@@ -25,17 +21,17 @@ A test passes if and only if the **observable behavior** the user (human or upst
 
 The test of a test:
 
-> *"If I rewrite the implementation completely — different functions, different file layout, different intermediate variables — but the inputs and observable outputs stay the same, does the test still pass?"*
+> _"If I rewrite the implementation completely — different functions, different file layout, different intermediate variables — but the inputs and observable outputs stay the same, does the test still pass?"_
 >
 > If yes → good test. If no → it's coupled to implementation and will create churn on every refactor.
 
-**Narrow exceptions.** Assertions on a thing that *is* the external contract are allowed:
+**Narrow exceptions.** Assertions on a thing that _is_ the external contract are allowed:
 
 - Asserting `$fetch` was called with a specific URL — the URL is the contract with the server.
 - Asserting an emitted event payload — the event is part of the component's public API.
 - Asserting a route param parsing — the URL is the contract with the browser.
 
-The test for "is this an exception": *would changing the assertion break a real consumer that lives outside this codebase (server, browser, screen reader, another service)?* If yes, it's a contract. If only an internal Wen365 caller would notice, it's implementation.
+The test for "is this an exception": _would changing the assertion break a real consumer that lives outside this codebase (server, browser, screen reader, another service)?_ If yes, it's a contract. If only an internal Wen365 caller would notice, it's implementation.
 
 ---
 
@@ -48,7 +44,7 @@ The test for "is this an exception": *would changing the assertion break a real 
 **Process boundaries in this codebase:**
 
 - HTTP via `$fetch` (the client → server boundary)
-- Alchemy SDK (network)
+- Alchemy HTTP API, called through `$fetch` (network)
 - Supabase client (network)
 - `localStorage` / `sessionStorage` (browser API)
 - `window.ethereum` (wallet API)
@@ -56,13 +52,13 @@ The test for "is this an exception": *would changing the assertion break a real 
 
 **Concrete pattern per layer:**
 
-| Layer | Mock | Run for real |
-|---|---|---|
-| `server/utils`, `server/mappers`, `server/errors` | nothing | the function under test |
-| `server/services/` | Alchemy SDK, Supabase client | `server/utils`, `server/mappers`, retry logic, the service itself |
-| `server/api/<route>.ts` | Alchemy / Supabase | the full Nitro request pipeline via `setup()` + `$fetch()` |
-| `app/composables/queries/*` | `$fetch` only | TanStack Query, the composable, real `QueryClient` |
-| `app/components/**/*.vue` | stub Nuxt UI primitives (third-party) | component logic, real DOM |
+| Layer                                             | Mock                                  | Run for real                                                      |
+| ------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------- |
+| `server/utils`, `server/mappers`, `server/errors` | nothing                               | the function under test                                           |
+| `server/services/`                                | `$fetch` (Alchemy); in-memory repos   | `server/utils`, `server/mappers`, retry logic, the service itself |
+| `server/api/<route>.ts`                           | Alchemy / Supabase                    | the full Nitro request pipeline via `setup()` + `$fetch()`        |
+| `app/composables/queries/*`                       | `$fetch` only                         | TanStack Query, the composable, real `QueryClient`                |
+| `app/components/**/*.vue`                         | stub Nuxt UI primitives (third-party) | component logic, real DOM                                         |
 
 **Carve-out — child components in a parent test.** You may stub a child component inside a parent component's test **if and only if** the child has its own dedicated test. This avoids double-testing the child while keeping the parent test focused.
 
@@ -81,8 +77,8 @@ If the child has no test of its own, **don't stub it** — that would mean the c
 
 **Anti-patterns.**
 
-- ❌ Mocking `useQuery` to verify "you passed a `queryFn`" — that tests *that you used TanStack at all*, which is structure. Mock `$fetch` instead and let TanStack run.
-- ❌ Mocking your own `mapToTokenDto` when testing the service that calls it. Run the real mapper.
+- ❌ Mocking `useQuery` to verify "you passed a `queryFn`" — that tests _that you used TanStack at all_, which is structure. Mock `$fetch` instead and let TanStack run.
+- ❌ Mocking your own `mapToPortfolioDto` when testing the service that calls it. Run the real mapper.
 - ❌ Mocking your own utility (`roundToTwoDecimals`) when testing a higher layer. It's pure — run it.
 
 ---
@@ -91,7 +87,7 @@ If the child has no test of its own, **don't stub it** — that would mean the c
 
 Before writing a test, ask:
 
-> *"If I delete this test, name a specific bug that could ship that wouldn't be caught by other tests, TypeScript, ESLint, or a runtime error in the first 10 seconds of using the feature."*
+> _"If I delete this test, name a specific bug that could ship that wouldn't be caught by other tests, TypeScript, ESLint, or a runtime error in the first 10 seconds of using the feature."_
 
 If you can't name a concrete bug → **don't write the test**.
 
@@ -103,7 +99,7 @@ If you can't name a concrete bug → **don't write the test**.
 4. **Error / failure paths** — rejected promise, 4xx/5xx response, offline, race.
 5. **A contract with the outside world** — fetch URL, request body shape, emitted event payload, route param parsing.
 6. **A regression you just fixed** — every fixed bug ships with a test that fails on the parent commit and passes on the fix.
-7. **Non-obvious correctness** — a future reader would say *"wait, why does it do that?"*.
+7. **Non-obvious correctness** — a future reader would say _"wait, why does it do that?"_.
 
 **Code does NOT earn a test when it's:**
 
@@ -125,7 +121,7 @@ There is **no automatic test floor** ("every service must have a test"). The del
 1. **Accessible role or accessible name** — `wrapper.find('button[aria-label="Connect wallet"]')`, `wrapper.find('[role="dialog"]')`. Mimics how a screen reader, e2e test, or human user identifies the element.
 2. **Visible text** — `wrapper.text()`, `wrapper.find('h1').text()`. Best for content assertions.
 3. **`data-testid`** — opt-in test hook. Use when (1) and (2) don't apply, or to disambiguate. Convention: `data-testid="net-worth-badge"` (kebab-case, namespaced to the component).
-4. **Component reference** — `wrapper.findComponent(Token)`. Only to assert *what props you passed to a child*. Never to reach into the child's internal state.
+4. **Component reference** — `wrapper.findComponent(Token)`. Only to assert _what props you passed to a child_. Never to reach into the child's internal state.
 
 **Forbidden queries:**
 
@@ -138,7 +134,7 @@ There is **no automatic test floor** ("every service must have a test"). The del
 
 - Assert what the user **perceives**: text, presence/absence, ARIA state, semantic color via stub attribute, input value, emitted event payload.
 - Prefer matchers that produce informative diffs (`toBe`, `toEqual`, `toContain`, `toMatchObject`) over boolean coercion (`toBe(true)` on a derived expression).
-- ❌ Don't snapshot test entire components — they fail on every cosmetic change and nobody reads the diff. Targeted snapshots are OK for *small, stable, semantic* outputs (e.g. a parser/formatter result).
+- ❌ Don't snapshot test entire components — they fail on every cosmetic change and nobody reads the diff. Targeted snapshots are OK for _small, stable, semantic_ outputs (e.g. a parser/formatter result).
 
 **Stub design-system components to expose semantic surfaces.**
 
@@ -170,16 +166,30 @@ expect(badge.attributes("data-color")).toBe("success");
 ```ts
 // ✅ Good
 describe("NetWorthCard", () => {
-  it("splits totalValue into a dollars-and-cents pair", () => { /* … */ });
-  it("pads single-digit cents with a leading zero", () => { /* … */ });
-  it("hides the 24h badge when delta data is absent", () => { /* … */ });
+  it("splits totalValue into a dollars-and-cents pair", () => {
+    /* … */
+  });
+  it("pads single-digit cents with a leading zero", () => {
+    /* … */
+  });
+  it("hides the 24h badge when delta data is absent", () => {
+    /* … */
+  });
 });
 
 // ❌ Bad
-it("works", () => { /* … */ });
-it("test 1", () => { /* … */ });
-it("returns correct value", () => { /* … */ });
-it("should test the badge", () => { /* … */ });
+it("works", () => {
+  /* … */
+});
+it("test 1", () => {
+  /* … */
+});
+it("returns correct value", () => {
+  /* … */
+});
+it("should test the badge", () => {
+  /* … */
+});
 ```
 
 **AAA structure with blank lines, no comments.** Blank lines do the work; `// Arrange` comments are noise.
@@ -208,7 +218,9 @@ it("renders a positive 24h badge in success color with a + sign", async () => {
 });
 
 // ❌ Bad — multiple concepts in one test
-it("renders badge correctly and disables when no data and pads cents", () => { /* … */ });
+it("renders badge correctly and disables when no data and pads cents", () => {
+  /* … */
+});
 ```
 
 **`describe` nesting: max two levels.**
@@ -240,16 +252,15 @@ expect(badge.attributes("data-color")).toBe("success");
 **When you do extract a factory:**
 
 ```ts
-// test/factories/portfolio.ts
-import type { Token, PortfolioDto } from "#shared/types";
-
-export const makeToken = (overrides: Partial<Token> = {}): Token => ({
+// test/factories/portfolio.ts — TokenDto and PortfolioDto are auto-imported in the Nuxt env
+export const makeToken = (overrides: Partial<TokenDto> = {}): TokenDto => ({
   network: "eth-mainnet",
   tokenAddress: "0x0000000000000000000000000000000000000001",
   tokenMetadata: { name: "Test Token", symbol: "TST", decimals: 18, logo: null },
-  tokenBalance: "1.5",
+  tokenBalance: 1.5,
   tokenValue: 100,
   tokenPrice: 66.67,
+  percentage: 100,
   ...overrides,
 });
 
@@ -272,16 +283,16 @@ it("filters out tokens with zero value", () => {
 
 **Rules:**
 
-- Defaults represent a **valid, minimal happy-path** object. The convention: *"the default is correct; this test varies one thing."*
+- Defaults represent a **valid, minimal happy-path** object. The convention: _"the default is correct; this test varies one thing."_
 - Each call returns a fresh object (use spread, not a frozen reference). No shared mutable instances across `it` blocks.
 - **Type overrides as `Partial<T>`.** TypeScript enforces completeness on the defaults; tests fill only what matters.
 - **Per ADR-0003, separate factories per layer.** `makeAlchemyToken` (server-side, for mapper/service tests) is **separate from** `makeToken` (client DTO, for component/composable tests). Don't mix.
 
 **Forbidden anti-patterns regardless of approach:**
 
-- ❌ **Type casts to fudge missing fields** — `{ tokenValue: 100 } as Token`. Defeats the type system. Use a factory or fill the literal.
+- ❌ **Type casts to fudge missing fields** — `{ tokenValue: 100 } as TokenDto`. Defeats the type system. Use a factory or fill the literal.
 - ❌ **Top-of-file mutable shared instances.** Tests must not mutate shared state across `it` blocks.
-- ❌ **Production data** — real wallet addresses, real Alchemy responses. Use synthetic addresses (`0x0000…0001`, `0x0000…0002`) — easier to read in failure diffs, no privacy concerns. *Exception:* dedicated "real-payload contract" fixtures whose entire purpose is detecting upstream API drift.
+- ❌ **Production data** — real Addresses, real Alchemy responses. Use synthetic addresses (`0x0000…0001`, `0x0000…0002`) — easier to read in failure diffs, no privacy concerns. _Exception:_ dedicated "real-payload contract" fixtures whose entire purpose is detecting upstream API drift.
 
 ---
 
@@ -301,7 +312,7 @@ it("filters out tokens with zero value", () => {
 
 **Tier 3 — underinvested today, should grow:**
 
-- **API route handlers in `server/api/`** using `@nuxt/test-utils` `setup()` + `$fetch()` against a test instance. Catches: validation gaps, auth bypass, error leakage, response-shape drift. *Currently zero coverage; the biggest gap.*
+- **API route handlers in `server/api/`** using `@nuxt/test-utils` `setup()` + `$fetch()` against a test instance. Catches: validation gaps, auth bypass, error leakage, response-shape drift. _Only `/api/health` is covered today; the biggest gap._
 
 **Tier 4 — defer:**
 
@@ -325,7 +336,7 @@ it("filters out tokens with zero value", () => {
 
 ## 8. Maintenance — coverage, flakes, deletion, churn
 
-**Coverage.** **No coverage targets.** Coverage is a *diagnostic*, not a goal. Goodhart's Law applies: targets cause meaningless tests that exercise lines without asserting anything. When reviewing a PR, look at *which lines you changed are uncovered* and ask whether they're risk-bearing. If yes, add a test. If they're trivial pass-throughs, leave them.
+**Coverage.** **No coverage targets.** Coverage is a _diagnostic_, not a goal. Goodhart's Law applies: targets cause meaningless tests that exercise lines without asserting anything. When reviewing a PR, look at _which lines you changed are uncovered_ and ask whether they're risk-bearing. If yes, add a test. If they're trivial pass-throughs, leave them.
 
 **Flakes.** **Zero tolerance.** A flaky test is worse than no test — it teaches the team to ignore CI.
 
@@ -347,7 +358,7 @@ When a test flakes:
 
 Don't delete a test just because it's currently failing — investigate first.
 
-**Churn signal.** If a refactor that doesn't change behavior requires editing N tests, the tests are over-coupled. The fix is to *rewrite the tests against behavior* (per §1 / §2), not to keep updating them. AI agents whose PRs edit ≥5 tests for a non-behavior-changing refactor are exhibiting this smell.
+**Churn signal.** If a refactor that doesn't change behavior requires editing N tests, the tests are over-coupled. The fix is to _rewrite the tests against behavior_ (per §1 / §2), not to keep updating them. AI agents whose PRs edit ≥5 tests for a non-behavior-changing refactor are exhibiting this smell.
 
 ---
 
@@ -373,7 +384,7 @@ Before committing or merging any new or changed test, walk through these in orde
 - `test/factories/<domain>.ts` — domain-specific factories (when extracted; see §6).
 - `test/nuxt/api/**` — API route tests with `setup()` + `$fetch()` (Tier 3 area; should grow).
 
-Both run via `pnpm test`. Always run `pnpm type-check` and `pnpm lint` before claiming work done (per `AGENTS.md`).
+Both run via `pnpm test`. Always run `pnpm type-check` and `pnpm lint` before claiming work done (per [`../AGENTS.md`](../AGENTS.md)).
 
 **Async + time.**
 
@@ -425,18 +436,9 @@ it("does not fetch when address is null", async () => {
 });
 ```
 
-**Component testing pattern (§4).** Stub external UI primitives to expose semantic attributes; render real DOM otherwise.
+**Component testing pattern (§4).** Stub external UI primitives to expose semantic attributes (the `uiStubs` object in §4); render real DOM otherwise.
 
 ```ts
-const uiStubs = {
-  UCard: { template: '<div><slot name="header" /><slot /></div>' },
-  UBadge: {
-    inheritAttrs: false,
-    props: ["color", "variant", "size"],
-    template: '<span data-testid="badge" :data-color="color"><slot /></span>',
-  },
-};
-
 async function mountCard(props: Record<string, unknown>) {
   return mountSuspended(NetWorthCard, { props, global: { stubs: uiStubs } });
 }
@@ -449,12 +451,15 @@ async function mountCard(props: Record<string, unknown>) {
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 import { describe, it, expect } from "vitest";
 
-await setup({ /* test fixture options */ });
+await setup({
+  /* test fixture options */
+});
 
 describe("/api/portfolio/:address", () => {
   it("returns 401 when unauthenticated", async () => {
-    await expect($fetch("/api/portfolio/0x0000000000000000000000000000000000000001"))
-      .rejects.toMatchObject({ statusCode: 401 });
+    await expect(
+      $fetch("/api/portfolio/0x0000000000000000000000000000000000000001"),
+    ).rejects.toMatchObject({ statusCode: 401 });
   });
 });
 ```
@@ -473,8 +478,8 @@ pnpm test:coverage # coverage report (diagnostic only — no targets, see §8)
 
 ## References
 
-- ADRs in `docs/adr/` — especially ADR-0003 (Alchemy types stay server-side), which dictates separate factories per layer (§6).
-- `CONTEXT.md` — domain vocabulary used in test names.
+- ADRs in [`docs/adr/`](../docs/adr/) — especially ADR-0003 (Alchemy types stay server-side), which dictates separate factories per layer (§6).
+- [`CONTEXT.md`](../CONTEXT.md) — domain vocabulary used in test names.
 - [Vitest](https://vitest.dev/) and [@nuxt/test-utils](https://nuxt.com/docs/4.x/getting-started/testing).
 - [Testing Library — Guiding Principles](https://testing-library.com/docs/guiding-principles) — source for the query priority in §4.
 - [Kent C. Dodds — The Testing Trophy](https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications) — source for the pyramid shape in §7.
