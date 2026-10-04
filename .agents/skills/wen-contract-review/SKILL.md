@@ -21,7 +21,7 @@ The reviewer must not share this conversation, so the author's assumptions don't
 
 Send exactly this prompt, with `<path>` filled in:
 
-> You are reviewing a contract cold, in the Wen365 repo. Read only: `<path>`, `CONTEXT.md`, `docs/adr/*.md`, `docs/agent-workflow.md` (section "Contracts"), and the `AGENTS.md` files of the directories the goal concerns (root, `app/`, `server/`, `test/`). Read-only: do not edit anything.
+> You are reviewing a contract cold, in the Wen365 repo. Read only: `<path>`, `CONTEXT.md`, `docs/adr/*.md`, `docs/agent-workflow.md` (section "Contracts"), `vitest.config.ts`, and the `AGENTS.md` files of the directories the goal concerns (root, `app/`, `server/`, `test/`). Read-only: do not edit anything.
 >
 > A contract states what will be delivered and how each criterion is verified. It deliberately does not say how to build it. Check:
 >
