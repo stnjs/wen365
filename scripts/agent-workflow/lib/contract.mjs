@@ -8,7 +8,13 @@ export const REQUIRED_SECTIONS = ["Goal", "Acceptance criteria", "Out of scope",
 
 /**
  * @typedef {{ kind: string, detail: string }} Verify
- * @typedef {{ id: string, number: number, text: string, verify: Verify | null }} Criterion
+ * @typedef {{
+ *   id: string,
+ *   number: number,
+ *   text: string,
+ *   verify: Verify | null,
+ *   unparsedVerify: string | null,
+ * }} Criterion
  * @typedef {{
  *   frontmatter: Record<string, string> | null,
  *   sections: Map<string, string>,
@@ -67,7 +73,9 @@ export function splitSections(body) {
 /**
  * Criteria are top-level `- **AC-n:** text` bullets. The first nested
  * `- Verify: <kind> — <detail>` line under a criterion is its verification
- * (`**Verify:**` in bold is accepted too).
+ * (`**Verify:**` in bold is accepted too). A line under a criterion that
+ * mentions `Verify:` but doesn't match is kept in `unparsedVerify` so lint can
+ * quote it.
  *
  * @param {string} section
  * @returns {Criterion[]}
@@ -84,13 +92,18 @@ export function parseCriteria(section) {
         number,
         text: (criterion[2] ?? "").trim(),
         verify: null,
+        unparsedVerify: null,
       });
       continue;
     }
-    const verify = /^\s+- (?:\*\*)?Verify:(?:\*\*)?\s*([A-Za-z]+)\s*[—–-]?\s*(.*)$/.exec(line);
     const current = criteria.at(-1);
-    if (verify && current && current.verify === null) {
+    if (!current || current.verify !== null) continue;
+    const verify = /^\s+- (?:\*\*)?Verify:(?:\*\*)?\s*([A-Za-z]+)\s*[—–-]?\s*(.*)$/.exec(line);
+    if (verify) {
       current.verify = { kind: (verify[1] ?? "").toLowerCase(), detail: (verify[2] ?? "").trim() };
+      current.unparsedVerify = null;
+    } else if (/Verify:/i.test(line) && current.unparsedVerify === null) {
+      current.unparsedVerify = line.trim();
     }
   }
   return criteria;

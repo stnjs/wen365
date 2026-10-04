@@ -12,4 +12,4 @@ A `ref`, `shallowRef` or `computed` is typed twice: once on the variable and onc
 
 **Good:** `const foo = ref<string>("hello world")`
 
-**Lint candidate:** `no-restricted-syntax` with selector `VariableDeclarator[id.typeAnnotation] > CallExpression[callee.name=/^(ref|shallowRef|computed)$/]`.
+**Lint candidate:** `no-restricted-syntax` with selector `VariableDeclarator[id.typeAnnotation] > CallExpression[callee.name=/^(ref|shallowRef|computed)$/][typeArguments]`.

@@ -12,6 +12,7 @@ describe("parseContract", () => {
       number: 1,
       text: "A signed-in user sees outcome 1 in the Portfolio",
       verify: { kind: "test", detail: "`test/unit/example.test.ts`" },
+      unparsedVerify: null,
     });
   });
 
@@ -66,5 +67,20 @@ describe("parseContract", () => {
     expect(contract.frontmatter?.type).toBe("feat");
     expect(contract.criteria).toHaveLength(3);
     expect(contract.criteria[2]?.verify?.kind).toBe("test");
+  });
+
+  it("keeps the text of a Verify line it cannot read", () => {
+    const contract = parseContract(
+      makeContract({
+        criteria: [
+          makeCriterion(1),
+          "- **AC-2:** Shows both Wallets\n- Verify: test — flush left",
+          makeCriterion(3),
+        ],
+      }),
+    );
+
+    expect(contract.criteria[1]?.verify).toBeNull();
+    expect(contract.criteria[1]?.unparsedVerify).toBe("- Verify: test — flush left");
   });
 });

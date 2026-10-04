@@ -42,3 +42,25 @@ export function resolveBase(cwd, preferred) {
     `Base ref not found (tried ${candidates.join(", ")}). Run \`git fetch origin\` or pass --base <ref>.`,
   );
 }
+
+/**
+ * Top-level directory of the repository containing `cwd`.
+ *
+ * @param {string} cwd
+ */
+export function repoRoot(cwd) {
+  try {
+    return git(["rev-parse", "--show-toplevel"], cwd);
+  } catch {
+    throw new Error(`Not inside a git repository: ${cwd}`);
+  }
+}
+
+/**
+ * Splits output of a git command run with `-z`.
+ *
+ * @param {string} output
+ */
+export function nulFields(output) {
+  return output.split("\0").filter(field => field !== "");
+}

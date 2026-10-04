@@ -4,7 +4,7 @@ import { join, posix } from "node:path";
 import process from "node:process";
 import { isMain, printJson, readFlag } from "./lib/cli.mjs";
 import { parseContract } from "./lib/contract.mjs";
-import { git, lines, resolveBase } from "./lib/git.mjs";
+import { git, nulFields, repoRoot, resolveBase } from "./lib/git.mjs";
 
 const CONTRACT_PATH = /^docs\/plans\/(?!_template\/)[^/]+\/contract\.md$/;
 
@@ -31,18 +31,17 @@ const CONTRACT_PATH = /^docs\/plans\/(?!_template\/)[^/]+\/contract\.md$/;
  * @returns {Plan}
  */
 export function findPlan({ cwd = process.cwd(), base } = {}) {
-  const root = git(["rev-parse", "--show-toplevel"], cwd);
+  const root = repoRoot(cwd);
   const baseRef = resolveBase(root, base);
   const mergeBase = git(["merge-base", baseRef, "HEAD"], root);
 
-  const committed = lines(
-    git(["diff", "--name-only", "--diff-filter=A", `${mergeBase}..HEAD`, "--", "docs/plans"], root),
+  const committed = nulFields(
+    git(
+      ["diff", "--name-only", "-z", "--diff-filter=A", `${mergeBase}..HEAD`, "--", "docs/plans"],
+      root,
+    ),
   );
-  const uncommitted = lines(
-    git(["status", "--porcelain", "--untracked-files=all", "--", "docs/plans"], root),
-  )
-    .filter(entry => entry.startsWith("??") || entry.startsWith("A"))
-    .map(entry => entry.slice(3));
+  const uncommitted = addedInWorkingTree(root);
   const paths = [...new Set([...committed, ...uncommitted])].filter(path =>
     CONTRACT_PATH.test(path),
   );
@@ -73,6 +72,29 @@ export function findPlan({ cwd = process.cwd(), base } = {}) {
     criteria: contract.criteria.map(criterion => criterion.id),
     hasAmendments: contract.hasAmendments,
   };
+}
+
+/**
+ * Paths under docs/plans that are new in the working tree: untracked, staged
+ * as added, or marked intent-to-add.
+ *
+ * @param {string} root
+ */
+function addedInWorkingTree(root) {
+  const fields = nulFields(
+    git(["status", "--porcelain=v1", "-z", "--untracked-files=all", "--", "docs/plans"], root),
+  );
+  /** @type {string[]} */
+  const added = [];
+  for (let index = 0; index < fields.length; index++) {
+    const entry = fields[index] ?? "";
+    const status = entry.slice(0, 2);
+    // A rename or copy is followed by its original path as a separate field.
+    if (status[0] === "R" || status[0] === "C") index++;
+    const isAdded = status === "??" || status[0] === "A" || status[1] === "A";
+    if (isAdded && !status.includes("D")) added.push(entry.slice(3));
+  }
+  return added;
 }
 
 /**

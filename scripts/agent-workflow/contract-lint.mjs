@@ -39,8 +39,14 @@ export function lintContract(text) {
       `Frontmatter \`status\` must be one of ${CONTRACT_STATUSES.join(", ")}; got "${fm.status ?? ""}".`,
     );
   }
-  if (fm.status === "approved" && !DATE.test(fm.approved ?? "")) {
+  const approved = fm.approved ?? "";
+  if (fm.status === "approved" && !isCalendarDate(approved)) {
     problems.push("Frontmatter `approved` must be a YYYY-MM-DD date when `status` is approved.");
+  }
+  if (fm.status === "draft" && approved !== "") {
+    problems.push(
+      "Frontmatter `approved` is set but `status` is draft; the date is written only on approval.",
+    );
   }
 
   for (const name of REQUIRED_SECTIONS) {
@@ -62,7 +68,11 @@ export function lintContract(text) {
     }
     if (criterion.text === "") problems.push(`${criterion.id} has no text.`);
     if (criterion.verify === null) {
-      problems.push(`${criterion.id} has no \`Verify:\` line.`);
+      problems.push(
+        criterion.unparsedVerify === null
+          ? `${criterion.id} has no \`Verify:\` line.`
+          : `${criterion.id} has a Verify line that can't be read: "${criterion.unparsedVerify}". Expected an indented "- Verify: <kind> — <detail>".`,
+      );
     } else if (!VERIFY_KINDS.includes(criterion.verify.kind)) {
       problems.push(
         `${criterion.id} Verify kind must be one of ${VERIFY_KINDS.join(", ")}; got "${criterion.verify.kind}".`,
@@ -86,6 +96,13 @@ export function lintContract(text) {
     );
   }
   return problems;
+}
+
+/** @param {string} value */
+function isCalendarDate(value) {
+  if (!DATE.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 /**

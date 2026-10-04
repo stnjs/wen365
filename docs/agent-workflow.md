@@ -8,18 +8,18 @@ Self-improvement = drift + repetition + human review. The loop improves the harn
 
 The workflow is being built in five PRs (design section 9). This table is updated by each one.
 
-| Step                 | Skill / script                                     | Available |
-| -------------------- | -------------------------------------------------- | --------- |
-| Clarify the idea     | `/wen-grilling`                                    | ✅        |
-| Write the contract   | `/wen-contract`, `contract-lint.mjs`               | ✅        |
-| Review the contract  | `/wen-contract-review`                             | ✅        |
-| Find the contract    | `plan.mjs`                                         | ✅        |
-| Implement            | `/wen-implement`, `/wen-tdd`                       | PR 2      |
-| Self-check           | `/wen-self-check`, `gate-changes.mjs`              | PR 2      |
-| Code review          | `/wen-code-review`, `review-context.mjs`           | PR 2      |
-| Drift and patterns   | `/wen-drift`, `review-threads.mjs`, `patterns.mjs` | PR 3      |
-| Orchestration and CI | `/wen-ship`, `status.mjs`, `check.mjs`             | PR 4      |
-| Automatic promotion  | `/wen-drift`                                       | PR 5      |
+| Step                 | Skill / script                                               | Available |
+| -------------------- | ------------------------------------------------------------ | --------- |
+| Clarify the idea     | `/wen-grilling`                                              | ✅        |
+| Write the contract   | `/wen-contract`, `contract-lint.mjs`                         | ✅        |
+| Review the contract  | `/wen-contract-review`                                       | ✅        |
+| Find the contract    | `plan.mjs`                                                   | ✅        |
+| Implement            | `/wen-implement`, `/wen-tdd`                                 | ✅        |
+| Self-check           | `/wen-self-check`, `gate-changes.mjs`, `self-check-lint.mjs` | ✅        |
+| Code review          | `/wen-code-review`, `review-context.mjs`                     | ✅        |
+| Drift and patterns   | `/wen-drift`, `review-threads.mjs`, `patterns.mjs`           | PR 3      |
+| Orchestration and CI | `/wen-ship`, `status.mjs`, `check.mjs`                       | PR 4      |
+| Automatic promotion  | `/wen-drift`                                                 | PR 5      |
 
 Until a step exists, do it by hand the way the design describes, or skip it.
 
@@ -40,6 +40,17 @@ A contract lives at `docs/plans/<YYYY-MM-DD>-<slug>/contract.md`, created from [
 - `status: approved` and the `approved:` date are written only when the human explicitly approves. After approval nothing above `## Amendments` changes. A scope change is an amendment entry plus an `approved:` bump in the same commit, again only on explicit approval.
 - Structure is checked by `node scripts/agent-workflow/contract-lint.mjs <path>`; judgement by `/wen-contract-review`.
 - The step-by-step implementation plan is the implementing agent's own working file. Write it to `docs/plans/<folder>/implementation-plan.md`: git ignores it, so it stays next to the contract for resuming on the same machine but is never committed. Only `contract.md`, `self-check.md` and `drift.md` are committed.
+
+## Self-check
+
+`/wen-self-check` writes `docs/plans/<folder>/self-check.md` from [`docs/plans/_template/self-check.md`](./plans/_template/self-check.md):
+
+- **Criteria:** one table row per contract criterion, amended ones included: `| AC-n | <status> | <evidence> |`.
+- **Gate changes:** every item `gate-changes.mjs` reports that you kept, as ``- `file` · kind · `text` — justified: <reason>``. Entries match by file, kind and text, so later commits that shift line numbers don't invalidate them.
+- **Friction** and **Known patterns**, from the implementing session.
+- **Review fixes**, appended by `/wen-code-review`, which also sets `reviewed:` to the last reviewed commit.
+
+`node scripts/agent-workflow/self-check-lint.mjs` checks it: every criterion present with a known status, evidence for `met`, `not met` or `partial` only when an amendment covers the criterion, and every kept gate change justified. `not verified` is a warning, not a failure.
 
 ## Vocabulary
 

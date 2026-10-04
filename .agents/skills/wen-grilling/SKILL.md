@@ -5,13 +5,13 @@ description: Grill the user relentlessly about a plan or design for Wen365 befor
 
 > Adapted from an earlier version of `grilling` in [mattpocock/skills](https://github.com/mattpocock/skills) (MIT, see [`../LICENSE-mattpocock-skills.txt`](../LICENSE-mattpocock-skills.txt)).
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one by one. For each question, provide your recommended answer.
+Interview the user relentlessly about every aspect of the plan until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one by one. For each question, give your recommended answer.
 
-Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+Ask the questions one at a time, waiting for the answer to each before continuing. Several questions at once are bewildering.
 
-If a _fact_ can be found by exploring the codebase, look it up rather than asking me. The _decisions_, though, are mine: put each one to me and wait for my answer.
+If a _fact_ can be found by exploring the codebase, look it up instead of asking. The _decisions_ belong to the user: put each one to them and wait for their answer.
 
-Do not enact the plan until I confirm we have reached a shared understanding.
+Do not act on the plan until the user confirms you have reached a shared understanding.
 
 ## How to ask a question
 
