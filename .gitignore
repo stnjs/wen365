@@ -47,3 +47,7 @@ blob-report/
 *.tgz
 tmp/
 temp/
+
+# Agent implementation plans are local working files; contract, self-check and drift are committed
+docs/plans/*/implementation-plan*.md
+docs/superpowers/

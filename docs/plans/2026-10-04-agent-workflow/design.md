@@ -85,6 +85,7 @@ docs/plans/
     contract.md                       full path only
     self-check.md                     full path only
     drift.md                          full path always; small path only when there were corrections
+    implementation-plan.md            optional, agent's working file, gitignored
 docs/patterns/
   <slug>.md                           one file per pattern
 
@@ -347,7 +348,7 @@ Built as five PRs, each usable on its own and each titled `chore(harness): …` 
 | 4   | `status.mjs`, `pr-body.mjs`, `wen-ship`, `check.mjs`, `.github/workflows/agent-workflow.yml`, `pnpm agent-workflow:check`                                                                                                                                       | Full orchestrated loop, enforced in CI              | rest of AC-1, AC-3; AC-4       |
 | 5   | Automatic promotion PRs from `wen-drift` (section 5.9 "Promote" for due slugs)                                                                                                                                                                                  | Promotion without remembering                       | —                              |
 
-Every PR must satisfy AC-6. PR 5 starts only after a few real drift runs show that slugs stay consistent and the thresholds feel right; until then `/wen-drift` reports due slugs and the human runs `promote`. Each PR gets its own implementation plan, written when the previous one has merged, so it can use what was learned.
+Every PR must satisfy AC-6. PR 5 starts only after a few real drift runs show that slugs stay consistent and the thresholds feel right; until then `/wen-drift` reports due slugs and the human runs `promote`. Each PR gets its own implementation plan, written when the previous one has merged, so it can use what was learned. Implementation plans are gitignored working files (`implementation-plan*.md`), not part of the record.
 
 ## 10. Out of scope / next
 

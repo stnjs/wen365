@@ -39,6 +39,7 @@ A contract lives at `docs/plans/<YYYY-MM-DD>-<slug>/contract.md`, created from [
 - `fix`: AC-1 is a regression test that fails before the fix and passes after. `refactor`: AC-1 is "Existing tests pass without modification".
 - `status: approved` and the `approved:` date are written only when the human explicitly approves. After approval nothing above `## Amendments` changes. A scope change is an amendment entry plus an `approved:` bump in the same commit, again only on explicit approval.
 - Structure is checked by `node scripts/agent-workflow/contract-lint.mjs <path>`; judgement by `/wen-contract-review`.
+- The step-by-step implementation plan is the implementing agent's own working file. Write it to `docs/plans/<folder>/implementation-plan.md`: git ignores it, so it stays next to the contract for resuming on the same machine but is never committed. Only `contract.md`, `self-check.md` and `drift.md` are committed.
 
 ## Vocabulary
 
