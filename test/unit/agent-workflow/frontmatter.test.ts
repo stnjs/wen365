@@ -35,4 +35,10 @@ describe("parseFrontmatter", () => {
 
     expect(parsed).toEqual({ data: { title: "Wallets" }, body: "body\n" });
   });
+
+  it("parses a file that starts with a UTF-8 byte order mark", () => {
+    expect(parseFrontmatter("\uFEFF---\ntitle: Wallets\n---\n")?.data).toEqual({
+      title: "Wallets",
+    });
+  });
 });

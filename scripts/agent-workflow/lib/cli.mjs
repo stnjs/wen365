@@ -21,12 +21,16 @@ export function printJson(value) {
 }
 
 /**
- * Value following `--<name>` in `args`, or undefined.
+ * Value following `--<name>` in `args`, or undefined when the flag is absent.
+ * Throws when the flag is present without a value.
  *
  * @param {string[]} args
  * @param {string} name
  */
 export function readFlag(args, name) {
   const index = args.indexOf(`--${name}`);
-  return index === -1 ? undefined : args[index + 1];
+  if (index === -1) return undefined;
+  const value = args[index + 1];
+  if (value === undefined || value.startsWith("--")) throw new Error(`--${name} needs a value.`);
+  return value;
 }
