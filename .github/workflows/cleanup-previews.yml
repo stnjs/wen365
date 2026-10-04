@@ -47,7 +47,7 @@ jobs:
             .deployments[]
             | select(.target != "production" and .meta.githubPrId == $pr)
             | .url
-            | select(test("^" + $project + "-[a-z0-9]+-[a-z0-9-]+\\.vercel\\.app$"))
+            | select(type == "string" and test("^" + $project + "-[a-z0-9]+-[a-z0-9-]+\\.vercel\\.app$"))
           ' <<<"$deployments")
 
           if [ -z "$urls" ]; then
