@@ -15,11 +15,12 @@ Read these in order:
 3. [`docs/adr/`](./docs/adr/) — decisions that are **not up for debate** unless explicitly revisiting. If you're about to propose something that contradicts an ADR, surface the conflict first.
 4. The `AGENTS.md` in the directory you're editing. Most agents load it automatically when they touch a file there; if yours doesn't, read it yourself.
 
-| Editing     | Read                                     | Covers                                                                             |
-| ----------- | ---------------------------------------- | ---------------------------------------------------------------------------------- |
-| `server/**` | [`server/AGENTS.md`](./server/AGENTS.md) | Handler shape, DomainError taxonomy, validation, upstream calls, logging, security |
-| `app/**`    | [`app/AGENTS.md`](./app/AGENTS.md)       | TanStack Query, Network registry, Nuxt UI, component conventions                   |
-| `test/**`   | [`test/AGENTS.md`](./test/AGENTS.md)     | What earns a test, where to mock, queries, Vitest mechanics                        |
+| Editing                                                                               | Read                                                 | Covers                                                                                 |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `server/**`                                                                           | [`server/AGENTS.md`](./server/AGENTS.md)             | Handler shape, DomainError taxonomy, validation, upstream calls, logging, security     |
+| `app/**`                                                                              | [`app/AGENTS.md`](./app/AGENTS.md)                   | TanStack Query, Network registry, Nuxt UI, component conventions                       |
+| `test/**`                                                                             | [`test/AGENTS.md`](./test/AGENTS.md)                 | What earns a test, where to mock, queries, Vitest mechanics                            |
+| `.agents/skills/**`, `scripts/agent-workflow/**`, `docs/plans/**`, `docs/patterns/**` | [`docs/agent-workflow.md`](./docs/agent-workflow.md) | Contract → self-check → drift workflow, pattern registry, skill and script conventions |
 
 ## Canonical commands
 
@@ -36,6 +37,10 @@ pnpm format           # Prettier
 ```
 
 Run `pnpm type-check` and `pnpm lint` before claiming work is done. CI also runs `pnpm format:check`.
+
+## Workflow
+
+Feature, fix and refactor work starts from an approved contract in `docs/plans/` and ends with a drift entry that feeds recurring problems back into this guidance. The workflow, its vocabulary and which steps exist so far are in [`docs/agent-workflow.md`](./docs/agent-workflow.md). Repo skills live in `.agents/skills/` (symlinked into `.claude/skills/`) and are prefixed `wen-`. `/wen-ship`, which runs the whole workflow, arrives in a later PR.
 
 ## Conventions at a glance
 
@@ -75,4 +80,4 @@ No MCP config is committed; each developer configures servers in their own tool.
 - Don't add Pinia stores for data that TanStack Query already caches (see ADR-0002).
 - Don't add SSR-dependent code — `ssr: false` (see ADR-0001).
 - Don't leak Alchemy-shaped types into `shared/types/` or client code (see ADR-0003).
-- Don't update `git config`, force-push to main, or skip hooks. Don't commit without an explicit request from the user.
+- Don't update `git config`, force-push, or skip hooks. Never commit to `main`: every change lands through a PR, and the `main` ruleset enforces it.
