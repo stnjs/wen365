@@ -15,7 +15,7 @@ Run `node scripts/agent-workflow/contract-lint.mjs <path>`. If it fails, return 
 
 The reviewer must not share this conversation, so the author's assumptions don't carry over.
 
-- **Claude Code:** Agent tool, `subagent_type: general-purpose`, `model: fable`.
+- **Claude Code:** Agent tool, `subagent_type: general-purpose`, `model: fable`. If this session itself runs on Fable, use `model: opus` instead, so the reviewer is never the author's model.
 - **Other agents:** a fresh-context subagent on a different model from the author's, if available.
 - **No subagent available:** tell the human the review can't run independently and stop. Do not review the contract yourself in this context.
 

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,12 +10,19 @@ import { makeContract, makeCriterion } from "~~/test/factories/contract";
 const LINT_SCRIPT = fileURLToPath(
   new URL("../../../scripts/agent-workflow/contract-lint.mjs", import.meta.url),
 );
+const TEMPLATE = fileURLToPath(
+  new URL("../../../docs/plans/_template/contract.md", import.meta.url),
+);
 
 const criteria = (count: number) => Array.from({ length: count }, (_, i) => makeCriterion(i + 1));
 
 describe("lintContract", () => {
   it("accepts a well-formed draft contract", () => {
     expect(lintContract(makeContract())).toEqual([]);
+  });
+
+  it("accepts the contract template unchanged, so a fresh copy never starts from a lint failure", () => {
+    expect(lintContract(readFileSync(TEMPLATE, "utf8"))).toEqual([]);
   });
 
   it("accepts an approved contract with an approval date", () => {

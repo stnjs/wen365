@@ -19,6 +19,12 @@ describe("parseFrontmatter", () => {
     expect(parsed?.data).toEqual({ status: "draft", approved: "", issue: "#5" });
   });
 
+  it("keeps a # that is part of an unquoted value", () => {
+    const parsed = parseFrontmatter("---\ntitle: Fix #5 stale Portfolio total\n---\n");
+
+    expect(parsed?.data.title).toBe("Fix #5 stale Portfolio total");
+  });
+
   it("returns null when the file has no frontmatter block", () => {
     expect(parseFrontmatter("## Goal\n")).toBeNull();
     expect(parseFrontmatter("---\ntitle: never closed\n")).toBeNull();

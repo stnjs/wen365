@@ -3,8 +3,9 @@
 /**
  * Reads the leading `---` block of a Markdown file. Supports flat `key: value`
  * lines only; every value is a string. Unquoted values drop a trailing
- * ` # comment`; quoted values are returned without their quotes. Empty values
- * become "". Line endings are normalised to "\n" in the returned body.
+ * ` # comment` (a `#` followed by whitespace); quoted values are returned
+ * without their quotes. Empty values become "". Line endings are normalised
+ * to "\n" in the returned body.
  *
  * @param {string} text
  * @returns {{ data: Record<string, string>, body: string } | null} null when there is no block
@@ -33,5 +34,6 @@ function parseValue(raw) {
     const close = value.indexOf(quote, 1);
     if (close !== -1) return value.slice(1, close);
   }
-  return value.replace(/(^|\s)#.*$/, "").trim();
+  // A comment is `#` followed by whitespace or the end, so `Fix #5` keeps its `#5`.
+  return value.replace(/(^|\s)#(?=\s|$).*$/, "").trim();
 }
