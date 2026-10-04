@@ -9,6 +9,8 @@ export interface GitRepo {
   write: (path: string, content: string) => void;
   commit: (message: string) => void;
   remove: () => void;
+  /** Commits `files` on main and fast-forwards the feature branch. Use before the branch has its own commits. */
+  baseline: (files: Record<string, string>) => void;
 }
 
 // Identity via env and hooks/signing via -c, so the fixture never touches any git config file.
@@ -44,5 +46,20 @@ export const makeGitRepo = (branch = "feat/example"): GitRepo => {
   commit("chore: init");
   git("checkout", "--quiet", "-b", branch);
 
-  return { dir, git, write, commit, remove: () => rmSync(dir, { recursive: true, force: true }) };
+  const baseline = (files: Record<string, string>) => {
+    git("checkout", "--quiet", "main");
+    for (const [path, content] of Object.entries(files)) write(path, content);
+    commit("chore: baseline");
+    git("checkout", "--quiet", branch);
+    git("merge", "--quiet", "--ff-only", "main");
+  };
+
+  return {
+    dir,
+    git,
+    write,
+    commit,
+    baseline,
+    remove: () => rmSync(dir, { recursive: true, force: true }),
+  };
 };
