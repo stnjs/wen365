@@ -49,6 +49,17 @@ describe("parseContract", () => {
     ).toBe(true);
   });
 
+  it("treats an unclosed comment as hiding the rest of the Amendments section, as rendering does", () => {
+    expect(
+      parseContract(makeContract({ amendments: "<!-- template note, never closed\nmore note" }))
+        .hasAmendments,
+    ).toBe(false);
+    expect(
+      parseContract(makeContract({ amendments: "- 2026-10-06 — AC-2: dropped CSV\n<!-- note" }))
+        .hasAmendments,
+    ).toBe(true);
+  });
+
   it("parses a contract saved with Windows line endings", () => {
     const contract = parseContract(makeContract().replace(/\n/g, "\r\n"));
 

@@ -96,7 +96,26 @@ export function parseCriteria(section) {
   return criteria;
 }
 
-/** @param {string} text */
+/**
+ * The visible text of a Markdown snippet: everything outside `<!-- … -->`.
+ * An unclosed comment hides the rest, as it does when rendered. Used only to
+ * decide whether a section is empty; the result is never rendered.
+ *
+ * @param {string} text
+ */
 function stripComments(text) {
-  return text.replace(/<!--[\s\S]*?-->/g, "").trim();
+  let visible = "";
+  let index = 0;
+  while (index < text.length) {
+    const open = text.indexOf("<!--", index);
+    if (open === -1) {
+      visible += text.slice(index);
+      break;
+    }
+    visible += text.slice(index, open);
+    const close = text.indexOf("-->", open + 4);
+    if (close === -1) break;
+    index = close + 3;
+  }
+  return visible.trim();
 }
