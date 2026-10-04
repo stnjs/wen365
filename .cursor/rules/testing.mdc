@@ -406,11 +406,13 @@ beforeEach(() => {
 });
 ```
 
-**Composable testing pattern (§2).** Mock at the process boundary — `$fetch` only. Let TanStack Query run.
+**Composable testing pattern (§2).** Mock at the process boundary — `$fetch` only. Let TanStack Query run. `$fetch` is a Nuxt auto-import (bound when `#build/fetch.mjs` loads since Nuxt 4.5), so mock it with `mockNuxtImport`; reassigning `global.$fetch` in the test module is too late to take effect.
 
 ```ts
-const mockFetch = vi.fn();
-global.$fetch = mockFetch as unknown as typeof global.$fetch;
+import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+
+const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));
+mockNuxtImport("$fetch", () => mockFetch);
 
 it("does not fetch when address is null", async () => {
   const address = ref<string | null>(null);
