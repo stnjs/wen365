@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { defineComponent, h, ref } from "vue";
-import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { mockNuxtImport, mountSuspended } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
 import { QueryClient, VueQueryPlugin } from "@tanstack/vue-query";
 import { usePortfolio } from "~/composables/queries/usePortfolio";
@@ -8,9 +8,10 @@ import { DEMO_PORTFOLIO } from "~/utils/demoData";
 
 // $fetch is the process boundary — the only thing this composable talks to
 // outside of TanStack. Per testing.mdc §2 we mock $fetch and let the real
-// TanStack Query run.
-const mockFetch = vi.fn();
-global.$fetch = mockFetch as unknown as typeof global.$fetch;
+// TanStack Query run. Since Nuxt 4.5, `$fetch` is an auto-import bound when
+// `#build/fetch.mjs` loads, so reassigning `globalThis.$fetch` here is too late.
+const { mockFetch } = vi.hoisted(() => ({ mockFetch: vi.fn() }));
+mockNuxtImport("$fetch", () => mockFetch);
 
 type Address = Parameters<typeof usePortfolio>[0];
 type DemoOpt = NonNullable<Parameters<typeof usePortfolio>[1]>["demo"];
