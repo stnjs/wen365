@@ -35,8 +35,20 @@ jobs:
 
           vercel() { npx --yes vercel@62.2.0 "$@" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"; }
 
-          urls=$(vercel list "$VERCEL_PROJECT" --environment preview --meta "githubPrId=$PR_NUMBER" --limit 100 --format json \
-            | jq -r '.deployments[] | select(.target != "production") | .url')
+          deployments=$(vercel list "$VERCEL_PROJECT" --environment preview --meta "githubPrId=$PR_NUMBER" --limit 100 --format json)
+
+          if [ "$(jq -r '.pagination.next' <<<"$deployments")" != "null" ]; then
+            echo "::warning::PR #$PR_NUMBER has more than 100 preview deployments; only the newest 100 are deleted"
+          fi
+
+          # Re-check the server-side filters, and only pass full deployment URLs:
+          # `vercel remove` treats a bare name as a project and would delete all of it.
+          urls=$(jq -r --arg pr "$PR_NUMBER" --arg project "$VERCEL_PROJECT" '
+            .deployments[]
+            | select(.target != "production" and .meta.githubPrId == $pr)
+            | .url
+            | select(test("^" + $project + "-[a-z0-9]+-[a-z0-9-]+\\.vercel\\.app$"))
+          ' <<<"$deployments")
 
           if [ -z "$urls" ]; then
             echo "No preview deployments for PR #$PR_NUMBER"
