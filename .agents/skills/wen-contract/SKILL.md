@@ -13,6 +13,7 @@ Run `node scripts/agent-workflow/plan.mjs`.
 
 - `status: "draft"` → continue at step 4 with that file.
 - `status: "approved"` → this branch already has an approved contract. For a scope change go to **Amendments** below; otherwise stop.
+- Any other `status` (empty or misspelled frontmatter) → run `node scripts/agent-workflow/contract-lint.mjs <contractPath>`, fix what it reports, then continue at step 4.
 - Fails with "More than one contract" → run `git fetch origin` once and retry (a stale `origin/main` can make an already-merged contract look like part of this branch); if it still fails, stop and show the human the message.
 - Fails with "No contract on this branch" → continue.
 - Fails with "Base ref not found" → run `git fetch origin` once and retry; if it still fails, stop and show the message.
@@ -73,6 +74,6 @@ git commit -m "docs(plan): <title>"
 
 After approval, never edit anything above `## Amendments`.
 
-1. Append `- YYYY-MM-DD — AC-n: <what changed> — <why>` under `## Amendments`.
+1. Append `- YYYY-MM-DD — AC-n: <what changed> — <why>` under `## Amendments`. One line per criterion; an amendment touching two criteria is two lines.
 2. Show the human the amendment and ask for approval. **Stop.**
 3. On explicit approval: bump `approved:` to today's date and commit the amendment and the bump together as `docs(plan): amend <title>`. An amendment without a bumped `approved:` does not count.
