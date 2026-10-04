@@ -45,7 +45,21 @@ export default defineConfig({
             },
           },
         ],
-      }),
+      }).then(withoutNitroSsrConditions),
     ],
   },
 });
+
+// Nuxt ≥4.4 (`@nuxt/nitro-server`) adds a Vite plugin that sets the SSR
+// environment's resolve conditions to Nitro's export conditions plus "import".
+// Vitest forwards those to its worker as Node `--conditions`, which also apply
+// to CJS `require()`: `@vue/compiler-sfc` then loads magic-string's ESM build
+// via require(esm) and crashes with "MagicString is not a constructor".
+// The conditions only matter for the Nitro server bundle, so drop the plugin
+// from the test project. Not excluded upstream as of @nuxt/test-utils 4.3.2.
+function withoutNitroSsrConditions<T extends { plugins?: unknown[] }>(config: T): T {
+  config.plugins = config.plugins?.filter(
+    plugin => (plugin as { name?: string } | null)?.name !== "nuxt:nitro:ssr-conditions",
+  );
+  return config;
+}

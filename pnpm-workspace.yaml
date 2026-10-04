@@ -8,3 +8,8 @@ onlyBuiltDependencies:
   - secp256k1
   - utf-8-validate
   - vue-demi
+
+overrides:
+  # reown adapter's optional dep is ">=5.9.9" and resolves to the wagmi-3 line (8.x).
+  # Keep it on the exact version wagmi@2 / @wagmi/vue@0.3 pin. Remove with the wagmi 3 migration.
+  "@reown/appkit-adapter-wagmi>@wagmi/connectors": "6.2.0"
