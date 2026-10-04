@@ -118,6 +118,34 @@ describe("lintContract", () => {
       "Missing frontmatter: the file must start with a `---` block.",
     ]);
   });
+
+  it("names a Verify line that exists but cannot be read", () => {
+    const problems = lintContract(
+      makeContract({
+        criteria: [
+          makeCriterion(1),
+          "- **AC-2:** Shows both Wallets\n  - Verify: **test** — bold kind",
+          makeCriterion(3),
+        ],
+      }),
+    );
+
+    expect(problems).toEqual([
+      'AC-2 has a Verify line that can\'t be read: "- Verify: **test** — bold kind". Expected an indented "- Verify: <kind> — <detail>".',
+    ]);
+  });
+
+  it("rejects an approval date that is not on the calendar", () => {
+    expect(lintContract(makeContract({ status: "approved", approved: "2026-02-30" }))).toEqual([
+      expect.stringContaining("`approved` must be a YYYY-MM-DD date"),
+    ]);
+  });
+
+  it("reports a draft that already carries an approval date", () => {
+    expect(lintContract(makeContract({ approved: "2026-10-05" }))).toEqual([
+      "Frontmatter `approved` is set but `status` is draft; the date is written only on approval.",
+    ]);
+  });
 });
 
 describe("contract-lint CLI", () => {

@@ -11,7 +11,7 @@
  * @returns {{ data: Record<string, string>, body: string } | null} null when there is no block
  */
 export function parseFrontmatter(text) {
-  const lines = text.split(/\r?\n/);
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/);
   if (lines[0] !== "---") return null;
   const end = lines.indexOf("---", 1);
   if (end === -1) return null;
