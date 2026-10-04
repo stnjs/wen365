@@ -164,6 +164,8 @@ CI runs `pnpm lint && pnpm type-check && pnpm test run` on every PR and push to 
 
 Deployed to [www.wen365.xyz](https://www.wen365.xyz/) on Vercel. The Vercel Cron schedule lives in [`vercel.json`](./vercel.json) and triggers `/api/cron/snapshot` daily at 00:00 UTC.
 
+When a PR is merged or closed, [`cleanup-previews.yml`](./.github/workflows/cleanup-previews.yml) deletes its Vercel preview deployments. It needs a `VERCEL_TOKEN` repo secret. Production deployments are pruned by the project's Deployment Retention Policy instead.
+
 ## Roadmap
 
 Next things I'd build, in rough order:
