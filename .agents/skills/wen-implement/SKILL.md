@@ -13,6 +13,7 @@ Run `node scripts/agent-workflow/plan.mjs`.
 
 - `status: "approved"` → continue.
 - `status: "draft"` → stop. The human hasn't approved the contract yet; point them to it.
+- Any other `status` → run `node scripts/agent-workflow/contract-lint.mjs <contractPath>` and stop: the contract needs fixing and approval first.
 - Fails → stop and show the message. "No contract on this branch" means the work needs `/wen-contract` first.
 
 Read the contract in full, including `## Amendments`, plus [`docs/agent-workflow.md`](../../../docs/agent-workflow.md) and the `AGENTS.md` of every directory you will touch.

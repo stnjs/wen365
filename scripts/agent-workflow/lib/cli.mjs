@@ -34,3 +34,20 @@ export function readFlag(args, name) {
   if (value === undefined || value.startsWith("--")) throw new Error(`--${name} needs a value.`);
   return value;
 }
+
+/**
+ * Runs `main` when the module is the entry file. Its return value becomes the
+ * exit code; a thrown error prints its message on stderr and exits 1.
+ *
+ * @param {string} moduleUrl pass `import.meta.url`
+ * @param {(args: string[]) => number} main
+ */
+export function runCli(moduleUrl, main) {
+  if (!isMain(moduleUrl)) return;
+  try {
+    process.exitCode = main(process.argv.slice(2));
+  } catch (error) {
+    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+    process.exitCode = 1;
+  }
+}

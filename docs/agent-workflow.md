@@ -8,18 +8,18 @@ Self-improvement = drift + repetition + human review. The loop improves the harn
 
 The workflow is being built in five PRs (design section 9). This table is updated by each one.
 
-| Step                 | Skill / script                                               | Available |
-| -------------------- | ------------------------------------------------------------ | --------- |
-| Clarify the idea     | `/wen-grilling`                                              | ✅        |
-| Write the contract   | `/wen-contract`, `contract-lint.mjs`                         | ✅        |
-| Review the contract  | `/wen-contract-review`                                       | ✅        |
-| Find the contract    | `plan.mjs`                                                   | ✅        |
-| Implement            | `/wen-implement`, `/wen-tdd`                                 | ✅        |
-| Self-check           | `/wen-self-check`, `gate-changes.mjs`, `self-check-lint.mjs` | ✅        |
-| Code review          | `/wen-code-review`, `review-context.mjs`                     | ✅        |
-| Drift and patterns   | `/wen-drift`, `review-threads.mjs`, `patterns.mjs`           | PR 3      |
-| Orchestration and CI | `/wen-ship`, `status.mjs`, `check.mjs`                       | PR 4      |
-| Automatic promotion  | `/wen-drift`                                                 | PR 5      |
+| Step                 | Skill / script                                                       | Available |
+| -------------------- | -------------------------------------------------------------------- | --------- |
+| Clarify the idea     | `/wen-grilling`                                                      | ✅        |
+| Write the contract   | `/wen-contract`, `contract-lint.mjs`                                 | ✅        |
+| Review the contract  | `/wen-contract-review`                                               | ✅        |
+| Find the contract    | `plan.mjs`                                                           | ✅        |
+| Implement            | `/wen-implement`, `/wen-tdd`                                         | ✅        |
+| Self-check           | `/wen-self-check`, `gate-changes.mjs`, `self-check-lint.mjs`         | ✅        |
+| Code review          | `/wen-code-review`, `review-context.mjs`                             | ✅        |
+| Drift and patterns   | `/wen-drift`, `review-threads.mjs`, `patterns.mjs`, `drift-lint.mjs` | ✅        |
+| Orchestration and CI | `/wen-ship`, `status.mjs`, `check.mjs`                               | PR 4      |
+| Automatic promotion  | `/wen-drift`                                                         | PR 5      |
 
 Until a step exists, do it by hand the way the design describes, or skip it.
 
@@ -52,6 +52,27 @@ A contract lives at `docs/plans/<YYYY-MM-DD>-<slug>/contract.md`, created from [
 
 `node scripts/agent-workflow/self-check-lint.mjs` checks it: every criterion present with a known status, evidence for `met`, `not met` or `partial` only when an amendment covers the criterion, and every kept gate change justified. `not verified` is a warning, not a failure.
 
+## Drift
+
+`/wen-drift` writes `docs/plans/<folder>/drift.md` from [`docs/plans/_template/drift.md`](./plans/_template/drift.md) as the last step before merge:
+
+- Frontmatter: `pr` (the PR number) and `path` (`full` or `small`).
+- `## Contract` (full path only): one row per criterion with its drift result, plus a pattern slug for every result other than `delivered` and `amended`.
+- `## Added`, `## Corrections`, `## Self-caught`, `## Friction`: one bullet per item, each ending in `` → `slug` ``.
+- In small-path drift only `## Corrections` has entries, and the file is written only when review threads led to changes.
+- Each entry is a single line.
+
+`review-threads.mjs` collects the corrections, `drift-lint.mjs` checks the file, and `patterns.mjs` counts the patterns.
+
+## Replying to review threads
+
+Agents reply under the human's GitHub account, so every agent reply starts with `🤖 wen-ship:`.
+
+- Fixed: reply `🤖 wen-ship: fixed in <short sha>` and resolve the thread.
+- Declined: reply `🤖 wen-ship: <reason>` and leave the thread open for the human.
+
+`review-threads.mjs` counts a thread as a correction when it has a `fixed in` reply or GitHub marks it outdated.
+
 ## Vocabulary
 
 **Criterion status** (self-check): `met` (evidence on this branch, checked in this run) · `partial` · `not met` · `not verified`.
@@ -83,7 +104,10 @@ One-line description.
 - Counting is by **distinct PRs** whose `drift.md` cites the slug, not by occurrences.
 - Promotion threshold: `target: lint` → 2 PRs, `target: prose` → 3 PRs. The human can promote any time.
 - Promotion target, highest that fits: lint/type rule → `AGENTS.md` line → ADR → plan template or self-check checklist. Promotions land as their own `chore(harness): promote <slug>` PR.
-- Self-check and code review check against `watching` patterns and `promoted` patterns whose `promoted-to` is prose. Lint-promoted and `rejected` patterns are skipped.
+- Self-check and code review check against `watching` patterns, and against `promoted` patterns whose `promoted-to` is a Markdown file. Lint-promoted and `rejected` patterns are skipped.
+- `patterns.mjs` validates every pattern file: `slug` is kebab-case and matches the file name; `target` is `lint` or `prose`; `status` is `watching`, `promoted` or `rejected` (lowercase); a promoted pattern's `promoted-to` names an existing file; a rejected pattern has a `rejected-reason`; and there's a description below the frontmatter.
+- Promotion is by hand for now: `/wen-drift` reports due patterns, and `/wen-drift promote <slug>` opens the PR.
+- To drop a pattern for good, `/wen-drift reject <slug> "<reason>"` sets `status: rejected` with the reason in its own PR. Closing a promotion PR unmerged also stops the pattern being proposed again.
 
 ## Skills and scripts
 

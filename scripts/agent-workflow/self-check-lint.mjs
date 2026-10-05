@@ -3,8 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 import { findGateChanges } from "./gate-changes.mjs";
-import { isMain, readFlag } from "./lib/cli.mjs";
-import { parseContract } from "./lib/contract.mjs";
+import { readFlag, runCli } from "./lib/cli.mjs";
+import { amendedCriteria, parseContract } from "./lib/contract.mjs";
 import { repoRoot } from "./lib/git.mjs";
 import { CRITERION_STATUSES, parseSelfCheck } from "./lib/self-check.mjs";
 import { findPlan } from "./plan.mjs";
@@ -28,6 +28,10 @@ export function lintSelfCheck({ selfCheck, contract, gateChanges }) {
   const problems = [];
   /** @type {string[]} */
   const warnings = [];
+
+  for (const { section, line } of report.unreadable) {
+    problems.push(`Could not read this line under ## ${section}: "${line}"`);
+  }
 
   /** @type {Map<string, import("./lib/self-check.mjs").CriterionRow>} */
   const rows = new Map();
@@ -72,52 +76,31 @@ export function lintSelfCheck({ selfCheck, contract, gateChanges }) {
 }
 
 /**
- * Criterion IDs named by amendment entries (`- YYYY-MM-DD — AC-n: …`; an en
- * dash or hyphen is accepted in place of the em dash).
- *
- * @param {string} section
- */
-function amendedCriteria(section) {
-  /** @type {Set<string>} */
-  const ids = new Set();
-  for (const match of section.matchAll(/^- \d{4}-\d{2}-\d{2} [—–-] (AC-\d+):/gm)) {
-    if (match[1] !== undefined) ids.add(match[1]);
-  }
-  return ids;
-}
-
-/**
  * @param {string[]} args
  * @returns {number} exit code
  */
 function main(args) {
-  try {
-    const base = readFlag(args, "base");
-    const plan = findPlan({ base });
-    const root = repoRoot(process.cwd());
-    const relative = `${plan.folder}/self-check.md`;
-    if (!existsSync(join(root, relative))) {
-      process.stderr.write(`${relative} does not exist. Run /wen-self-check.\n`);
-      return 1;
-    }
-    const { problems, warnings } = lintSelfCheck({
-      selfCheck: readFileSync(join(root, relative), "utf8"),
-      contract: readFileSync(join(root, plan.contractPath), "utf8"),
-      gateChanges: findGateChanges({ base }),
-    });
-    const warningLines = warnings.map(warning => `warning: ${warning}\n`).join("");
-    if (problems.length > 0) {
-      process.stderr.write(
-        `${relative}:\n${problems.map(problem => `- ${problem}`).join("\n")}\n${warningLines}`,
-      );
-      return 1;
-    }
-    process.stdout.write(`${relative}: ok\n${warningLines}`);
-    return 0;
-  } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+  const base = readFlag(args, "base");
+  const plan = findPlan({ base });
+  const root = repoRoot(process.cwd());
+  const relative = `${plan.folder}/self-check.md`;
+  if (!existsSync(join(root, relative))) {
+    process.stderr.write(`${relative} does not exist. Run /wen-self-check.\n`);
     return 1;
   }
+  const { problems, warnings } = lintSelfCheck({
+    selfCheck: readFileSync(join(root, relative), "utf8"),
+    contract: readFileSync(join(root, plan.contractPath), "utf8"),
+    gateChanges: findGateChanges({ base }),
+  });
+  const warningLines = warnings.map(warning => `warning: ${warning}\n`).join("");
+  if (problems.length > 0) {
+    process.stderr.write(`${relative}:\n${problems.map(problem => `- ${problem}`).join("\n")}\n`);
+    process.stdout.write(warningLines);
+    return 1;
+  }
+  process.stdout.write(`${relative}: ok\n${warningLines}`);
+  return 0;
 }
 
-if (isMain(import.meta.url)) process.exitCode = main(process.argv.slice(2));
+runCli(import.meta.url, main);

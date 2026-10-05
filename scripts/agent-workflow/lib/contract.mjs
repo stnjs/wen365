@@ -1,5 +1,6 @@
 // @ts-check
 import { parseFrontmatter } from "./frontmatter.mjs";
+import { visibleText } from "./markdown.mjs";
 
 export const CONTRACT_TYPES = ["feat", "fix", "refactor"];
 export const CONTRACT_STATUSES = ["draft", "approved"];
@@ -35,7 +36,7 @@ export function parseContract(text) {
     frontmatter: parsed ? parsed.data : null,
     sections,
     criteria: parseCriteria(sections.get("Acceptance criteria") ?? ""),
-    hasAmendments: stripComments(sections.get("Amendments") ?? "") !== "",
+    hasAmendments: visibleText(sections.get("Amendments") ?? "").trim() !== "",
   };
 }
 
@@ -110,25 +111,16 @@ export function parseCriteria(section) {
 }
 
 /**
- * The visible text of a Markdown snippet: everything outside `<!-- … -->`.
- * An unclosed comment hides the rest, as it does when rendered. Used only to
- * decide whether a section is empty; the result is never rendered.
+ * Criterion IDs named by amendment entries (`- YYYY-MM-DD — AC-n: …`; an en
+ * dash or hyphen is accepted in place of the em dash).
  *
- * @param {string} text
+ * @param {string} section
  */
-function stripComments(text) {
-  let visible = "";
-  let index = 0;
-  while (index < text.length) {
-    const open = text.indexOf("<!--", index);
-    if (open === -1) {
-      visible += text.slice(index);
-      break;
-    }
-    visible += text.slice(index, open);
-    const close = text.indexOf("-->", open + 4);
-    if (close === -1) break;
-    index = close + 3;
+export function amendedCriteria(section) {
+  /** @type {Set<string>} */
+  const ids = new Set();
+  for (const match of section.matchAll(/^- \d{4}-\d{2}-\d{2} [—–-] (AC-\d+):/gm)) {
+    if (match[1] !== undefined) ids.add(match[1]);
   }
-  return visible.trim();
+  return ids;
 }

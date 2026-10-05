@@ -1,7 +1,7 @@
 # Agent workflow: self-check, drift and pattern promotion
 
 - **Date:** 2026-10-04
-- **Status:** approved; PR 1 merged (#29), PR 2 in progress
+- **Status:** approved; PRs 1–2 merged (#29, #30), PR 3 in progress
 - **PR type:** `chore(harness)` (small path: this work creates the gate, so it cannot pass its own full-path checks)
 
 This is the first plan folder in the repo. It holds a design doc rather than a `contract.md` because the contract template is one of the things this work creates.
@@ -82,6 +82,7 @@ docs/agent-workflow.md                single source for the workflow, the drift 
 docs/plans/
   _template/contract.md
   _template/self-check.md
+  _template/drift.md
   YYYY-MM-DD-<slug>/                  one folder per piece of work
     contract.md                       full path only
     self-check.md                     full path only
@@ -91,9 +92,9 @@ docs/patterns/
   <slug>.md                           one file per pattern
 
 scripts/agent-workflow/
-  plan.mjs  review-context.mjs  gate-changes.mjs  contract-lint.mjs  self-check-lint.mjs
+  plan.mjs  review-context.mjs  gate-changes.mjs  contract-lint.mjs  self-check-lint.mjs  drift-lint.mjs
   review-threads.mjs  pr-body.mjs  patterns.mjs  status.mjs  check.mjs
-  lib/                                shared helpers (frontmatter, git, gh)
+  lib/                                shared helpers (frontmatter, markdown, git, cli, contract, self-check, pattern, drift)
 
 .github/workflows/agent-workflow.yml  the CI gate
 test/unit/agent-workflow/             script tests
@@ -345,7 +346,7 @@ Built as five PRs, each usable on its own and each titled `chore(harness): …` 
 | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------ |
 | 1   | `docs/agent-workflow.md`, `docs/plans/_template/contract.md`, `docs/patterns/` with `redundant-ref-annotation`, `scripts/agent-workflow/lib/`, `plan.mjs`, `contract-lint.mjs`, `wen-contract`, `wen-contract-review`, `wen-grilling`, root `AGENTS.md` changes | Write, lint and review contracts                    | AC-2, AC-5; part of AC-1, AC-3 |
 | 2   | `gate-changes.mjs`, `review-context.mjs`, `self-check-lint.mjs`, `docs/plans/_template/self-check.md`, `wen-implement`, `wen-tdd`, `wen-self-check`, `wen-code-review`                                                                                          | Implement, self-check and review against a contract | part of AC-1, AC-3             |
-| 3   | `review-threads.mjs`, `patterns.mjs`, `wen-drift` with manual `promote` / `reject`                                                                                                                                                                              | Drift is logged and counted; promotion by hand      | part of AC-1, AC-3             |
+| 3   | `review-threads.mjs`, `patterns.mjs`, `drift-lint.mjs`, `docs/plans/_template/drift.md`, pattern file validation, `wen-drift` with manual `promote` / `reject`                                                                                                  | Drift is logged and counted; promotion by hand      | part of AC-1, AC-3             |
 | 4   | `status.mjs`, `pr-body.mjs`, `wen-ship`, `check.mjs`, `.github/workflows/agent-workflow.yml`, `pnpm agent-workflow:check`                                                                                                                                       | Full orchestrated loop, enforced in CI              | rest of AC-1, AC-3; AC-4       |
 | 5   | Automatic promotion PRs from `wen-drift` (section 5.9 "Promote" for due slugs)                                                                                                                                                                                  | Promotion without remembering                       | —                              |
 
@@ -381,4 +382,6 @@ Every PR must satisfy AC-6. PR 5 starts only after a few real drift runs show th
 | Delivery                        | Five PRs; automatic promotion last, after real drift data                                                  |
 | wen-tdd                         | Loop rules only; no copy of generic tests.md/mocking.md                                                    |
 | Self-check validation           | `self-check-lint.mjs` in PR 2; PR 4's `check.mjs` reuses it                                                |
+| Drift validation                | `drift-lint.mjs` in PR 3; PR 4's `check.mjs` reuses it                                                     |
+| Pattern files                   | Validated by `patterns.mjs`; malformed values are errors, not silent skips                                 |
 | Commit authority                | Agents commit and push freely on feature branches; `main` is protected by the ruleset                      |

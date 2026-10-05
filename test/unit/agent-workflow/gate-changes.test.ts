@@ -200,6 +200,16 @@ describe("findGateChanges", () => {
 
     expect(findGateChanges({ cwd: repo.dir })).toEqual([]);
   });
+
+  it("fails with a readable reason when package.json is not valid JSON", () => {
+    repo.baseline({ "package.json": "{ not json" });
+    repo.write("app/a.ts", "export const a = 1;\n");
+    repo.commit("feat: a");
+
+    expect(() => findGateChanges({ cwd: repo.dir })).toThrow(
+      /^package\.json at [0-9a-f]+ is not valid JSON: /,
+    );
+  });
 });
 
 describe("gate-changes CLI", () => {

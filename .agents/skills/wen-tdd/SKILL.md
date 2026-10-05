@@ -18,4 +18,4 @@ A seam is the public boundary a test observes behaviour through. On the full pat
 - **Red before green.** Write the failing test, run it, and read the failure: it must fail because the behaviour is missing, not because of a typo or an import error. Then write only enough code to pass.
 - **One slice at a time.** One seam, one test, one minimal implementation per cycle. Never write all the tests first.
 - **Expected values come from outside the code:** a literal, a worked example, the contract. Never compute the expected value the way the code does.
-- **Refactoring is not part of the loop.** It happens after `/wen-code-review`, with the tests green.
+- **Refactoring is not part of the red → green cycle.** Tidy up once the criterion is green, keeping the tests green.

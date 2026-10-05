@@ -142,6 +142,30 @@ describe("lintSelfCheck", () => {
 
     expect(lintSelfCheck({ selfCheck, contract, gateChanges: [change] }).problems).toEqual([]);
   });
+
+  it("names a criteria row it cannot read", () => {
+    const selfCheck = makeSelfCheck({
+      rows: [makeRow("AC-1"), "| ac-2 | met | x |", makeRow("AC-3")],
+    });
+
+    expect(lintSelfCheck({ selfCheck, contract, gateChanges: [] }).problems).toEqual([
+      'Could not read this line under ## Criteria: "| ac-2 | met | x |"',
+      "AC-2 is missing from ## Criteria.",
+    ]);
+  });
+
+  it("names a gate entry it cannot read", () => {
+    const selfCheck = makeSelfCheck({
+      gateChanges: [
+        '- test/unit/wallet.test.ts · test-skip · `it.skip("adds a Wallet", () => {});` — justified: flaky',
+      ],
+    });
+
+    expect(lintSelfCheck({ selfCheck, contract, gateChanges: [skip] }).problems).toEqual([
+      'Could not read this line under ## Gate changes: "- test/unit/wallet.test.ts · test-skip · `it.skip("adds a Wallet", () => {});` — justified: flaky"',
+      'Gate change not justified under ## Gate changes: `test/unit/wallet.test.ts` · test-skip · it.skip("adds a Wallet", () => {});',
+    ]);
+  });
 });
 
 describe("self-check-lint CLI", () => {
@@ -195,5 +219,24 @@ describe("self-check-lint CLI", () => {
     expect(result.stdout).toBe(
       "docs/plans/2026-10-05-multiple-wallets/self-check.md: ok\nwarning: AC-3 is not verified: manual check pending.\n",
     );
+  });
+
+  it("prints warnings on stdout even when it fails", () => {
+    repo.write("test/unit/wallet.test.ts", "// @ts-nocheck\n");
+    repo.write(
+      "docs/plans/2026-10-05-multiple-wallets/self-check.md",
+      makeSelfCheck({
+        rows: [
+          makeRow("AC-1"),
+          makeRow("AC-2"),
+          makeRow("AC-3", "not verified", "manual check pending"),
+        ],
+      }),
+    );
+    repo.commit("test: wallet");
+    const result = spawnSync("node", [SCRIPT], { cwd: repo.dir, encoding: "utf8" });
+
+    expect(result.status).toBe(1);
+    expect(result.stdout).toBe("warning: AC-3 is not verified: manual check pending.\n");
   });
 });
