@@ -1,0 +1,61 @@
+name: Cleanup previews
+
+# Deletes a PR's Vercel preview deployments once the PR is merged or closed.
+# Production deployments are never touched; the Vercel retention policy prunes those.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  cleanup:
+    name: Delete preview deployments
+    # Fork PRs and PRs Dependabot closes itself run without repo secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_SCOPE: sons-projects-8d38a651
+      VERCEL_PROJECT: wen365
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+
+    steps:
+      - name: Delete preview deployments for this PR
+        run: |
+          set -euo pipefail
+
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret is not set"
+            exit 1
+          fi
+
+          vercel() { npx --yes vercel@62.2.0 "$@" --scope "$VERCEL_SCOPE" --token "$VERCEL_TOKEN"; }
+
+          deployments=$(vercel list "$VERCEL_PROJECT" --environment preview --meta "githubPrId=$PR_NUMBER" --limit 100 --format json)
+
+          if [ "$(jq -r '.pagination.next' <<<"$deployments")" != "null" ]; then
+            echo "::warning::PR #$PR_NUMBER has more than 100 preview deployments; only the newest 100 are deleted"
+          fi
+
+          # Re-check the server-side filters, and only pass full deployment URLs:
+          # `vercel remove` treats a bare name as a project and would delete all of it.
+          urls=$(jq -r --arg pr "$PR_NUMBER" --arg project "$VERCEL_PROJECT" '
+            .deployments[]
+            | select(.target != "production" and .meta.githubPrId == $pr)
+            | .url
+            | select(type == "string" and test("^" + $project + "-[a-z0-9]+-[a-z0-9-]+\\.vercel\\.app$"))
+          ' <<<"$deployments")
+
+          if [ -z "$urls" ]; then
+            echo "No preview deployments for PR #$PR_NUMBER"
+            exit 0
+          fi
+
+          echo "Deleting preview deployments for PR #$PR_NUMBER:"
+          echo "$urls"
+          # shellcheck disable=SC2086 # one URL per word
+          vercel remove $urls --yes
