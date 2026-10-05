@@ -18,9 +18,9 @@ const CODERABBIT_FOOTER = "<!-- This is an auto-generated reply by CodeRabbit --
  *   path: string,
  *   line: number | null,
  *   originalLine: number | null,
- *   comments: { nodes: ThreadComment[] },
+ *   comments: { nodes: ThreadComment[], pageInfo?: { hasNextPage: boolean } },
  * }} ReviewThread
- * @typedef {{ data: { repository: { pullRequest: { reviewThreads: { nodes: ReviewThread[] } } | null } } }} ThreadsResponse
+ * @typedef {{ data: { repository: { pullRequest: { reviewThreads: { nodes: ReviewThread[], pageInfo?: { hasNextPage: boolean } } } | null } } }} ThreadsResponse
  * @typedef {{
  *   author: string,
  *   file: string,
@@ -32,18 +32,19 @@ const CODERABBIT_FOOTER = "<!-- This is an auto-generated reply by CodeRabbit --
  * }} Correction
  */
 
-// Unpaginated: up to 100 threads and 50 comments per thread, enough for one PR here.
+// Up to 100 threads and 50 comments per thread; more fails rather than returning a partial list.
 const QUERY = `query($owner: String!, $name: String!, $number: Int!) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
       reviewThreads(first: 100) {
+        pageInfo { hasNextPage }
         nodes {
           isResolved
           isOutdated
           path
           line
           originalLine
-          comments(first: 50) { nodes { author { login } body } }
+          comments(first: 50) { pageInfo { hasNextPage } nodes { author { login } body } }
         }
       }
     }
@@ -62,9 +63,19 @@ const QUERY = `query($owner: String!, $name: String!, $number: Int!) {
 export function collectCorrections(response) {
   const pullRequest = response.data.repository.pullRequest;
   if (pullRequest === null) throw new Error("Pull request not found.");
+  if (pullRequest.reviewThreads.pageInfo?.hasNextPage) {
+    throw new Error(
+      "The PR has more than 100 review threads; review-threads.mjs does not page through them.",
+    );
+  }
   /** @type {Correction[]} */
   const corrections = [];
   for (const thread of pullRequest.reviewThreads.nodes) {
+    if (thread.comments.pageInfo?.hasNextPage) {
+      throw new Error(
+        `A thread on ${thread.path} has more than 50 comments; review-threads.mjs does not page through them.`,
+      );
+    }
     const [first, ...replies] = thread.comments.nodes;
     if (first === undefined || first.body.trimStart().startsWith(AGENT_PREFIX)) continue;
     const fixCommit =

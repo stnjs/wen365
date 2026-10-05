@@ -109,6 +109,8 @@ export function loadPatternInputs({ cwd = process.cwd(), base } = {}) {
   return { patterns, drifts, problems };
 }
 
+const PROMOTION_PR_LIMIT = 500;
+
 /** Titles of promotion PRs in any state. */
 function promotionTitles() {
   let output;
@@ -121,11 +123,11 @@ function promotionTitles() {
         "--state",
         "all",
         "--search",
-        "promote in:title",
+        'in:title "chore(harness): promote"',
         "--json",
         "title",
         "--limit",
-        "500",
+        String(PROMOTION_PR_LIMIT),
       ],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
     );
@@ -133,11 +135,22 @@ function promotionTitles() {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`gh failed (is it installed and authenticated?): ${detail}`);
   }
-  return titlesOf(JSON.parse(output));
+  return titlesOf(JSON.parse(output), PROMOTION_PR_LIMIT);
 }
 
-/** @param {Array<{ title: string }>} prs */
-function titlesOf(prs) {
+/**
+ * Titles of the listed PRs. A list that reached `limit` may be cut off, and a
+ * missing promotion PR would make its pattern due again, so that fails.
+ *
+ * @param {Array<{ title: string }>} prs
+ * @param {number} limit
+ */
+export function titlesOf(prs, limit) {
+  if (prs.length >= limit) {
+    throw new Error(
+      `The promotion-PR list reached the ${limit}-result limit and may be incomplete; raise PROMOTION_PR_LIMIT.`,
+    );
+  }
   return prs.map(pr => pr.title);
 }
 
@@ -151,7 +164,7 @@ function main(args) {
   const titles =
     injected === undefined
       ? promotionTitles()
-      : titlesOf(JSON.parse(readFileSync(injected, "utf8")));
+      : titlesOf(JSON.parse(readFileSync(injected, "utf8")), Number.POSITIVE_INFINITY);
   printJson({ ...countPatterns({ patterns, drifts, promotionTitles: titles }), problems });
   if (problems.length === 0) return 0;
   process.stderr.write(`${problems.map(problem => `- ${problem}`).join("\n")}\n`);

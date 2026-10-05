@@ -60,20 +60,20 @@ describe("lintPattern", () => {
 });
 
 describe("isCheckedByHand", () => {
-  it("covers watching patterns and patterns promoted into prose only", () => {
-    expect(isCheckedByHand(parsePattern(makePattern()))).toBe(true);
-    expect(
-      isCheckedByHand(
-        parsePattern(makePattern({ status: "promoted", promotedTo: "app/AGENTS.md" })),
-      ),
-    ).toBe(true);
-    expect(
-      isCheckedByHand(
-        parsePattern(makePattern({ status: "promoted", promotedTo: "eslint.config.mjs" })),
-      ),
-    ).toBe(false);
-    expect(
-      isCheckedByHand(parsePattern(makePattern({ status: "rejected", rejectedReason: "noise" }))),
-    ).toBe(false);
+  it.each([
+    ["a watching pattern", makePattern(), true],
+    [
+      "a pattern promoted into prose",
+      makePattern({ status: "promoted", promotedTo: "app/AGENTS.md" }),
+      true,
+    ],
+    [
+      "a pattern promoted into a lint rule",
+      makePattern({ status: "promoted", promotedTo: "eslint.config.mjs" }),
+      false,
+    ],
+    ["a rejected pattern", makePattern({ status: "rejected", rejectedReason: "noise" }), false],
+  ])("for %s returns %s", (_case, text, expected) => {
+    expect(isCheckedByHand(parsePattern(text))).toBe(expected);
   });
 });

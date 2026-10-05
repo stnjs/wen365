@@ -144,6 +144,30 @@ describe("collectCorrections", () => {
     expect(correction?.body).toBe("_🎯 Functional Correctness_\n\n**Rename `x`.**");
   });
 
+  it("fails instead of returning a partial list when the PR has more threads than were fetched", () => {
+    const paged = response(thread());
+    const threads = paged.data.repository.pullRequest.reviewThreads;
+
+    expect(() =>
+      collectCorrections({
+        data: {
+          repository: {
+            pullRequest: { reviewThreads: { ...threads, pageInfo: { hasNextPage: true } } },
+          },
+        },
+      }),
+    ).toThrow(/more than 100 review threads/);
+  });
+
+  it("fails instead of missing a reply when a thread has more comments than were fetched", () => {
+    const long = {
+      ...thread(),
+      comments: { ...thread().comments, pageInfo: { hasNextPage: true } },
+    };
+
+    expect(() => collectCorrections(response(long))).toThrow(/more than 50 comments/);
+  });
+
   it("fails clearly when the pull request is missing", () => {
     expect(() => collectCorrections({ data: { repository: { pullRequest: null } } })).toThrow(
       "Pull request not found.",

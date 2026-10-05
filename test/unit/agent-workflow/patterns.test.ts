@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { parsePattern } from "~~/scripts/agent-workflow/lib/pattern.mjs";
-import { countPatterns, loadPatternInputs } from "~~/scripts/agent-workflow/patterns.mjs";
+import { countPatterns, loadPatternInputs, titlesOf } from "~~/scripts/agent-workflow/patterns.mjs";
 import { makeDrift, makePattern } from "~~/test/factories/drift";
 import { makeGitRepo, type GitRepo } from "~~/test/factories/gitRepo";
 
@@ -89,6 +89,16 @@ describe("countPatterns", () => {
     });
 
     expect(result.unknownSlugs).toEqual(["formatting-churn"]);
+  });
+});
+
+describe("titlesOf", () => {
+  it("fails instead of using a promotion-PR list cut off at the limit", () => {
+    const full = Array.from({ length: 500 }, (_, n) => ({
+      title: `chore(harness): promote p${n}`,
+    }));
+
+    expect(() => titlesOf(full, 500)).toThrow(/reached the 500-result limit/);
   });
 });
 
