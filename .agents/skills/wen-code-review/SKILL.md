@@ -46,7 +46,7 @@ As the implementing agent:
 - Rerun the affected tests, then `pnpm lint` and `pnpm type-check`, and commit the fixes.
 - **Full path:** for each finding you fixed, append to `## Review fixes` in `self-check.md`:
   `` - [Standards|Spec] `file:line` <what was wrong> → `<slug>` `` (omit `` → `<slug>` `` if no pattern fits).
-  Update the criteria table if a fix changed the evidence. Set `reviewed:` to `git rev-parse --short HEAD`, run `node scripts/agent-workflow/self-check-lint.mjs`, and commit `docs(self-check): review fixes`.
+  Update the criteria table if a fix changed the evidence. Set `reviewed:` to `git rev-parse --short HEAD`: the last code commit, before the self-check commit that records it. Then run `node scripts/agent-workflow/self-check-lint.mjs`, and commit `docs(self-check): review fixes`.
 - **Small path:** fix and commit; nothing to log.
 
 ## Smell baseline
