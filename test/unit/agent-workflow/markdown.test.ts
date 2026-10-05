@@ -22,7 +22,7 @@ describe("removeBlocks", () => {
 });
 
 describe("criterionRows", () => {
-  it("returns AC rows as cells and skips header, separator and comments", () => {
+  it("returns only criterion rows, as cells", () => {
     const section =
       "<!-- AC-9 in a comment -->\n| AC | Status |\n| --- | --- |\n| AC-1 | met | a \\| b |";
 

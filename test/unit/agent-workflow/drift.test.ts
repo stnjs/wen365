@@ -7,7 +7,7 @@ const contract = makeContract({ status: "approved", approved: "2026-10-05" });
 const knownSlugs = new Set(["redundant-ref-annotation", "drive-by-refactor"]);
 
 describe("parseDrift", () => {
-  it("reads rows, entries and their slugs", () => {
+  it("parses contract rows plus entries with their slugs", () => {
     const report = parseDrift(
       makeDrift({
         rows: [
@@ -59,19 +59,54 @@ describe("lintDrift", () => {
     ]);
   });
 
-  it("requires a slug for a result that is not clean, and none for a clean one", () => {
+  it("requires a slug for a result that is not clean", () => {
+    const drift = makeDrift({
+      rows: [driftRow("AC-1", "dropped"), driftRow("AC-2"), driftRow("AC-3")],
+    });
+
+    expect(lintDrift({ drift, contract, knownSlugs })).toEqual([
+      "AC-1 is dropped and needs a pattern slug.",
+    ]);
+  });
+
+  it("rejects a slug on a clean result", () => {
     const drift = makeDrift({
       rows: [
-        driftRow("AC-1", "dropped"),
+        driftRow("AC-1"),
         driftRow("AC-2", "delivered", "drive-by-refactor"),
         driftRow("AC-3"),
       ],
     });
 
     expect(lintDrift({ drift, contract, knownSlugs })).toEqual([
-      "AC-1 is dropped and needs a pattern slug.",
       "AC-2 is delivered and takes no pattern slug.",
     ]);
+  });
+
+  it("rejects amended for a criterion no amendment names", () => {
+    const drift = makeDrift({
+      rows: [driftRow("AC-1", "amended"), driftRow("AC-2"), driftRow("AC-3")],
+    });
+
+    expect(lintDrift({ drift, contract, knownSlugs })).toEqual([
+      "AC-1 is amended, but no entry under ## Amendments names it.",
+    ]);
+  });
+
+  it("requires an amended criterion to be marked amended, not delivered", () => {
+    const amendedContract = makeContract({
+      status: "approved",
+      approved: "2026-10-06",
+      amendments: "- 2026-10-06 — AC-2: CSV export moved to a later contract — out of time",
+    });
+
+    expect(lintDrift({ drift: makeDrift(), contract: amendedContract, knownSlugs })).toEqual([
+      "AC-2 was changed by an amendment; mark it amended, or with a finding if even the amended version wasn't met.",
+    ]);
+    const marked = makeDrift({
+      rows: [driftRow("AC-1"), driftRow("AC-2", "amended"), driftRow("AC-3")],
+    });
+    expect(lintDrift({ drift: marked, contract: amendedContract, knownSlugs })).toEqual([]);
   });
 
   it("reports an unknown result", () => {
@@ -100,7 +135,7 @@ describe("lintDrift", () => {
     ]);
   });
 
-  it("accepts small-path drift with corrections only and no contract", () => {
+  it("accepts small-path drift that records only corrections, without a contract", () => {
     const drift = makeDrift({
       path: "small",
       rows: [],
@@ -118,11 +153,14 @@ describe("lintDrift", () => {
     ]);
   });
 
-  it("requires the PR number and a known path", () => {
-    expect(
-      lintDrift({ drift: makeDrift({ pr: "", path: "medium" }), contract, knownSlugs }),
-    ).toEqual([
+  it("requires the PR number", () => {
+    expect(lintDrift({ drift: makeDrift({ pr: "" }), contract, knownSlugs })).toEqual([
       "Frontmatter `pr` must be the pull request number.",
+    ]);
+  });
+
+  it("requires a known path", () => {
+    expect(lintDrift({ drift: makeDrift({ path: "medium" }), contract, knownSlugs })).toEqual([
       'Frontmatter `path` must be full or small; got "medium".',
     ]);
   });

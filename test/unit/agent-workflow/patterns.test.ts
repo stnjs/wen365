@@ -71,14 +71,23 @@ describe("countPatterns", () => {
     ).toEqual([]);
   });
 
-  it("ignores drift without a PR number and reports slugs that have no pattern file", () => {
+  it("ignores drift without a PR number", () => {
     const result = countPatterns({
       patterns: [lint],
-      drifts: [{ pr: null, slugs: ["redundant-ref-annotation"] }, cites(4, "formatting-churn")],
+      drifts: [{ pr: null, slugs: ["redundant-ref-annotation"] }],
       promotionTitles: [],
     });
 
     expect(result.counts[0]?.prs).toEqual([]);
+  });
+
+  it("reports cited slugs that have no pattern file", () => {
+    const result = countPatterns({
+      patterns: [lint],
+      drifts: [cites(4, "formatting-churn")],
+      promotionTitles: [],
+    });
+
     expect(result.unknownSlugs).toEqual(["formatting-churn"]);
   });
 });
@@ -92,7 +101,7 @@ describe("loadPatternInputs", () => {
     repo.remove();
   });
 
-  it("reads drift merged on main and the branch's own drift, but not the template", () => {
+  it("collects drift merged on main plus the branch's own, skipping the template", () => {
     repo.baseline({
       "docs/patterns/redundant-ref-annotation.md": makePattern(),
       "docs/plans/2026-10-01-old/drift.md": makeDrift({
@@ -130,7 +139,7 @@ describe("patterns CLI", () => {
     repo.remove();
   });
 
-  it("prints counts and due slugs using injected promotion PRs", () => {
+  it("prints the pattern report using injected promotion PRs", () => {
     repo.write("docs/patterns/redundant-ref-annotation.md", makePattern());
     repo.write(
       "docs/plans/2026-10-01-a/drift.md",

@@ -64,12 +64,18 @@ describe("collectCorrections", () => {
     ]);
   });
 
-  it("keeps an outdated thread without an agent reply and falls back to the original line", () => {
+  it("keeps an outdated thread without an agent reply", () => {
+    const [correction] = collectCorrections(response(thread({ isOutdated: true })));
+
+    expect(correction).toMatchObject({ outdated: true, fixCommit: null });
+  });
+
+  it("falls back to the original line when the thread has no current line", () => {
     const [correction] = collectCorrections(
       response(thread({ isOutdated: true, line: null, originalLine: 7 })),
     );
 
-    expect(correction).toMatchObject({ line: 7, outdated: true, fixCommit: null });
+    expect(correction?.line).toBe(7);
   });
 
   it("drops a thread resolved without a fix or a changed line", () => {
@@ -88,6 +94,21 @@ describe("collectCorrections", () => {
     expect(collectCorrections(response(declined))).toEqual([]);
   });
 
+  it("drops a thread the agent declined even after its lines changed", () => {
+    const declined = thread({
+      isOutdated: true,
+      comments: [
+        { author: "github-advanced-security", body: "Incomplete multi-character sanitization." },
+        {
+          author: "stnjs",
+          body: "🤖 wen-ship: not an injection risk; the text is never rendered.",
+        },
+      ],
+    });
+
+    expect(collectCorrections(response(declined))).toEqual([]);
+  });
+
   it("ignores threads the agent started itself", () => {
     expect(
       collectCorrections(
@@ -98,18 +119,29 @@ describe("collectCorrections", () => {
     ).toEqual([]);
   });
 
-  it("marks CodeRabbit nitpicks and strips its details blocks and comments", () => {
+  it("marks CodeRabbit nitpicks", () => {
+    const [correction] = collectCorrections(
+      response(
+        thread({
+          comments: [
+            { author: "coderabbitai", body: "_🧹 Nitpick_ | _🔵 Trivial_\n\nRename `x`." },
+            fixReply,
+          ],
+        }),
+      ),
+    );
+
+    expect(correction?.nitpick).toBe(true);
+  });
+
+  it("summarizes a comment without its details blocks or HTML comments", () => {
     const body =
-      "_🧹 Nitpick_ | _🔵 Trivial_\n\n**Rename `x`.**\n\n<details>\n<summary>Fix</summary>\n<details>inner</details>\nmore\n</details>\n<!-- fingerprint -->";
+      "_🎯 Functional Correctness_\n\n**Rename `x`.**\n\n<details>\n<summary>Fix</summary>\n<details>inner</details>\nmore\n</details>\n<!-- fingerprint -->";
     const [correction] = collectCorrections(
       response(thread({ comments: [{ author: "coderabbitai", body }, fixReply] })),
     );
 
-    expect(correction).toMatchObject({
-      author: "coderabbitai",
-      nitpick: true,
-      body: "_🧹 Nitpick_ | _🔵 Trivial_\n\n**Rename `x`.**",
-    });
+    expect(correction?.body).toBe("_🎯 Functional Correctness_\n\n**Rename `x`.**");
   });
 
   it("fails clearly when the pull request is missing", () => {
@@ -120,7 +152,7 @@ describe("collectCorrections", () => {
 });
 
 describe("review-threads CLI", () => {
-  it("reads injected GraphQL JSON and prints the corrections", () => {
+  it("prints the corrections from injected GraphQL JSON", () => {
     const dir = mkdtempSync(join(tmpdir(), "wen-review-threads-"));
     const input = join(dir, "threads.json");
     writeFileSync(input, JSON.stringify(response(thread({ isOutdated: true }))));

@@ -53,7 +53,8 @@ const QUERY = `query($owner: String!, $name: String!, $number: Int!) {
 /**
  * Review threads that led to a change: the agent replied "fixed in <sha>", or
  * GitHub marks the thread outdated because the commented lines changed.
- * Threads with neither, and threads the agent started, are dropped.
+ * Threads with neither, threads the agent declined, and threads the agent
+ * started are dropped.
  *
  * @param {ThreadsResponse} response `gh api graphql` output
  * @returns {Correction[]}
@@ -69,7 +70,11 @@ export function collectCorrections(response) {
     const fixCommit =
       replies.map(reply => FIX_REPLY.exec(reply.body.trim())?.[1]).find(sha => sha !== undefined) ??
       null;
-    if (fixCommit === null && !thread.isOutdated) continue;
+    // Any other agent reply is a decline: the human gets the thread back, so it isn't a correction
+    // even if later commits made it outdated.
+    const declined =
+      fixCommit === null && replies.some(reply => reply.body.trimStart().startsWith(AGENT_PREFIX));
+    if (declined || (fixCommit === null && !thread.isOutdated)) continue;
     const author = first.author?.login ?? "ghost";
     corrections.push({
       author,

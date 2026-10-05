@@ -107,6 +107,7 @@ One-line description.
 - Self-check and code review check against `watching` patterns, and against `promoted` patterns whose `promoted-to` is a Markdown file. Lint-promoted and `rejected` patterns are skipped.
 - `patterns.mjs` validates every pattern file: `slug` is kebab-case and matches the file name; `target` is `lint` or `prose`; `status` is `watching`, `promoted` or `rejected` (lowercase); a promoted pattern's `promoted-to` names an existing file; a rejected pattern has a `rejected-reason`; and there's a description below the frontmatter.
 - Promotion is by hand for now: `/wen-drift` reports due patterns, and `/wen-drift promote <slug>` opens the PR.
+- To drop a pattern for good, `/wen-drift reject <slug> "<reason>"` sets `status: rejected` with the reason in its own PR. Closing a promotion PR unmerged also stops the pattern being proposed again.
 
 ## Skills and scripts
 

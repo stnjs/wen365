@@ -1,5 +1,5 @@
 // @ts-check
-import { parseContract, splitSections } from "./contract.mjs";
+import { amendedCriteria, parseContract, splitSections } from "./contract.mjs";
 import { parseFrontmatter } from "./frontmatter.mjs";
 import { criterionRows, unwrapCode, visibleText } from "./markdown.mjs";
 
@@ -107,13 +107,16 @@ export function lintDrift({ drift, contract, knownSlugs }) {
 
   if (report.path === "full") {
     if (contract === null) problems.push("Full-path drift needs the contract in the same folder.");
-    else
+    else {
+      const parsed = parseContract(contract);
       problems.push(
         ...contractProblems(
           report.rows,
-          parseContract(contract).criteria.map(c => c.id),
+          parsed.criteria.map(criterion => criterion.id),
+          amendedCriteria(parsed.sections.get("Amendments") ?? ""),
         ),
       );
+    }
   }
   if (report.path === "small") {
     if (report.rows.length > 0) problems.push("Small-path drift has no ## Contract rows.");
@@ -146,8 +149,9 @@ export function lintDrift({ drift, contract, knownSlugs }) {
 /**
  * @param {DriftRow[]} rows
  * @param {string[]} criterionIds
+ * @param {Set<string>} amended criteria named under ## Amendments
  */
-function contractProblems(rows, criterionIds) {
+function contractProblems(rows, criterionIds, amended) {
   /** @type {string[]} */
   const problems = [];
   /** @type {Map<string, DriftRow>} */
@@ -165,6 +169,12 @@ function contractProblems(rows, criterionIds) {
     } else if (!DRIFT_RESULTS.includes(row.result)) {
       problems.push(
         `${id} result must be one of ${DRIFT_RESULTS.join(", ")}; got "${row.result}".`,
+      );
+    } else if (row.result === "amended" && !amended.has(id)) {
+      problems.push(`${id} is amended, but no entry under ## Amendments names it.`);
+    } else if (row.result === "delivered" && amended.has(id)) {
+      problems.push(
+        `${id} was changed by an amendment; mark it amended, or with a finding if even the amended version wasn't met.`,
       );
     } else if (CLEAN_RESULTS.includes(row.result) && row.slug !== "") {
       problems.push(`${id} is ${row.result} and takes no pattern slug.`);
