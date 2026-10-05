@@ -3,9 +3,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import process from "node:process";
 import { printJson, readFlag, runCli } from "./lib/cli.mjs";
-import { parseFrontmatter } from "./lib/frontmatter.mjs";
 import { git, lines, nulFields, repoRoot, resolveBase } from "./lib/git.mjs";
 import { listMarkdown } from "./lib/markdown.mjs";
+import { isCheckedByHand, parsePattern } from "./lib/pattern.mjs";
 import { NoContractError, findPlan } from "./plan.mjs";
 
 /**
@@ -80,11 +80,9 @@ function agentsFilesFor(root, files) {
  * @param {string} root
  */
 function patternsToCheck(root) {
-  return listMarkdown(root, "docs/patterns").filter(path => {
-    const data = parseFrontmatter(readFileSync(join(root, path), "utf8"))?.data ?? {};
-    if (data.status === "watching") return true;
-    return data.status === "promoted" && (data["promoted-to"] ?? "").endsWith(".md");
-  });
+  return listMarkdown(root, "docs/patterns").filter(path =>
+    isCheckedByHand(parsePattern(readFileSync(join(root, path), "utf8"))),
+  );
 }
 
 /**
