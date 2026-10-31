@@ -40,7 +40,7 @@
     "viem": "^2.48.11",
     "vue": "^3.5.34",
     "wagmi": "^2.19.5",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@nuxt/devtools": "^3.4.2",
